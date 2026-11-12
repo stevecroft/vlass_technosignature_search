@@ -5,7 +5,7 @@
 \input{numbers}
 
 \shorttitle{A wideband VLASS technosignature search}
-\shortauthors{TODO}
+\shortauthors{Croft}
 \submitjournal{AJ}
 \graphicspath{{figures/}}
 
@@ -20,7 +20,6 @@
 
 \title{A Wideband Technosignature Search of \NSample\ Nearby Main-sequence Stars with the VLA Sky Survey}
 
-%% TODO: authors, ORCIDs and affiliations
 \author[orcid=0000-0003-4823-129X, sname='Croft']{Steve Croft} 
 \affiliation{\BLOxford}
 \affiliation{\BLBerkeley}
@@ -32,8 +31,8 @@
 Searches for radio technosignatures have concentrated on narrowband signals, which are easy to distinguish from natural emission but are only one of many ways a transmitter might radiate. We present a complementary search for excess broadband 2--4\,GHz continuum emission from \NSample\ Gaia DR3 main-sequence stars within 100\,pc, using Epoch~1 of the VLA Sky Survey (VLASS). After propagating each star to the epoch of its VLASS image and calibrating chance alignments with sky-offset catalogs, we find \NSecure\ secure stellar associations (\NFalseSecure\ expected by chance). All but one are explained by known natural emitters---mainly active binaries, flare stars, and X-ray-bright coronae---and the remaining source, near the high-proper-motion M dwarf LSPM~J1943+5337, is shown by multi-epoch VLASS astrometry to be a background source that stays fixed while the star moves. No unexplained detection remains. We place 95\% upper limits on steady 2--4\,GHz emission from every star (median $\Lnu<\LlimMed\,\WHz$; $\Lnu<\BarnardL\,\WHz$ for Barnard's star) and on the fraction of stars hosting a transmitter: $f<\FpopNine$ above $10^9\,\WHz$ and $f<\FpopSeven$ above $10^7\,\WHz$. Stacking \NStackStars\ cutouts in distance shells reveals sub-threshold natural emission from M dwarfs (\StackMS$\pm$\StackMSerr\,$\mu$Jy at 20--40\,pc) but none from FGK stars, and constrains the product of transmitter fraction and power to transmitters 4--6 times fainter than individual non-detections, reaching $f<1$ at $\Lnu\approx\ReachM\,\WHz$ (EIRP $\approx\ReachEIRP$\,W across 2\,GHz). Continuum surveys are $\sim\BLratio$ times less sensitive than targeted narrowband searches to narrow lines, but constrain broadband, modulated, or rapidly drifting signals that narrowband pipelines do not detect.
 \end{abstract}
 
-%% TODO: confirm UAT concept IDs before submission
-\keywords{\uat{Technosignatures}{2128} --- \uat{Search for extraterrestrial intelligence}{2127} --- \uat{Radio continuum emission}{1340} --- \uat{Stellar radio emission}{1868} --- \uat{Sky surveys}{1464}}
+%% UAT concept IDs checked against UAT_list.json (astrothesaurus/UAT, v6.0.0)
+\keywords{\uat{Technosignatures}{2128} --- \uat{Search for extraterrestrial intelligence}{2127} --- \uat{Radio continuum emission}{1340} --- \uat{Stellar activity}{1580} --- \uat{Main sequence stars}{1000} --- \uat{Sky surveys}{1464}}
 
 \section{Introduction} \label{sec:intro}
 
@@ -156,8 +155,9 @@ The National Radio Astronomy Observatory is a facility of the National Science F
 Analysis code and an initial draft of this manuscript were prepared with assistance from an AI system (Claude Opus 5.5, Anthropic); all results were verified by the author.
 \end{acknowledgments}
 
-%% TODO: confirm facility keywords against the AAS list
-\facilities{VLA, Gaia, ROSAT, SRG(eROSITA), PS1, CADC}
+%% Facility keywords from the AAS list (journals.aas.org/facility-keywords). PO:1.2m = Samuel Oschin Schmidt (POSS-I/II plates, via DSS);
+%% MAST served the DSS and PS1 data. CADC (VLASS images) is acknowledged in the text; add it here if it appears in the AAS list.
+\facilities{VLA, Gaia, ROSAT, eROSITA, PS1, PO:1.2m, MAST}
 
 \software{Astropy \citep{Astropy2013,Astropy2018,Astropy2022}, NumPy \citep{Harris2020}, SciPy \citep{Virtanen2020}, pandas \citep{McKinney2010}, Matplotlib \citep{Hunter2007}, PyVO \citep{Graham2014}}
 
