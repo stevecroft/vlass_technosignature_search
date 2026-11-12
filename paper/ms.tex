@@ -12,15 +12,21 @@
 \newcommand{\Lnu}{L_\nu}
 \newcommand{\WHz}{\mathrm{W\,Hz^{-1}}}
 
+\newcommand{\BLBerkeley}{Breakthrough Listen, University of California, Berkeley, 501 Campbell Hall \#3411, Berkeley, CA 94720, USA}
+\newcommand{\seti}{SETI Institute, 339 Bernardo Ave, Suite 200, Mountain View, CA 94043, USA}
+\newcommand{\BLOxford}{Breakthrough Listen, University of Oxford, Denys Wilkinson Building, Keble Road, Oxford OX1 3RH, UK}
+
 \begin{document}
 
 \title{A Wideband Technosignature Search of \NSample\ Nearby Main-sequence Stars with the VLA Sky Survey}
 
 %% TODO: authors, ORCIDs and affiliations
-\author[orcid=0000-0000-0000-0000]{TODO Author Name}
-\affiliation{TODO Institution}
-\email[show]{TODO@example.edu}
-\correspondingauthor{TODO Author Name}
+\author[orcid=0000-0003-4823-129X, sname='Croft']{Steve Croft} 
+\affiliation{\BLOxford}
+\affiliation{\BLBerkeley}
+\affiliation{\seti}
+\email[show]{scroft@berkeley.edu}
+\correspondingauthor{Steve Croft}
 
 \begin{abstract}
 Searches for radio technosignatures have concentrated on narrowband signals, which are easy to distinguish from natural emission but are only one of many ways a transmitter might radiate. We present a complementary search for excess broadband 2--4\,GHz continuum emission from \NSample\ Gaia DR3 main-sequence stars within 100\,pc, using Epoch~1 of the VLA Sky Survey (VLASS). After propagating each star to the epoch of its VLASS image and calibrating chance alignments with sky-offset catalogs, we find \NSecure\ secure stellar associations (\NFalseSecure\ expected by chance). All but one are explained by known natural emitters---mainly active binaries, flare stars, and X-ray-bright coronae---and the remaining source, near the high-proper-motion M dwarf LSPM~J1943+5337, is shown by multi-epoch VLASS astrometry to be a background source that stays fixed while the star moves. No unexplained detection remains. We place 95\% upper limits on steady 2--4\,GHz emission from every star (median $\Lnu<\LlimMed\,\WHz$; $\Lnu<\BarnardL\,\WHz$ for Barnard's star) and on the fraction of stars hosting a transmitter: $f<\FpopNine$ above $10^9\,\WHz$ and $f<\FpopSeven$ above $10^7\,\WHz$. Stacking \NStackStars\ cutouts in distance shells reveals sub-threshold natural emission from M dwarfs (\StackMS$\pm$\StackMSerr\,$\mu$Jy at 20--40\,pc) but none from FGK stars, and constrains the product of transmitter fraction and power to transmitters 4--6 times fainter than individual non-detections, reaching $f<1$ at $\Lnu\approx\ReachM\,\WHz$ (EIRP $\approx\ReachEIRP$\,W across 2\,GHz). Continuum surveys are $\sim\BLratio$ times less sensitive than targeted narrowband searches to narrow lines, but constrain broadband, modulated, or rapidly drifting signals that narrowband pipelines do not detect.
@@ -142,9 +148,12 @@ We searched \NSample\ main-sequence stars within 100\,pc for excess 2--4\,GHz co
 All code, the downloaded catalogs, the \NCutouts\ VLASS cutouts, and the derived tables and figures are available at Zenodo (TODO: DOI). Each script records the exact query used, and the package reproduces every number in this paper.
 
 \begin{acknowledgments}
-%% TODO: funding and personal acknowledgments.
-%% TODO (AAS policy): disclose use of AI tools, e.g. "Analysis code and an initial draft of this manuscript were prepared with assistance from an AI system (Claude, Anthropic); all results were verified by the authors."
+
+S.C. is supported by funding from Breakthrough Listen. The Breakthrough Prize Foundation funds the Breakthrough Initiatives, which manages Breakthrough Listen.
+
 The National Radio Astronomy Observatory is a facility of the National Science Foundation operated under cooperative agreement by Associated Universities, Inc. CIRADA is funded by a grant from the Canada Foundation for Innovation 2017 Innovation Fund (Project 35999), as well as by the Provinces of Ontario, British Columbia, Alberta, Manitoba and Quebec. This research used the facilities of the Canadian Astronomy Data Centre operated by the National Research Council of Canada with the support of the Canadian Space Agency. This work has made use of data from the European Space Agency (ESA) mission Gaia, processed by the Gaia Data Processing and Analysis Consortium (DPAC). Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the Gaia Multilateral Agreement. This research has made use of the SIMBAD database and the VizieR catalogue access tool, CDS, Strasbourg, France, accessed via the CfA mirrors. The Digitized Sky Surveys were produced at the Space Telescope Science Institute under U.S. Government grant NAG W-2166. The Pan-STARRS1 Surveys have been made possible through contributions by the institutions listed in \citet{Chambers2016}.
+
+Analysis code and an initial draft of this manuscript were prepared with assistance from an AI system (Claude Opus 5.5, Anthropic); all results were verified by the author.
 \end{acknowledgments}
 
 %% TODO: confirm facility keywords against the AAS list
