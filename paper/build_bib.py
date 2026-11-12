@@ -41,7 +41,7 @@ def finalize(text):
         "Astronomy and Astrophysics Supplement Series": r"\aaps", "Monthly Notices of the Royal Astronomical Society": r"\mnras",
         "Publications of the Astronomical Society of the Pacific": r"\pasp", "Annual Review of Astronomy and Astrophysics": r"\araa",
         "Nature": r"\nat", "Nature Astronomy": "NatAs", "Nature Methods": "NatMe", "Research Notes of the AAS": "RNAAS",
-        r"Computing in Science \& Engineering": "CSE"}
+        r"Computing in Science \& Engineering": "CSE", "Publications of the Astronomical Society of Australia": "PASA"}
     text = re.sub(r"journal=\{([^}]*)\}", lambda m: "journal={" + JOURNALS.get(m.group(1), m.group(1)) + "}", text)
     text = re.sub(r"\s*<sup>.*?</sup>", "", text)
     text = re.sub(r"(@inproceedings\{McKinney2010,) series=\{SciPy\},", r"\1", text)   # avoid "SciPy (SciPy)"
@@ -55,7 +55,11 @@ def finalize(text):
         return e
     text = "@".join(add_mnras_eid(e) if i else e for i, e in enumerate(text.split("@")))
     # CrossRef 'issued' is the online date; use the volume year where they differ
-    text = re.sub(r"(Garrett2022,.*?year=\{)2022(\})", r"\g<1>2023\2", text, count=1, flags=re.S)
+    for key, yr in {"Garrett2022": 2023, "Choza2024": 2024}.items():
+        text = re.sub(r"(" + key + r",[^@]*?year=\{)\d{4}(\})", r"\g<1>" + str(yr) + r"\2", text, count=1)
+    # article numbers CrossRef leaves out of the pages field
+    for key, eid in {"TremblayTingay2020": "e035"}.items():
+        text = re.sub(r"(" + key + r",[^@]*?year=\{\d{4}\})(?![^@]*pages=)", r"\1, pages={" + eid + "}", text, count=1)
     return texify(text)
 
 DOIS = {
@@ -63,7 +67,10 @@ DOIS = {
     "Isaacson2017": "10.1088/1538-3873/aa5800", "Tremblay2025": "10.3847/1538-3881/ad9ea5",
     "Painter2025": "10.3847/1538-3881/adbc5e", "Wlodarczyk2020": "10.1093/mnras/staa2672",
     "Garrett2022": "10.1093/mnras/stac2607",
-    "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378", "Wright2018": "10.3847/1538-3881/aae099",
+    "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378",
+    "Choza2024": "10.3847/1538-3881/acf576", "Harp2016": "10.3847/0004-6256/152/6/181", "Siemion2013": "10.1088/0004-637X/767/1/94",
+    "HorowitzSagan1993": "10.1086/173157", "GrayMooley2017": "10.3847/1538-3881/153/3/110",
+    "TremblayTingay2020": "10.1017/pasa.2020.27", "Uno2023": "10.1093/mnras/stad993", "Wright2018": "10.3847/1538-3881/aae099",
     "Tarter2001": "10.1146/annurev.astro.39.1.511", "Lacy2020": "10.1088/1538-3873/ab63eb",
     "Gordon2021": "10.3847/1538-4365/ac05c0", "Gordon2020": "10.3847/2515-5172/abbe23",
     "GaiaDR3": "10.1051/0004-6361/202243940", "GaiaMission": "10.1051/0004-6361/201629272",
@@ -84,6 +91,11 @@ MANUAL = r"""
   title = "{The Pan-STARRS1 Surveys}",
   journal = {arXiv e-prints}, year = 2016, eid = {arXiv:1612.05560},
   eprint = {1612.05560}, archivePrefix = {arXiv}, primaryClass = {astro-ph.IM}}
+@INPROCEEDINGS{Backus2004,
+  author = {{Backus}, P.~R. and {Project Phoenix Team}},
+  title = "{Project Phoenix}",
+  booktitle = {American Astronomical Society Meeting Abstracts \#204},
+  year = 2004, volume = {204}, pages = {75.04}}
 @ARTICLE{Mohan2015,
   author = {{Mohan}, Niruj and {Rafferty}, David},
   title = "{PyBDSF: Python Blob Detection and Source Finder}",

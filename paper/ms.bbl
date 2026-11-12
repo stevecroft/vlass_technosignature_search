@@ -67,6 +67,13 @@
   Community-oriented Open-source Project and the Latest Major Release (v5.0) of
   the Core Package},} \apj, 935, 167, \dodoi{10.3847/1538-4357/ac7c74}
 
+% type= inproceedings
+\bibitem[{P.~R. {Backus} {\&} {}{Project Phoenix Team}(2004){Backus} \&
+  {Project Phoenix Team}}]{Backus2004}
+{Backus}, P.~R., \& {Project Phoenix Team}. 2004, \bibinfo{title}{{Project
+  Phoenix},} in American Astronomical Society Meeting Abstracts \#204, Vol.
+  204, 75.04
+
 % type= article
 \bibitem[{R.~H. Becker {et~al.}(1995)Becker, White, \& Helfand}]{Becker1995}
 Becker, R.~H., White, R.~L., \& Helfand, D.~J. 1995, \bibinfo{title}{{The FIRST
@@ -94,6 +101,15 @@ Callingham, J.~R., Vedantham, H.~K., Shimwell, T.~W., {et~al.} 2021,
 {Chambers}, K.~C., {Magnier}, E.~A., {Metcalfe}, N., {et~al.} 2016,
   \bibinfo{title}{{The Pan-STARRS1 Surveys},} arXiv e-prints.
 \newblock \doarXiv{1612.05560}
+
+% type= article
+\bibitem[{C. Choza {et~al.}(2024)Choza, Bautista, Croft, Siemion, Brzycki,
+  Bhattaram, Czech, de~Pater, Gajjar, Isaacson, Lacker, Lacki, Lebofsky,
+  MacMahon, Price, Schoultz, Sheikh, Varghese, Morgan, Drew, \&
+  Worden}]{Choza2024}
+Choza, C., Bautista, D., Croft, S., {et~al.} 2024, \bibinfo{title}{{The
+  Breakthrough Listen Search for Intelligent Life: Technosignature Search of 97
+  Nearby Galaxies},} \aj, 167, 10, \dodoi{10.3847/1538-3881/acf576}
 
 % type= article
 \bibitem[{J.~J. Condon {et~al.}(1998)Condon, Cotton, Greisen, Yin, Perley,
@@ -391,9 +407,23 @@ Gordon, Y.~A., Boyce, M.~M., O'Dea, C.~P., {et~al.} 2021, \bibinfo{title}{{A
   Astrophysics Source Code Library, record ascl:1402.004
 
 % type= article
+\bibitem[{R.~H. Gray {\&} K. Mooley(2017)Gray \& Mooley}]{GrayMooley2017}
+Gray, R.~H., \& Mooley, K. 2017, \bibinfo{title}{{A VLA Search for Radio
+  Signals from M31 and M33},} \aj, 153, 110,
+  \dodoi{10.3847/1538-3881/153/3/110}
+
+% type= article
 \bibitem[{M. G{\"u}del {\&} A.~O. Benz(1993)G{\"u}del \& Benz}]{GudelBenz1993}
 G{\"u}del, M., \& Benz, A.~O. 1993, \bibinfo{title}{{X-ray/microwave relation
   of different types of active stars},} \apj, 405, L63, \dodoi{10.1086/186766}
+
+% type= article
+\bibitem[{G.~R. Harp {et~al.}(2016)Harp, Richards, Tarter, Dreher, Jordan,
+  Shostak, Smolek, Kilsdonk, Wilcox, Wimberly, Ross, Barott, Ackermann, \&
+  Blair}]{Harp2016}
+Harp, G.~R., Richards, J., Tarter, J.~C., {et~al.} 2016, \bibinfo{title}{{SETI
+  OBSERVATIONS OF EXOPLANETS WITH THE ALLEN TELESCOPE ARRAY},} \aj, 152, 181,
+  \dodoi{10.3847/0004-6256/152/6/181}
 
 % type= article
 \bibitem[{C.~R. Harris {et~al.}(2020)Harris, Millman, van~der Walt, Gommers,
@@ -409,6 +439,12 @@ Harris, C.~R., Millman, K.~J., van~der Walt, S.~J., {et~al.} 2020,
 Helfand, D.~J., White, R.~L., \& Becker, R.~H. 2015, \bibinfo{title}{{THE LAST
   OF FIRST : THE FINAL CATALOG AND SOURCE IDENTIFICATIONS},} \apj, 801, 26,
   \dodoi{10.1088/0004-637x/801/1/26}
+
+% type= article
+\bibitem[{P. Horowitz {\&} C. Sagan(1993)Horowitz \& Sagan}]{HorowitzSagan1993}
+Horowitz, P., \& Sagan, C. 1993, \bibinfo{title}{{Five years of Project META -
+  an all-sky narrow-band radio search for extraterrestrial signals},} \apj,
+  415, 218, \dodoi{10.1086/173157}
 
 % type= article
 \bibitem[{J.~D. Hunter(2007)Hunter}]{Hunter2007}
@@ -526,9 +562,24 @@ Saide, R.~C., Garrett, M.~A., \& Heeralall-Issur, N. 2023,
   \dodoi{10.1093/mnras/stad378}
 
 % type= article
+\bibitem[{A.~P.~V. Siemion {et~al.}(2013)Siemion, Demorest, Korpela, Maddalena,
+  Werthimer, Cobb, Howard, Langston, Lebofsky, Marcy, \& Tarter}]{Siemion2013}
+Siemion, A. P.~V., Demorest, P., Korpela, E., {et~al.} 2013, \bibinfo{title}{{A
+  1.1-1.9 GHz SETI SURVEY OF THE KEPLER FIELD. I. A SEARCH FOR NARROW-BAND
+  EMISSION FROM SELECT TARGETS},} \apj, 767, 94,
+  \dodoi{10.1088/0004-637x/767/1/94}
+
+% type= article
 \bibitem[{J. Tarter(2001)Tarter}]{Tarter2001}
 Tarter, J. 2001, \bibinfo{title}{{The Search for Extraterrestrial Intelligence
   (SETI)},} \araa, 39, 511, \dodoi{10.1146/annurev.astro.39.1.511}
+
+% type= article
+\bibitem[{C.~D. Tremblay {\&} S.~J. Tingay(2020)Tremblay \&
+  Tingay}]{TremblayTingay2020}
+Tremblay, C.~D., \& Tingay, S.~J. 2020, \bibinfo{title}{{A SETI survey of the
+  Vela region using the Murchison Widefield Array: Orders of magnitude
+  expansion in search space},} PASA, 37, e035, \dodoi{10.1017/pasa.2020.27}
 
 % type= article
 \bibitem[{C.~D. Tremblay {et~al.}(2025)Tremblay, Sofair, Steffes, Myburgh,
@@ -540,9 +591,16 @@ Tremblay, C.~D., Sofair, J., Steffes, L., {et~al.} 2025,
   \dodoi{10.3847/1538-3881/ad9ea5}
 
 % type= article
-\bibitem[{H.~K. Vedantham {et~al.}(2022)Vedantham, Callingham, Shimwell, Benz,
+\bibitem[{Y. Uno {et~al.}(2023)Uno, Hashimoto, Goto, Ho, Hsu, \&
+  Burns}]{Uno2023}
+Uno, Y., Hashimoto, T., Goto, T., {et~al.} 2023, \bibinfo{title}{{Upper limits
+  on transmitter rate of extragalactic civilizations placed by Breakthrough
+  Listen observations},} \mnras, 522, 4649, \dodoi{10.1093/mnras/stad993}
+
+% type= article
+\bibitem[{H.~K. Vedantham {et~al.}(2023)Vedantham, Callingham, Shimwell, Benz,
   Hajduk, Ray, Tasse, \& Drabent}]{Vedantham2022}
-Vedantham, H.~K., Callingham, J.~R., Shimwell, T.~W., {et~al.} 2022,
+Vedantham, H.~K., Callingham, J.~R., Shimwell, T.~W., {et~al.} 2023,
   \bibinfo{title}{{Peculiar Radio--X-Ray Relationship in Active Stars},} \apjl,
   926, L30, \dodoi{10.3847/2041-8213/ac5115}
 

@@ -15,6 +15,7 @@ python 07_classify_and_limits.py    # needs 05/06 outputs only for the LSPM J194
 python 10_stack.py                  # ~35 s; holds the 1.3 GB cutout array + float64 shell copies (interactive run peaked at ~17 GB)
 python 11_figures.py
 python 12_compare_breakthrough_listen.py
+python 13_transmitter_rate.py      # transmitter rate vs EIRP; literature points need external/seti_limits_py3 (see below)
 ```
 
 Re-fetching from the archives (only needed to rebuild `data/raw`):
@@ -45,6 +46,13 @@ Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 0
 | `aastex702.cls`, `aasjournalv7.1.bst` | Official AASTeX v7.0.2 files (unmodified; full distribution in `aastex_v702_dist/`). |
 | `aasjournalv7.1_patched.bst` | Copy of the AAS style with a single fix: the original leaves `next.extra = "b"` after the forward pass, which gives the last presorted reference a spurious "a" year suffix (e.g. "Ivezić et al. 2002a"). `ms.tex` uses this copy. |
 | `build.sh` | Local build (pdflatex → bibtex → pdflatex ×2). Overleaf does the same automatically. |
+
+### Literature points for the transmitter-rate figure
+
+`13_transmitter_rate.py` draws previous surveys with `seti_limits_py3`, the plotting code of B. Jacobson-Bell
+(forthcoming paper; Choza et al. 2024 correction applied). It is not redistributed here: place it in
+`external/seti_limits_py3/` (git-ignored) or point `SETI_LIMITS_DIR` at it. Without it, the script still writes
+`results/vlass_transmitter_rate_points.csv` and plots the VLASS curves alone.
 
 ### Large files
 

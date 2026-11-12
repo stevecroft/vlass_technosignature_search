@@ -16,3 +16,6 @@ paper/*.out
 paper/*.synctex.gz
 paper/*.fdb_latexmk
 paper/*.fls
+
+# Third-party plotting code (seti_limits_py3, from the forthcoming Jacobson-Bell et al. paper): not redistributed
+external/

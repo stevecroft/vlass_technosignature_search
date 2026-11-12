@@ -99,6 +99,8 @@ if __name__ == "__main__":
         i6 = np.argmin(np.abs(Lg - 1e6)); put(f"FStackSix{t}", f"{fv[f'f_UL95_stack_{t}'][i6]:.2f}")
     iB = np.argmin(np.abs(np.log(Lg) - np.log(4e5)))      # Garrett (2026) Type I leakage benchmark, L_nu ~ 4e5 W/Hz
     for t in ["FGK", "M"]: put(f"FBrat{t}", f"{fv[f'f_UL95_stack_{t}'][iB]:.2f}")
+    trp = pd.read_csv(os.path.join(RES, "vlass_transmitter_rate_points.csv"))          # from code/13_transmitter_rate.py
+    put("TRfloor", sci(trp[trp.kind == "individual"].transmitter_rate.min(), 1))
     put("ReachEIRP", sci(min(Lg[np.nanargmax(fv[f'f_UL95_stack_{t}'] < 1)] for t in ['FGK', 'M']) * 2e9))
     z = np.load(os.path.join(RAW, "vlass_ep1_ql_cutouts_41px.npz"), mmap_mode="r"); put("NCutouts", com(len(z["source_id"])))
 
@@ -189,7 +191,7 @@ if __name__ == "__main__":
 """)
     # figures
     for f in ["vlass_separation_histogram", "vlass_detections_cmd", "vlass_perstar_limits", "vlass_population_limit",
-              "vlass_technosig_summary", "vlass_ep1_stacking_summary", "lspm1943_archival_imaging", "lspm1943_vlass_multiepoch_astrometry"]:
+              "vlass_technosig_summary", "vlass_ep1_stacking_summary", "transmitter_rate_vs_eirp", "lspm1943_archival_imaging", "lspm1943_vlass_multiepoch_astrometry"]:
         for ext in ("pdf", "png"):
             src = os.path.join(RES, f"{f}.{ext}")
             if os.path.exists(src): shutil.copy(src, os.path.join(HERE, "figures", f"{f}.{ext}"))
