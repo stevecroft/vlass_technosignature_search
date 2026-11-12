@@ -1,0 +1,8 @@
+{
+ "sigma_sys_arcsec": 0.23125714115190477,
+ "N_true": 48.27526082224394,
+ "N_bg_pairs": 330.5,
+ "n_rel_gt_0p5": 50,
+ "n_rel_gt_0p9": 43,
+ "expected_false_rel_gt_0p5": 2.455397722585488
+}

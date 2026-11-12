@@ -1,0 +1,9 @@
+# LaTeX build products (Overleaf regenerates these)
+*.aux
+*.log
+*.blg
+*.out
+*.bbl.stale
+*.synctex.gz
+*.fdb_latexmk
+*.fls

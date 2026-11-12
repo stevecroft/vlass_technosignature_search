@@ -1,0 +1,576 @@
+\begin{thebibliography}{}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\href{#1}{#1}}
+\providecommand{\dodoi}[1]{doi:~\href{http://doi.org/#1}{\nolinkurl{#1}}}
+\providecommand{\doeprint}[1]{\href{http://ascl.net/#1}{\nolinkurl{http://ascl.net/#1}}}
+\providecommand{\doarXiv}[1]{\href{https://arxiv.org/abs/#1}{\nolinkurl{https://arxiv.org/abs/#1}}}
+
+% type= article
+\bibitem[{{}{Astropy Collaboration} {et~al.}(2013){Astropy Collaboration},
+  Robitaille, Tollerud, Greenfield, Droettboom, Bray, Aldcroft, Davis,
+  Ginsburg, Price-Whelan, Kerzendorf, Conley, Crighton, Barbary, Muna,
+  Ferguson, Grollier, Parikh, Nair, G{\"u}nther, Deil, Woillez, Conseil,
+  Kramer, Turner, Singer, Fox, Weaver, Zabalza, Edwards, Azalee~Bostroem,
+  Burke, Casey, Crawford, Dencheva, Ely, Jenness, Labrie, Lim, Pierfederici,
+  Pontzen, Ptak, Refsdal, Servillat, \& Streicher}]{Astropy2013}
+{Astropy Collaboration}, Robitaille, T.~P., Tollerud, E.~J., {et~al.} 2013,
+  \bibinfo{title}{{Astropy: A community Python package for astronomy},} \aap,
+  558, A33, \dodoi{10.1051/0004-6361/201322068}
+
+% type= article
+\bibitem[{{}{Astropy Collaboration} {et~al.}(2018){Astropy Collaboration},
+  Price-Whelan, Sip{\H o}cz, G{\"u}nther, Lim, Crawford, Conseil, Shupe, Craig,
+  Dencheva, Ginsburg, VanderPlas, Bradley, P{\'e}rez-Su{\'a}rez, de~Val-Borro,
+  Aldcroft, Cruz, Robitaille, Tollerud, Ardelean, Babej, Bach, Bachetti,
+  Bakanov, Bamford, Barentsen, Barmby, Baumbach, Berry, Biscani, Boquien,
+  Bostroem, Bouma, Brammer, Bray, Breytenbach, Buddelmeijer, Burke, Calderone,
+  Rodr{\'\i}guez, Cara, Cardoso, Cheedella, Copin, Corrales, Crichton,
+  D'Avella, Deil, Depagne, Dietrich, Donath, Droettboom, Earl, Erben, Fabbro,
+  Ferreira, Finethy, Fox, Garrison, Gibbons, Goldstein, Gommers, Greco,
+  Greenfield, Groener, Grollier, Hagen, Hirst, Homeier, Horton, Hosseinzadeh,
+  Hu, Hunkeler, Ivezi{\'c}, Jain, Jenness, Kanarek, Kendrew, Kern, Kerzendorf,
+  Khvalko, King, Kirkby, Kulkarni, Kumar, Lee, Lenz, Littlefair, Ma, Macleod,
+  Mastropietro, McCully, Montagnac, Morris, Mueller, Mumford, Muna, Murphy,
+  Nelson, Nguyen, Ninan, N{\"o}the, Ogaz, Oh, Parejko, Parley, Pascual, Patil,
+  Patil, Plunkett, Prochaska, Rastogi, Janga, Sabater, Sakurikar, Seifert,
+  Sherbert, Sherwood-Taylor, Shih, Sick, Silbiger, Singanamalla, Singer,
+  Sladen, Sooley, Sornarajah, Streicher, Teuben, Thomas, Tremblay, Turner,
+  Terr{\'o}n, Kerkwijk, de~la Vega, Watkins, Weaver, Whitmore, Woillez, \&
+  Zabalza}]{Astropy2018}
+{Astropy Collaboration}, Price-Whelan, A.~M., Sip{\H o}cz, B.~M., {et~al.}
+  2018, \bibinfo{title}{{The Astropy Project: Building an Open-science Project
+  and Status of the v2.0 Core Package},} \aj, 156, 123,
+  \dodoi{10.3847/1538-3881/aabc4f}
+
+% type= article
+\bibitem[{{}{Astropy Collaboration} {et~al.}(2022){Astropy Collaboration},
+  Price-Whelan, Lim, Earl, Starkman, Bradley, Shupe, Patil, Corrales, Brasseur,
+  N{\"o}the, Donath, Tollerud, Morris, Ginsburg, Vaher, Weaver, Tocknell,
+  Jamieson, van Kerkwijk, Robitaille, Merry, Bachetti, G{\"u}nther, Aldcroft,
+  Alvarado-Montes, Archibald, B{\'o}di, Bapat, Barentsen, Baz{\'a}n, Biswas,
+  Boquien, Burke, Cara, Cara, Conroy, Conseil, Craig, Cross, Cruz, D'Eugenio,
+  Dencheva, Devillepoix, Dietrich, Eigenbrot, Erben, Ferreira, Foreman-Mackey,
+  Fox, Freij, Garg, Geda, Glattly, Gondhalekar, Gordon, Grant, Greenfield,
+  Groener, Guest, Gurovich, Handberg, Hart, Hatfield-Dodds, Homeier,
+  Hosseinzadeh, Jenness, Jones, Joseph, Kalmbach, Karamehmetoglu,
+  Ka{\l}uszy{\'n}ski, Kelley, Kern, Kerzendorf, Koch, Kulumani, Lee, Ly, Ma,
+  MacBride, Maljaars, Muna, Murphy, Norman, O'Steen, Oman, Pacifici, Pascual,
+  Pascual-Granado, Patil, Perren, Pickering, Rastogi, Roulston, Ryan, Rykoff,
+  Sabater, Sakurikar, Salgado, Sanghi, Saunders, Savchenko, Schwardt,
+  Seifert-Eckert, Shih, Jain, Shukla, Sick, Simpson, Singanamalla, Singer,
+  Singhal, Sinha, Sip{\H o}cz, Spitler, Stansby, Streicher, {\v S}umak,
+  Swinbank, Taranu, Tewary, Tremblay, Val-Borro, Van~Kooten, Vasovi{\'c},
+  Verma, de~Miranda~Cardoso, Williams, Wilson, Winkel, Wood-Vasey, Xue,
+  Yoachim, Zhang, \& Zonca}]{Astropy2022}
+{Astropy Collaboration}, Price-Whelan, A.~M., Lim, P.~L., {et~al.} 2022,
+  \bibinfo{title}{{The Astropy Project: Sustaining and Growing a
+  Community-oriented Open-source Project and the Latest Major Release (v5.0) of
+  the Core Package},} \apj, 935, 167, \dodoi{10.3847/1538-4357/ac7c74}
+
+% type= article
+\bibitem[{R.~H. Becker {et~al.}(1995)Becker, White, \& Helfand}]{Becker1995}
+Becker, R.~H., White, R.~L., \& Helfand, D.~J. 1995, \bibinfo{title}{{The FIRST
+  Survey: Faint Images of the Radio Sky at Twenty Centimeters},} \apj, 450,
+  559, \dodoi{10.1086/176166}
+
+% type= article
+\bibitem[{T. Boller {et~al.}(2016)Boller, Freyberg, Tr{\"u}mper, Haberl, Voges,
+  \& Nandra}]{Boller2016}
+Boller, T., Freyberg, M.~J., Tr{\"u}mper, J., {et~al.} 2016,
+  \bibinfo{title}{{Second ROSAT all-sky survey (2RXS) source catalogue},} \aap,
+  588, A103, \dodoi{10.1051/0004-6361/201525648}
+
+% type= article
+\bibitem[{J.~R. Callingham {et~al.}(2021)Callingham, Vedantham, Shimwell, Pope,
+  Davis, Best, Hardcastle, R{\"o}ttgering, Sabater, Tasse, van Weeren,
+  Williams, Zarka, de~Gasperin, \& Drabent}]{Callingham2021}
+Callingham, J.~R., Vedantham, H.~K., Shimwell, T.~W., {et~al.} 2021,
+  \bibinfo{title}{{The population of M dwarfs observed at low radio
+  frequencies},} NatAs, 5, 1233, \dodoi{10.1038/s41550-021-01483-0}
+
+% type= article
+\bibitem[{K.~C. {Chambers} {et~al.}(2016){Chambers}, {Magnier}, {Metcalfe},
+  {et~al.}}]{Chambers2016}
+{Chambers}, K.~C., {Magnier}, E.~A., {Metcalfe}, N., {et~al.} 2016,
+  \bibinfo{title}{{The Pan-STARRS1 Surveys},} arXiv e-prints.
+\newblock \doarXiv{1612.05560}
+
+% type= article
+\bibitem[{J.~J. Condon {et~al.}(1998)Condon, Cotton, Greisen, Yin, Perley,
+  Taylor, \& Broderick}]{Condon1998}
+Condon, J.~J., Cotton, W.~D., Greisen, E.~W., {et~al.} 1998,
+  \bibinfo{title}{{The NRAO VLA Sky Survey},} \aj, 115, 1693,
+  \dodoi{10.1086/300337}
+
+% type= article
+\bibitem[{W.~H. de~Vries {et~al.}(2004)de~Vries, Becker, White, \&
+  Helfand}]{deVries2004}
+de~Vries, W.~H., Becker, R.~H., White, R.~L., \& Helfand, D.~J. 2004,
+  \bibinfo{title}{{Optical Properties of faint FIRST Variable Radio Sources},}
+  \aj, 127, 2565, \dodoi{10.1086/383550}
+
+% type= article
+\bibitem[{J.~E. Enriquez {et~al.}(2017)Enriquez, Siemion, Foster, Gajjar,
+  Hellbourg, Hickish, Isaacson, Price, Croft, DeBoer, Lebofsky, MacMahon, \&
+  Werthimer}]{Enriquez2017}
+Enriquez, J.~E., Siemion, A., Foster, G., {et~al.} 2017, \bibinfo{title}{{The
+  Breakthrough Listen Search for Intelligent Life: 1.1--1.9 GHz Observations of
+  692 Nearby Stars},} \apj, 849, 104, \dodoi{10.3847/1538-4357/aa8d1b}
+
+% type= article
+\bibitem[{H.~A. Flewelling {et~al.}(2020)Flewelling, Magnier, Chambers,
+  Heasley, Holmberg, Huber, Sweeney, Waters, Calamida, Casertano, Chen, Farrow,
+  Hasinger, Henderson, Long, Metcalfe, Narayan, Nieto-Santisteban, Norberg,
+  Rest, Saglia, Szalay, Thakar, Tonry, Valenti, Werner, White, Denneau, Draper,
+  Hodapp, Jedicke, Kaiser, Kudritzki, Price, Wainscoat, Chastel, McLean,
+  Postman, \& Shiao}]{Flewelling2020}
+Flewelling, H.~A., Magnier, E.~A., Chambers, K.~C., {et~al.} 2020,
+  \bibinfo{title}{{The Pan-STARRS1 Database and Data Products},} \apjs, 251, 7,
+  \dodoi{10.3847/1538-4365/abb82d}
+
+% type= article
+\bibitem[{{}{Gaia Collaboration} {et~al.}(2016){Gaia Collaboration}, Prusti,
+  de~Bruijne, Brown, Vallenari, Babusiaux, Bailer-Jones, Bastian, Biermann,
+  Evans, Eyer, Jansen, Jordi, Klioner, Lammers, Lindegren, Luri, Mignard,
+  Milligan, Panem, Poinsignon, Pourbaix, Randich, Sarri, Sartoretti, Siddiqui,
+  Soubiran, Valette, van Leeuwen, Walton, Aerts, Arenou, Cropper, Drimmel,
+  H{\o}g, Katz, Lattanzi, O'Mullane, Grebel, Holland, Huc, Passot, Bramante,
+  Cacciari, Casta{\~n}eda, Chaoul, Cheek, De~Angeli, Fabricius, Guerra,
+  Hern{\'a}ndez, Jean-Antoine-Piccolo, Masana, Messineo, Mowlavi, Nienartowicz,
+  Ord{\'o}{\~n}ez-Blanco, Panuzzo, Portell, Richards, Riello, Seabroke, Tanga,
+  Th{\'e}venin, Torra, Els, Gracia-Abril, Comoretto, Garcia-Reinaldos, Lock,
+  Mercier, Altmann, Andrae, Astraatmadja, Bellas-Velidis, Benson, Berthier,
+  Blomme, Busso, Carry, Cellino, Clementini, Cowell, Creevey, Cuypers,
+  Davidson, De~Ridder, de~Torres, Delchambre, Dell'Oro, Ducourant, Fr{\'e}mat,
+  Garc{\'\i}a-Torres, Gosset, Halbwachs, Hambly, Harrison, Hauser, Hestroffer,
+  Hodgkin, Huckle, Hutton, Jasniewicz, Jordan, Kontizas, Korn, Lanzafame,
+  Manteiga, Moitinho, Muinonen, Osinde, Pancino, Pauwels, Petit, Recio-Blanco,
+  Robin, Sarro, Siopis, Smith, Smith, Sozzetti, Thuillot, van Reeven, Viala,
+  Abbas, Abreu~Aramburu, Accart, Aguado, Allan, Allasia, Altavilla,
+  {\'A}lvarez, Alves, Anderson, Andrei, Anglada~Varela, Antiche, Antoja,
+  Ant{\'o}n, Arcay, Atzei, Ayache, Bach, Baker, Balaguer-N{\'u}{\~n}ez,
+  Barache, Barata, Barbier, Barblan, Baroni, Barrado~y Navascu{\'e}s, Barros,
+  Barstow, Becciani, Bellazzini, Bellei, Bello~Garc{\'\i}a, Belokurov,
+  Bendjoya, Berihuete, Bianchi, Bienaym{\'e}, Billebaud, Blagorodnova,
+  Blanco-Cuaresma, Boch, Bombrun, Borrachero, Bouquillon, Bourda, Bouy,
+  Bragaglia, Breddels, Brouillet, Br{\"u}semeister, Bucciarelli, Budnik,
+  Burgess, Burgon, Burlacu, Busonero, Buzzi, Caffau, Cambras, Campbell,
+  Cancelliere, Cantat-Gaudin, Carlucci, Carrasco, Castellani, Charlot, Charnas,
+  Charvet, Chassat, Chiavassa, Clotet, Cocozza, Collins, Collins, Costigan,
+  Crifo, Cross, Crosta, Crowley, Dafonte, Damerdji, Dapergolas, David, David,
+  De~Cat, de~Felice, de~Laverny, De~Luise, De~March, de~Martino, de~Souza,
+  Debosscher, del Pozo, Delbo, Delgado, Delgado, di~Marco, Di~Matteo, Diakite,
+  Distefano, Dolding, Dos~Anjos, Drazinos, Dur{\'a}n, Dzigan, Ecale,
+  Edvardsson, Enke, Erdmann, Escolar, Espina, Evans, Eynard~Bontemps, Fabre,
+  Fabrizio, Faigler, Falc{\~a}o, Farr{\`a}s~Casas, Faye, Federici, Fedorets,
+  Fern{\'a}ndez-Hern{\'a}ndez, Fernique, Fienga, Figueras, Filippi, Findeisen,
+  Fonti, Fouesneau, Fraile, Fraser, Fuchs, Furnell, Gai, Galleti, Galluccio,
+  Garabato, Garc{\'\i}a-Sedano, Gar{\'e}, Garofalo, Garralda, Gavras, Gerssen,
+  Geyer, Gilmore, Girona, Giuffrida, Gomes, Gonz{\'a}lez-Marcos,
+  Gonz{\'a}lez-N{\'u}{\~n}ez, Gonz{\'a}lez-Vidal, Granvik, Guerrier, Guillout,
+  Guiraud, G{\'u}rpide, Guti{\'e}rrez-S{\'a}nchez, Guy, Haigron,
+  Hatzidimitriou, Haywood, Heiter, Helmi, Hobbs, Hofmann, Holl, Holland, Hunt,
+  Hypki, Icardi, Irwin, Jevardat~de Fombelle, Jofr{\'e}, Jonker, Jorissen,
+  Julbe, Karampelas, Kochoska, Kohley, Kolenberg, Kontizas, Koposov,
+  Kordopatis, Koubsky, Kowalczyk, Krone-Martins, Kudryashova, Kull, Bachchan,
+  Lacoste-Seris, Lanza, Lavigne, Le~Poncin-Lafitte, Lebreton, Lebzelter,
+  Leccia, Leclerc, Lecoeur-Taibi, Lemaitre, Lenhardt, Leroux, Liao, Licata,
+  Lindstr{\o}m, Lister, Livanou, Lobel, L{\"o}ffler, L{\'o}pez, Lopez-Lozano,
+  Lorenz, Loureiro, MacDonald, Magalh{\~a}es~Fernandes, Managau, Mann,
+  Mantelet, Marchal, Marchant, Marconi, Marie, Marinoni, Marrese,
+  Marschalk{\'o}, Marshall, Mart{\'\i}n-Fleitas, Martino, Mary, Matijevi{\v c},
+  Mazeh, McMillan, Messina, Mestre, Michalik, Millar, Miranda, Molina,
+  Molinaro, Molinaro, Moln{\'a}r, Moniez, Montegriffo, Monteiro, Mor, Mora,
+  Morbidelli, Morel, Morgenthaler, Morley, Morris, Mulone, Muraveva, Musella,
+  Narbonne, Nelemans, Nicastro, Noval, Ord{\'e}novic, Ordieres-Mer{\'e},
+  Osborne, Pagani, Pagano, Pailler, Palacin, Palaversa, Parsons, Paulsen,
+  Pecoraro, Pedrosa, Pentik{\"a}inen, Pereira, Pichon, Piersimoni, Pineau,
+  Plachy, Plum, Poujoulet, Pr{\v s}a, Pulone, Ragaini, Rago, Rambaux,
+  Ramos-Lerate, Ranalli, Rauw, Read, Regibo, Renk, Reyl{\'e}, Ribeiro,
+  Rimoldini, Ripepi, Riva, Rixon, Roelens, Romero-G{\'o}mez, Rowell, Royer,
+  Rudolph, Ruiz-Dern, Sadowski, Sagrist{\`a}~Sell{\'e}s, Sahlmann, Salgado,
+  Salguero, Sarasso, Savietto, Schnorhk, Schultheis, Sciacca, Segol, Segovia,
+  Segransan, Serpell, Shih, Smareglia, Smart, Smith, Solano, Solitro, Sordo,
+  Soria~Nieto, Souchay, Spagna, Spoto, Stampa, Steele, Steidelm{\"u}ller,
+  Stephenson, Stoev, Suess, S{\"u}veges, Surdej, Szabados, Szegedi-Elek,
+  Tapiador, Taris, Tauran, Taylor, Teixeira, Terrett, Tingley, Trager, Turon,
+  Ulla, Utrilla, Valentini, van Elteren, Van~Hemelryck, van Leeuwen, Varadi,
+  Vecchiato, Veljanoski, Via, Vicente, Vogt, Voss, Votruba, Voutsinas,
+  Walmsley, Weiler, Weingrill, Werner, Wevers, Whitehead, Wyrzykowski, Yoldas,
+  {\v Z}erjal, Zucker, Zurbach, Zwitter, Alecu, Allen, Allende~Prieto, Amorim,
+  Anglada-Escud{\'e}, Arsenijevic, Azaz, Balm, Beck, Bernstein, Bigot, Bijaoui,
+  Blasco, Bonfigli, Bono, Boudreault, Bressan, Brown, Brunet, Bunclark,
+  Buonanno, Butkevich, Carret, Carrion, Chemin, Ch{\'e}reau, Corcione,
+  Darmigny, de~Boer, de~Teodoro, de~Zeeuw, Delle~Luche, Domingues, Dubath,
+  Fodor, Fr{\'e}zouls, Fries, Fustes, Fyfe, Gallardo, Gallegos, Gardiol,
+  Gebran, Gomboc, G{\'o}mez, Grux, Gueguen, Heyrovsky, Hoar, Iannicola,
+  Isasi~Parache, Janotto, Joliet, Jonckheere, Keil, Kim, Klagyivik, Klar,
+  Knude, Kochukhov, Kolka, Kos, Kutka, Lainey, LeBouquin, Liu, Loreggia,
+  Makarov, Marseille, Martayan, Martinez-Rubi, Massart, Meynadier, Mignot,
+  Munari, Nguyen, Nordlander, Ocvirk, O'Flaherty, Olias~Sanz, Ortiz, Osorio,
+  Oszkiewicz, Ouzounis, Palmer, Park, Pasquato, Peltzer, Peralta, P{\'e}turaud,
+  Pieniluoma, Pigozzi, Poels, Prat, Prod'homme, Raison, Rebordao, Risquez,
+  Rocca-Volmerange, Rosen, Ruiz-Fuertes, Russo, Sembay, Serraller~Vizcaino,
+  Short, Siebert, Silva, Sinachopoulos, Slezak, Soffel, Sosnowska, Strai{\v
+  z}ys, ter Linden, Terrell, Theil, Tiede, Troisi, Tsalmantza, Tur, Vaccari,
+  Vachier, Valles, Van~Hamme, Veltz, Virtanen, Wallut, Wichmann, Wilkinson,
+  Ziaeepour, \& Zschocke}]{GaiaMission}
+{Gaia Collaboration}, Prusti, T., de~Bruijne, J. H.~J., {et~al.} 2016,
+  \bibinfo{title}{{The Gaia mission},} \aap, 595, A1,
+  \dodoi{10.1051/0004-6361/201629272}
+
+% type= article
+\bibitem[{{}{Gaia Collaboration} {et~al.}(2021){Gaia Collaboration}, Smart,
+  Sarro, Rybizki, Reyl{\'e}, Robin, Hambly, Abbas, Barstow, de~Bruijne,
+  Bucciarelli, Carrasco, Cooper, Hodgkin, Masana, Michalik, Sahlmann, Sozzetti,
+  Brown, Vallenari, Prusti, Babusiaux, Biermann, Creevey, Evans, Eyer, Hutton,
+  Jansen, Jordi, Klioner, Lammers, Lindegren, Luri, Mignard, Panem, Pourbaix,
+  Randich, Sartoretti, Soubiran, Walton, Arenou, Bailer-Jones, Bastian,
+  Cropper, Drimmel, Katz, Lattanzi, van Leeuwen, Bakker, Casta{\~n}eda,
+  De~Angeli, Ducourant, Fabricius, Fouesneau, Fr{\'e}mat, Guerra, Guerrier,
+  Guiraud, Jean-Antoine~Piccolo, Messineo, Mowlavi, Nicolas, Nienartowicz,
+  Pailler, Panuzzo, Riclet, Roux, Seabroke, Sordo, Tanga, Th{\'e}venin,
+  Gracia-Abril, Portell, Teyssier, Altmann, Andrae, Bellas-Velidis, Benson,
+  Berthier, Blomme, Brugaletta, Burgess, Busso, Carry, Cellino, Cheek,
+  Clementini, Damerdji, Davidson, Delchambre, Dell'Oro,
+  Fern{\'a}ndez-Hern{\'a}ndez, Galluccio, Garc{\'\i}a-Lario, Garcia-Reinaldos,
+  Gonz{\'a}lez-N{\'u}{\~n}ez, Gosset, Haigron, Halbwachs, Harrison,
+  Hatzidimitriou, Heiter, Hern{\'a}ndez, Hestroffer, Holl, Jan{\ss}en,
+  Jevardat~de Fombelle, Jordan, Krone-Martins, Lanzafame, L{\"o}ffler, Lorca,
+  Manteiga, Marchal, Marrese, Moitinho, Mora, Muinonen, Osborne, Pancino,
+  Pauwels, Recio-Blanco, Richards, Riello, Rimoldini, Roegiers, Siopis, Smith,
+  Ulla, Utrilla, van Leeuwen, van Reeven, Abreu~Aramburu, Accart, Aerts,
+  Aguado, Ajaj, Altavilla, {\'A}lvarez, {\'A}lvarez Cid-Fuentes, Alves,
+  Anderson, Anglada~Varela, Antoja, Audard, Baines, Baker,
+  Balaguer-N{\'u}{\~n}ez, Balbinot, Balog, Barache, Barbato, Barros,
+  Bartolom{\'e}, Bassilana, Bauchet, Baudesson-Stella, Becciani, Bellazzini,
+  Bernet, Bertone, Bianchi, Blanco-Cuaresma, Boch, Bombrun, Bossini,
+  Bouquillon, Bragaglia, Bramante, Breedt, Bressan, Brouillet, Burlacu,
+  Busonero, Butkevich, Buzzi, Caffau, Cancelliere, C{\'a}novas, Cantat-Gaudin,
+  Carballo, Carlucci, Carnerero, Casamiquela, Castellani, Castro-Ginard,
+  Castro~Sampol, Chaoul, Charlot, Chemin, Chiavassa, Cioni, Comoretto, Cornez,
+  Cowell, Crifo, Crosta, Crowley, Dafonte, Dapergolas, David, David,
+  de~Laverny, De~Luise, De~March, De~Ridder, de~Souza, de~Teodoro, de~Torres,
+  del Peloso, del Pozo, Delgado, Delgado, Delisle, Di~Matteo, Diakite, Diener,
+  Distefano, Dolding, Eappachen, Edvardsson, Enke, Esquej, Fabre, Fabrizio,
+  Faigler, Fedorets, Fernique, Fienga, Figueras, Fouron, Fragkoudi, Fraile,
+  Franke, Gai, Garabato, Garcia-Gutierrez, Garc{\'\i}a-Torres, Garofalo,
+  Gavras, Gerlach, Geyer, Giacobbe, Gilmore, Girona, Giuffrida, Gomel, Gomez,
+  Gonzalez-Santamaria, Gonz{\'a}lez-Vidal, Granvik, Guti{\'e}rrez-S{\'a}nchez,
+  Guy, Hauser, Haywood, Helmi, Hidalgo, Hilger, H{\l}adczuk, Hobbs, Holland,
+  Huckle, Jasniewicz, Jonker, Juaristi~Campillo, Julbe, Karbevska, Kervella,
+  Khanna, Kochoska, Kontizas, Kordopatis, Korn, Kostrzewa-Rutkowska,
+  Kruszy{\'n}ska, Lambert, Lanza, Lasne, Le~Campion, Le~Fustec, Lebreton,
+  Lebzelter, Leccia, Leclerc, Lecoeur-Taibi, Liao, Licata, Lindstr{\o}m,
+  Lister, Livanou, Lobel, Madrero~Pardo, Managau, Mann, Marchant, Marconi,
+  Marcos~Santos, Marinoni, Marocco, Marshall, Martin~Polo, Mart{\'\i}n-Fleitas,
+  Masip, Massari, Mastrobuono-Battisti, Mazeh, McMillan, Messina, Millar,
+  Mints, Molina, Molinaro, Moln{\'a}r, Montegriffo, Mor, Morbidelli, Morel,
+  Morris, Mulone, Munoz, Muraveva, Murphy, Musella, Noval, Ord{\'e}novic,
+  Orr{\`u}, Osinde, Pagani, Pagano, Palaversa, Palicio, Panahi, Pawlak,
+  Pe{\~n}alosa~Esteller, Penttil{\"a}, Piersimoni, Pineau, Plachy, Plum,
+  Poggio, Poretti, Poujoulet, Pr{\v s}a, Pulone, Racero, Ragaini, Rainer,
+  Raiteri, Rambaux, Ramos, Ramos-Lerate, Re~Fiorentin, Regibo, Ripepi, Riva,
+  Rixon, Robichon, Robin, Roelens, Rohrbasser, Romero-G{\'o}mez, Rowell, Royer,
+  Rybicki, Sadowski, Sagrist{\`a}~Sell{\'e}s, Salgado, Salguero, Samaras,
+  Sanchez~Gimenez, Sanna, Santove{\~n}a, Sarasso, Schultheis, Sciacca, Segol,
+  Segovia, S{\'e}gransan, Semeux, Shahaf, Siddiqui, Siebert, Siltala, Slezak,
+  Solano, Solitro, Souami, Souchay, Spagna, Spoto, Steele, Steidelm{\"u}ller,
+  Stephenson, S{\"u}veges, Szabados, Szegedi-Elek, Taris, Tauran, Taylor,
+  Teixeira, Thuillot, Tonello, Torra, Torra, Turon, Unger, Vaillant, van
+  Dillen, Vanel, Vecchiato, Viala, Vicente, Voutsinas, Weiler, Wevers,
+  Wyrzykowski, Yoldas, Yvard, Zhao, Zorec, Zucker, Zurbach, \&
+  Zwitter}]{Smart2021}
+{Gaia Collaboration}, Smart, R.~L., Sarro, L.~M., {et~al.} 2021,
+  \bibinfo{title}{{Gaia Early Data Release 3: The Gaia Catalogue of Nearby
+  Stars},} \aap, 649, A6, \dodoi{10.1051/0004-6361/202039498}
+
+% type= article
+\bibitem[{{}{Gaia Collaboration} {et~al.}(2023){Gaia Collaboration}, Vallenari,
+  Brown, Prusti, de~Bruijne, Arenou, Babusiaux, Biermann, Creevey, Ducourant,
+  Evans, Eyer, Guerra, Hutton, Jordi, Klioner, Lammers, Lindegren, Luri,
+  Mignard, Panem, Pourbaix, Randich, Sartoretti, Soubiran, Tanga, Walton,
+  Bailer-Jones, Bastian, Drimmel, Jansen, Katz, Lattanzi, van Leeuwen, Bakker,
+  Cacciari, Casta{\~n}eda, De~Angeli, Fabricius, Fouesneau, Fr{\'e}mat,
+  Galluccio, Guerrier, Heiter, Masana, Messineo, Mowlavi, Nicolas,
+  Nienartowicz, Pailler, Panuzzo, Riclet, Roux, Seabroke, Sordo, Th{\'e}venin,
+  Gracia-Abril, Portell, Teyssier, Altmann, Andrae, Audard, Bellas-Velidis,
+  Benson, Berthier, Blomme, Burgess, Busonero, Busso, C{\'a}novas, Carry,
+  Cellino, Cheek, Clementini, Damerdji, Davidson, de~Teodoro, Nu{\~n}ez~Campos,
+  Delchambre, Dell'Oro, Esquej, Fern{\'a}ndez-Hern{\'a}ndez, Fraile, Garabato,
+  Garc{\'\i}a-Lario, Gosset, Haigron, Halbwachs, Hambly, Harrison,
+  Hern{\'a}ndez, Hestroffer, Hodgkin, Holl, Jan{\ss}en, Jevardat~de Fombelle,
+  Jordan, Krone-Martins, Lanzafame, L{\"o}ffler, Marchal, Marrese, Moitinho,
+  Muinonen, Osborne, Pancino, Pauwels, Recio-Blanco, Reyl{\'e}, Riello,
+  Rimoldini, Roegiers, Rybizki, Sarro, Siopis, Smith, Sozzetti, Utrilla, van
+  Leeuwen, Abbas, {\'A}brah{\'a}m, Abreu~Aramburu, Aerts, Aguado, Ajaj,
+  Aldea-Montero, Altavilla, {\'A}lvarez, Alves, Anders, Anderson,
+  Anglada~Varela, Antoja, Baines, Baker, Balaguer-N{\'u}{\~n}ez, Balbinot,
+  Balog, Barache, Barbato, Barros, Barstow, Bartolom{\'e}, Bassilana, Bauchet,
+  Becciani, Bellazzini, Berihuete, Bernet, Bertone, Bianchi, Binnenfeld,
+  Blanco-Cuaresma, Blazere, Boch, Bombrun, Bossini, Bouquillon, Bragaglia,
+  Bramante, Breedt, Bressan, Brouillet, Brugaletta, Bucciarelli, Burlacu,
+  Butkevich, Buzzi, Caffau, Cancelliere, Cantat-Gaudin, Carballo, Carlucci,
+  Carnerero, Carrasco, Casamiquela, Castellani, Castro-Ginard, Chaoul, Charlot,
+  Chemin, Chiaramida, Chiavassa, Chornay, Comoretto, Contursi, Cooper, Cornez,
+  Cowell, Crifo, Cropper, Crosta, Crowley, Dafonte, Dapergolas, David, David,
+  de~Laverny, De~Luise, De~March, De~Ridder, de~Souza, de~Torres, del Peloso,
+  del Pozo, Delbo, Delgado, Delisle, Demouchy, Dharmawardena, Di~Matteo,
+  Diakite, Diener, Distefano, Dolding, Edvardsson, Enke, Fabre, Fabrizio,
+  Faigler, Fedorets, Fernique, Fienga, Figueras, Fournier, Fouron, Fragkoudi,
+  Gai, Garcia-Gutierrez, Garcia-Reinaldos, Garc{\'\i}a-Torres, Garofalo, Gavel,
+  Gavras, Gerlach, Geyer, Giacobbe, Gilmore, Girona, Giuffrida, Gomel, Gomez,
+  Gonz{\'a}lez-N{\'u}{\~n}ez, Gonz{\'a}lez-Santamar{\'\i}a, Gonz{\'a}lez-Vidal,
+  Granvik, Guillout, Guiraud, Guti{\'e}rrez-S{\'a}nchez, Guy, Hatzidimitriou,
+  Hauser, Haywood, Helmer, Helmi, Sarmiento, Hidalgo, Hilger, H{\l}adczuk,
+  Hobbs, Holland, Huckle, Jardine, Jasniewicz, Jean-Antoine~Piccolo,
+  Jim{\'e}nez-Arranz, Jorissen, Juaristi~Campillo, Julbe, Karbevska, Kervella,
+  Khanna, Kontizas, Kordopatis, Korn, K{\'o}sp{\'a}l, Kostrzewa-Rutkowska,
+  Kruszy{\'n}ska, Kun, Laizeau, Lambert, Lanza, Lasne, Le~Campion, Lebreton,
+  Lebzelter, Leccia, Leclerc, Lecoeur-Taibi, Liao, Licata, Lindstr{\o}m,
+  Lister, Livanou, Lobel, Lorca, Loup, Madrero~Pardo, Magdaleno~Romeo, Managau,
+  Mann, Manteiga, Marchant, Marconi, Marcos, Marcos~Santos, Mar{\'\i}n~Pina,
+  Marinoni, Marocco, Marshall, Martin~Polo, Mart{\'\i}n-Fleitas, Marton, Mary,
+  Masip, Massari, Mastrobuono-Battisti, Mazeh, McMillan, Messina, Michalik,
+  Millar, Mints, Molina, Molinaro, Moln{\'a}r, Monari, Mongui{\'o},
+  Montegriffo, Montero, Mor, Mora, Morbidelli, Morel, Morris, Muraveva, Murphy,
+  Musella, Nagy, Noval, Oca{\~n}a, Ogden, Ordenovic, Osinde, Pagani, Pagano,
+  Palaversa, Palicio, Pallas-Quintela, Panahi, Payne-Wardenaar,
+  Pe{\~n}alosa~Esteller, Penttil{\"a}, Pichon, Piersimoni, Pineau, Plachy,
+  Plum, Poggio, Pr{\v s}a, Pulone, Racero, Ragaini, Rainer, Raiteri, Rambaux,
+  Ramos, Ramos-Lerate, Re~Fiorentin, Regibo, Richards, Rios~Diaz, Ripepi, Riva,
+  Rix, Rixon, Robichon, Robin, Robin, Roelens, Rogues, Rohrbasser,
+  Romero-G{\'o}mez, Rowell, Royer, Ruz~Mieres, Rybicki, Sadowski,
+  S{\'a}ez~N{\'u}{\~n}ez, Sagrist{\`a}~Sell{\'e}s, Sahlmann, Salguero, Samaras,
+  Sanchez~Gimenez, Sanna, Santove{\~n}a, Sarasso, Schultheis, Sciacca, Segol,
+  Segovia, S{\'e}gransan, Semeux, Shahaf, Siddiqui, Siebert, Siltala, Silvelo,
+  Slezak, Slezak, Smart, Snaith, Solano, Solitro, Souami, Souchay, Spagna,
+  Spina, Spoto, Steele, Steidelm{\"u}ller, Stephenson, S{\"u}veges, Surdej,
+  Szabados, Szegedi-Elek, Taris, Taylor, Teixeira, Tolomei, Tonello, Torra,
+  Torra, Torralba~Elipe, Trabucchi, Tsounis, Turon, Ulla, Unger, Vaillant, van
+  Dillen, van Reeven, Vanel, Vecchiato, Viala, Vicente, Voutsinas, Weiler,
+  Wevers, Wyrzykowski, Yoldas, Yvard, Zhao, Zorec, Zucker, \&
+  Zwitter}]{GaiaDR3}
+{Gaia Collaboration}, Vallenari, A., Brown, A. G.~A., {et~al.} 2023,
+  \bibinfo{title}{{Gaia Data Release 3: Summary of the content and survey
+  properties},} \aap, 674, A1, \dodoi{10.1051/0004-6361/202243940}
+
+% type= article
+\bibitem[{M.~A. Garrett {\&} A.~P.~V. Siemion(2022)Garrett \&
+  Siemion}]{Garrett2022}
+Garrett, M.~A., \& Siemion, A. P.~V. 2022, \bibinfo{title}{{Constraints on
+  extragalactic transmitters via Breakthrough Listen observations of background
+  sources},} \mnras, 519, 4581, \dodoi{10.1093/mnras/stac2607}
+
+% type= article
+\bibitem[{Y.~A. Gordon {et~al.}(2020)Gordon, Boyce, O'Dea, Rudnick, Andernach,
+  Vantyghem, Baum, Bui, \& Dionyssiou}]{Gordon2020}
+Gordon, Y.~A., Boyce, M.~M., O'Dea, C.~P., {et~al.} 2020, \bibinfo{title}{{A
+  Catalog of Very Large Array Sky Survey Epoch 1 Quick Look Components,
+  Sources, and Host Identifications},} RNAAS, 4, 175,
+  \dodoi{10.3847/2515-5172/abbe23}
+
+% type= article
+\bibitem[{Y.~A. Gordon {et~al.}(2021)Gordon, Boyce, O'Dea, Rudnick, Andernach,
+  Vantyghem, Baum, Bui, Dionyssiou, Safi-Harb, \& Sander}]{Gordon2021}
+Gordon, Y.~A., Boyce, M.~M., O'Dea, C.~P., {et~al.} 2021, \bibinfo{title}{{A
+  Quick Look at the 3 GHz Radio Sky. I. Source Statistics from the Very Large
+  Array Sky Survey},} \apjs, 255, 30, \dodoi{10.3847/1538-4365/ac05c0}
+
+% type= article
+\bibitem[{M. {Graham} {et~al.}(2014){Graham}, {Plante}, {Tody}, \&
+  {Fitzpatrick}}]{Graham2014}
+{Graham}, M., {Plante}, R., {Tody}, D., \& {Fitzpatrick}, M. 2014,
+  \bibinfo{title}{{PyVO: Python access to the Virtual Observatory},}
+  Astrophysics Source Code Library, record ascl:1402.004
+
+% type= article
+\bibitem[{M. G{\"u}del {\&} A.~O. Benz(1993)G{\"u}del \& Benz}]{GudelBenz1993}
+G{\"u}del, M., \& Benz, A.~O. 1993, \bibinfo{title}{{X-ray/microwave relation
+  of different types of active stars},} \apj, 405, L63, \dodoi{10.1086/186766}
+
+% type= article
+\bibitem[{C.~R. Harris {et~al.}(2020)Harris, Millman, van~der Walt, Gommers,
+  Virtanen, Cournapeau, Wieser, Taylor, Berg, Smith, Kern, Picus, Hoyer, van
+  Kerkwijk, Brett, Haldane, del R{\'\i}o, Wiebe, Peterson, G{\'e}rard-Marchant,
+  Sheppard, Reddy, Weckesser, Abbasi, Gohlke, \& Oliphant}]{Harris2020}
+Harris, C.~R., Millman, K.~J., van~der Walt, S.~J., {et~al.} 2020,
+  \bibinfo{title}{{Array programming with NumPy},} \nat, 585, 357,
+  \dodoi{10.1038/s41586-020-2649-2}
+
+% type= article
+\bibitem[{D.~J. Helfand {et~al.}(2015)Helfand, White, \& Becker}]{Helfand2015}
+Helfand, D.~J., White, R.~L., \& Becker, R.~H. 2015, \bibinfo{title}{{THE LAST
+  OF FIRST : THE FINAL CATALOG AND SOURCE IDENTIFICATIONS},} \apj, 801, 26,
+  \dodoi{10.1088/0004-637x/801/1/26}
+
+% type= article
+\bibitem[{J.~D. Hunter(2007)Hunter}]{Hunter2007}
+Hunter, J.~D. 2007, \bibinfo{title}{{Matplotlib: A 2D Graphics Environment},}
+  CSE, 9, 90, \dodoi{10.1109/mcse.2007.55}
+
+% type= article
+\bibitem[{H. Isaacson {et~al.}(2017)Isaacson, Siemion, Marcy, Lebofsky, Price,
+  MacMahon, Croft, DeBoer, Hickish, Werthimer, Sheikh, Hellbourg, \&
+  Enriquez}]{Isaacson2017}
+Isaacson, H., Siemion, A. P.~V., Marcy, G.~W., {et~al.} 2017,
+  \bibinfo{title}{{The Breakthrough Listen Search for Intelligent Life: Target
+  Selection of Nearby Stars and Galaxies},} \pasp, 129, 054501,
+  \dodoi{10.1088/1538-3873/aa5800}
+
+% type= article
+\bibitem[{{\v Z}. Ivezi{\'c} {et~al.}(2002)Ivezi{\'c}, Menou, Knapp, Strauss,
+  Lupton, Vanden~Berk, Richards, Tremonti, Weinstein, Anderson, Bahcall,
+  Becker, Bernardi, Blanton, Eisenstein, Fan, Finkbeiner, Finlator, Frieman,
+  Gunn, Hall, Kim, Kinkhabwala, Narayanan, Rockosi, Schlegel, Schneider,
+  Strateva, SubbaRao, Thakar, Voges, White, Yanny, Brinkmann, Doi, Fukugita,
+  Hennessy, Munn, Nichol, \& York}]{Ivezic2002}
+Ivezi{\'c}, {\v Z}., Menou, K., Knapp, G.~R., {et~al.} 2002,
+  \bibinfo{title}{{Optical and Radio Properties of Extragalactic Sources
+  Observed by the FIRST Survey and the Sloan Digital Sky Survey},} \aj, 124,
+  2364, \dodoi{10.1086/344069}
+
+% type= article
+\bibitem[{M. Lacy {et~al.}(2020)Lacy, Baum, Chandler, Chatterjee, Clarke,
+  Deustua, English, Farnes, Gaensler, Gugliucci, Hallinan, Kent, Kimball, Law,
+  Lazio, Marvil, Mao, Medlin, Mooley, Murphy, Myers, Osten, Richards,
+  Rosolowsky, Rudnick, Schinzel, Sivakoff, Sjouwerman, Taylor, White, Wrobel,
+  Andernach, Beasley, Berger, Bhatnager, Birkinshaw, Bower, Brandt, Brown,
+  Burke-Spolaor, Butler, Comerford, Demorest, Fu, Giacintucci, Golap, G{\"u}th,
+  Hales, Hiriart, Hodge, Horesh, Ivezi{\'c}, Jarvis, Kamble, Kassim, Liu,
+  Loinard, Lyons, Masters, Mezcua, Moellenbrock, Mroczkowski, Nyland, O'Dea,
+  O'Sullivan, Peters, Radford, Rao, Robnett, Salcido, Shen, Sobotka, Witz,
+  Vaccari, Weeren, Vargas, Williams, \& Yoon}]{Lacy2020}
+Lacy, M., Baum, S.~A., Chandler, C.~J., {et~al.} 2020, \bibinfo{title}{{The
+  Karl G. Jansky Very Large Array Sky Survey (VLASS). Science Case and Survey
+  Design},} \pasp, 132, 035001, \dodoi{10.1088/1538-3873/ab63eb}
+
+% type= inproceedings
+\bibitem[{W. McKinney(2010)McKinney}]{McKinney2010}
+McKinney, W. 2010, \bibinfo{title}{{Data Structures for Statistical Computing
+  in Python},} in Proceedings of the 9th Python in Science Conference, 56--61,
+  \dodoi{10.25080/majora-92bf1922-00a}
+
+% type= article
+\bibitem[{A. Merloni {et~al.}(2024)Merloni, Lamer, Liu, Ramos-Ceja, Brunner,
+  Bulbul, Dennerl, Doroshenko, Freyberg, Friedrich, Gatuzz, Georgakakis,
+  Haberl, Igo, Kreykenbohm, Liu, Maitra, Malyali, Mayer, Nandra, Predehl,
+  Robrade, Salvato, Sanders, Stewart, Tub{\'\i}n-Arenas, Weber, Wilms, Arcodia,
+  Artis, Aschersleben, Avakyan, Aydar, Bahar, Balzer, Becker, Berger, Boller,
+  Bornemann, Br{\"u}ggen, Brusa, Buchner, Burwitz, Camilloni, Clerc, Comparat,
+  Coutinho, Czesla, Dannhauer, Dauner, Dauser, Dietl, Dolag, Dwelly, Egg, Ehl,
+  Freund, Friedrich, Gaida, Garrel, Ghirardini, Gokus, Gr{\"u}nwald, Grandis,
+  Grotova, Gruen, Gueguen, H{\"a}mmerich, Hamaus, Hasinger, Haubner, Homan,
+  Ider~Chitham, Joseph, Joyce, K{\"o}nig, Kaltenbrunner, Khokhriakova, Kink,
+  Kirsch, Kluge, Knies, Krippendorf, Krumpe, Kurpas, Li, Liu, Locatelli,
+  Lorenz, M{\"u}ller, Magaudda, Mannes, McCall, Meidinger, Michailidis, Migkas,
+  Mu{\~n}oz-Giraldo, Musiimenta, Nguyen-Dang, Ni, Olechowska, Ota, Pacaud,
+  Pasini, Perinati, Pires, Pommranz, Ponti, Poppenhaeger, P{\"u}hlhofer, Rau,
+  Reh, Reiprich, Roster, Saeedi, Santangelo, Sasaki, Schmitt, Schneider,
+  Schrabback, Schuster, Schwope, Seppi, Serim, Shreeram, Sokolova-Lapa, Starck,
+  Stelzer, Stierhof, Suleimanov, Tenzer, Traulsen, Tr{\"u}mper, Tsuge, Urrutia,
+  Veronica, Waddell, Willer, Wolf, Yeung, Zainab, Zangrandi, Zhang, Zhang, \&
+  Zheng}]{Merloni2024}
+Merloni, A., Lamer, G., Liu, T., {et~al.} 2024, \bibinfo{title}{{The
+  SRG/eROSITA all-sky survey: First X-ray catalogues and data release of the
+  western Galactic hemisphere},} \aap, 682, A34,
+  \dodoi{10.1051/0004-6361/202347165}
+
+% type= article
+\bibitem[{N. {Mohan} {\&} D. {Rafferty}(2015){Mohan} \& {Rafferty}}]{Mohan2015}
+{Mohan}, N., \& {Rafferty}, D. 2015, \bibinfo{title}{{PyBDSF: Python Blob
+  Detection and Source Finder},} Astrophysics Source Code Library, record
+  ascl:1502.007
+
+% type= article
+\bibitem[{F. Ochsenbein {et~al.}(2000)Ochsenbein, Bauer, \&
+  Marcout}]{Ochsenbein2000}
+Ochsenbein, F., Bauer, P., \& Marcout, J. 2000, \bibinfo{title}{{The VizieR
+  database of astronomical catalogues},} \aaps, 143, 23,
+  \dodoi{10.1051/aas:2000169}
+
+% type= article
+\bibitem[{C. Painter {et~al.}(2025)Painter, Croft, Lebofsky, Andersson, Choza,
+  Gajjar, Price, \& Siemion}]{Painter2025}
+Painter, C., Croft, S., Lebofsky, M., {et~al.} 2025, \bibinfo{title}{{A Novel
+  Technosignature Search in the Breakthrough Listen Green Bank Telescope
+  Archive},} \aj, 169, 222, \dodoi{10.3847/1538-3881/adbc5e}
+
+% type= article
+\bibitem[{M.~J. Pecaut {\&} E.~E. Mamajek(2013)Pecaut \& Mamajek}]{Pecaut2013}
+Pecaut, M.~J., \& Mamajek, E.~E. 2013, \bibinfo{title}{{INTRINSIC COLORS,
+  TEMPERATURES, AND BOLOMETRIC CORRECTIONS OF PRE-MAIN-SEQUENCE STARS},} \apjs,
+  208, 9, \dodoi{10.1088/0067-0049/208/1/9}
+
+% type= article
+\bibitem[{D.~C. Price {et~al.}(2020)Price, Enriquez, Brzycki, Croft, Czech,
+  DeBoer, DeMarines, Foster, Gajjar, Gizani, Hellbourg, Isaacson, Lacki,
+  Lebofsky, MacMahon, Pater, Siemion, Werthimer, Green, Kaczmarek, Maddalena,
+  Mader, Drew, \& Worden}]{Price2020}
+Price, D.~C., Enriquez, J.~E., Brzycki, B., {et~al.} 2020, \bibinfo{title}{{The
+  Breakthrough Listen Search for Intelligent Life: Observations of 1327 Nearby
+  Stars Over 1.10--3.45 GHz},} \aj, 159, 86, \dodoi{10.3847/1538-3881/ab65f1}
+
+% type= article
+\bibitem[{J. Tarter(2001)Tarter}]{Tarter2001}
+Tarter, J. 2001, \bibinfo{title}{{The Search for Extraterrestrial Intelligence
+  (SETI)},} \araa, 39, 511, \dodoi{10.1146/annurev.astro.39.1.511}
+
+% type= article
+\bibitem[{C.~D. Tremblay {et~al.}(2025)Tremblay, Sofair, Steffes, Myburgh,
+  Czech, Demorest, Donnachie, Pollak, Ruzindana, A.~P.~V., Varghese, \&
+  Sheikh}]{Tremblay2025}
+Tremblay, C.~D., Sofair, J., Steffes, L., {et~al.} 2025,
+  \bibinfo{title}{{COSMIC's Large-scale Search for Technosignatures during the
+  VLA Sky Survey: Survey Description and First Results},} \aj, 169, 122,
+  \dodoi{10.3847/1538-3881/ad9ea5}
+
+% type= article
+\bibitem[{H.~K. Vedantham {et~al.}(2022)Vedantham, Callingham, Shimwell, Benz,
+  Hajduk, Ray, Tasse, \& Drabent}]{Vedantham2022}
+Vedantham, H.~K., Callingham, J.~R., Shimwell, T.~W., {et~al.} 2022,
+  \bibinfo{title}{{Peculiar Radio--X-Ray Relationship in Active Stars},} \apjl,
+  926, L30, \dodoi{10.3847/2041-8213/ac5115}
+
+% type= article
+\bibitem[{P. Virtanen {et~al.}(2020)Virtanen, Gommers, Oliphant, Haberland,
+  Reddy, Cournapeau, Burovski, Peterson, Weckesser, Bright, van~der Walt,
+  Brett, Wilson, Millman, Mayorov, Nelson, Jones, Kern, Larson, Carey, Polat,
+  Feng, Moore, VanderPlas, Laxalde, Perktold, Cimrman, Henriksen, Quintero,
+  Harris, Archibald, Ribeiro, Pedregosa, van Mulbregt, Vijaykumar, Bardelli,
+  Rothberg, Hilboll, Kloeckner, Scopatz, Lee, Rokem, Woods, Fulton, Masson,
+  H{\"a}ggstr{\"o}m, Fitzgerald, Nicholson, Hagen, Pasechnik, Olivetti, Martin,
+  Wieser, Silva, Lenders, Wilhelm, Young, Price, Ingold, Allen, Lee, Audren,
+  Probst, Dietrich, Silterra, Webber, Slavi{\v c}, Nothman, Buchner, Kulick,
+  Sch{\"o}nberger, de~Miranda~Cardoso, Reimer, Harrington, Rodr{\'\i}guez,
+  Nunez-Iglesias, Kuczynski, Tritz, Thoma, Newville, K{\"u}mmerer, Bolingbroke,
+  Tartre, Pak, Smith, Nowaczyk, Shebanov, Pavlyk, Brodtkorb, Lee, McGibbon,
+  Feldbauer, Lewis, Tygier, Sievert, Vigna, Peterson, More, Pudlik, Oshima,
+  Pingel, Robitaille, Spura, Jones, Cera, Leslie, Zito, Krauss, Upadhyay,
+  Halchenko, \& V{\'a}zquez-Baeza}]{Virtanen2020}
+Virtanen, P., Gommers, R., Oliphant, T.~E., {et~al.} 2020,
+  \bibinfo{title}{{SciPy 1.0: fundamental algorithms for scientific computing
+  in Python},} NatMe, 17, 261, \dodoi{10.1038/s41592-019-0686-2}
+
+% type= article
+\bibitem[{M. Wenger {et~al.}(2000)Wenger, Ochsenbein, Egret, Dubois, Bonnarel,
+  Borde, Genova, Jasniewicz, Lalo{\"e}, Lesteven, \& Monier}]{Wenger2000}
+Wenger, M., Ochsenbein, F., Egret, D., {et~al.} 2000, \bibinfo{title}{{The
+  SIMBAD astronomical database: The CDS reference database for astronomical
+  objects},} \aaps, 143, 9, \dodoi{10.1051/aas:2000332}
+
+% type= article
+\bibitem[{B.~S. Wlodarczyk-Sroka {et~al.}(2020)Wlodarczyk-Sroka, Garrett, \&
+  Siemion}]{Wlodarczyk2020}
+Wlodarczyk-Sroka, B.~S., Garrett, M.~A., \& Siemion, A. P.~V. 2020,
+  \bibinfo{title}{{Extending the Breakthrough Listen nearby star survey to
+  other stellar objects in the field},} \mnras, 498, 5720,
+  \dodoi{10.1093/mnras/staa2672}
+
+% type= article
+\bibitem[{J.~T. Wright {et~al.}(2018)Wright, Kanodia, \& Lubar}]{Wright2018}
+Wright, J.~T., Kanodia, S., \& Lubar, E. 2018, \bibinfo{title}{{How Much SETI
+  Has Been Done? Finding Needles in the n-dimensional Cosmic Haystack},} \aj,
+  156, 260, \dodoi{10.3847/1538-3881/aae099}
+
+\end{thebibliography}

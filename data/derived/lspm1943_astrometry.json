@@ -1,0 +1,15 @@
+{
+ "frame_tie_dE": -0.03315400057270719,
+ "frame_tie_dN": 0.10672674651566183,
+ "tgt_N_mu_mas_yr": 67.72697104077324,
+ "tgt_N_mu_err": 50.34866116167422,
+ "tgt_N_chi2_stationary": 1.8330459998519932,
+ "tgt_N_chi2_comoving": 2.8938862595304413,
+ "tgt_N_chi2_at_star": 85.71683594952293,
+ "tgt_E_mu_mas_yr": -224.86102285868319,
+ "tgt_E_mu_err": 53.04389720339751,
+ "tgt_E_chi2_stationary": 18.423791682976386,
+ "tgt_E_chi2_comoving": 16.217899387897965,
+ "tgt_E_chi2_at_star": 18.469297052154197,
+ "verdict": "background"
+}

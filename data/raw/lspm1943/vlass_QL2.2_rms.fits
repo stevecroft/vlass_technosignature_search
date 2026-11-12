@@ -1,0 +1,849 @@
+SIMPLE  =                    T / Java FITS: Wed Nov 11 01:38:03 UTC 2026        BITPIX  =                  -32 / Floating point (32 bit)                        NAXIS   =                    4                                                  NAXIS1  =                   29 / n'th data dimension                            NAXIS2  =                   29 / n'th data dimension                            NAXIS3  =                    1 / n'th data dimension                            NAXIS4  =                    1 / n'th data dimension                            EXTEND  =                    T / allow extensions                               BSCALE  =                  1.0 / PHYSICAL = PIXEL*BSCALE + BZERO                BZERO   =                 0.E0                                                  BMAJ    =     8.45713880327E-4                                                  BMIN    =     6.49599035581E-4                                                  BPA     =       -87.3307800293                                                  BTYPE   = 'Intensity'                                                           OBJECT  = 'J194312+533000'                                                      BUNIT   = 'Jy/beam '           / Brightness (pixel) unit                        EQUINOX =                 2.E3                                                  RADESYS = 'ICRS    '                                                            LONPOLE =                180.0                                                  LATPOLE =                 53.5                                                  PC1_1   =                  1.0                                                  PC2_1   =                 0.E0                                                  PC3_1   =                 0.E0                                                  PC4_1   =                 0.E0                                                  PC1_2   =                 0.E0                                                  PC2_2   =                  1.0                                                  PC3_2   =                 0.E0                                                  PC4_2   =                 0.E0                                                  PC1_3   =                 0.E0                                                  PC2_3   =                 0.E0                                                  PC3_3   =                  1.0                                                  PC4_3   =                 0.E0                                                  PC1_4   =                 0.E0                                                  PC2_4   =                 0.E0                                                  PC3_4   =                 0.E0                                                  PC4_4   =                  1.0                                                  CTYPE1  = 'RA---SIN'                                                            CRVAL1  =    295.8005409226443                                                  CDELT1  =   -2.777777777778E-4                                                  CRPIX1  =                358.0                                                  CUNIT1  = 'deg     '                                                            CTYPE2  = 'DEC--SIN'                                                            CRVAL2  =    53.49999983606202                                                  CDELT2  =    2.777777777778E-4                                                  CRPIX2  =               -448.0                                                  CUNIT2  = 'deg     '                                                            CTYPE3  = 'FREQ    '                                                            CRVAL3  =                 3.E9                                                  CDELT3  =     2.072152310327E9                                                  CRPIX3  =                  1.0                                                  CUNIT3  = 'Hz      '                                                            CTYPE4  = 'STOKES  '                                                            CRVAL4  =                  1.0                                                  CDELT4  =                  1.0                                                  CRPIX4  =                  1.0                                                  CUNIT4  = '        '                                                            PV2_1   =                 0.E0                                                  PV2_2   =                 0.E0                                                  RESTFRQ =     2.987888186695E9 / Rest Frequency (Hz)                            SPECSYS = 'LSRK    '           / Spectral reference frame                       ALTRVAL =    -1.215249719738E6 / Alternate frequency reference value            ALTRPIX =                  1.0 / Alternate frequency reference pixel            VELREF  =                  257 / 1 LSR, 2 HEL, 3 OBS, +256 Radio                COMMENT  casacore non-standard usage: 4 LSD, 5 GEO, 6 SOU, 7 GAL                TELESCOP= 'EVLA    '                                                            OBSERVER= 'Dr. Vlass Scientist'                                                 DATE-OBS= '2021-09-28T06:08:35.700000' / First scan started                     DATE-END= '2021-09-28T06:43:26.850000' / Last scan finished                     TIMESYS = 'UTC     '                                                            OBSRA   =          295.8006625                                                  OBSDEC  =                 53.5                                                  OBSGEO-X=    -1.601156673287E6                                                  OBSGEO-Y=    -5.041988986066E6                                                  OBSGEO-Z=     3.554879236821E6                                                  INSTRUME= 'EVLA    '                                                            CASAVER = '6.1.3.3 '                                                            DATAMAX =     0.05312457680702                                                  DATAMIN =   -8.590525831096E-4                                                  DISTANCE=                 0.E0                                                  FIELD   = '3913    '                                                            FILNAM01= 'VLASS2  '                                                            FILNAM02= '2       '                                                            FILNAM03= 'ql      '                                                            FILNAM04= 'T24t20  '                                                            FILNAM05= 'J194312+533000'                                                      FILNAM06= '10      '                                                            FILNAM07= '2048    '                                                            FILNAM08= 'v1      '                                                            FILNAM09= 'I       '                                                            FILNAM10= 'iter1   '                                                            FILNAM11= 'image   '                                                            FILNAM12= 'tt0     '                                                            GROUP   = 'N/A     '                                                            INTENT  = 'TARGET  '                                                            ITER    =                    1                                                  MEMBER  = 'unknown '                                                            NFIELD  =                    1                                                  NFILNAM =                   12                                                  NPOL    =                    2                                                  NSPWNAM =                   16                                                  OFFDEC  =               -999.0                                                  OFFRA   =               -999.0                                                  PER_EB  =                    F                                                  PIPEVER = '2021.1.1.32'                                                         PROPCODE= 'VLASS   '                                                            ROBUST  =                  1.0                                                  SGOAL   = 'N/A     '                                                            SPECMODE= 'mfs     '                                                            SPW     = '10,11,12,13,14,15,16,17,2,3,4,5,6,7,8,9'                             SPWNAM01= 'EVLA_S#B0D0#10'                                                      SPWNAM02= 'EVLA_S#B0D0#11'                                                      SPWNAM03= 'EVLA_S#B0D0#12'                                                      SPWNAM04= 'EVLA_S#B0D0#13'                                                      SPWNAM05= 'EVLA_S#B0D0#14'                                                      SPWNAM06= 'EVLA_S#B0D0#15'                                                      SPWNAM07= 'EVLA_S#B0D0#16'                                                      SPWNAM08= 'EVLA_S#B0D0#17'                                                      SPWNAM09= 'EVLA_S#A0C0#2'                                                       SPWNAM10= 'EVLA_S#A0C0#3'                                                       SPWNAM11= 'EVLA_S#A0C0#4'                                                       SPWNAM12= 'EVLA_S#A0C0#5'                                                       SPWNAM13= 'EVLA_S#A0C0#6'                                                       SPWNAM14= 'EVLA_S#A0C0#7'                                                       SPWNAM15= 'EVLA_S#A0C0#8'                                                       SPWNAM16= 'EVLA_S#A0C0#9'                                                       TYPE    = 'image   '                                                            USEWEIGH=                    F                                                  DATE    = '2021-11-06T07:55:23.722000' / Date FITS file was written             ORIGIN  = 'CASA 6.1.3-3 CASAtools:v1.0.0'                                       HISTORY  CASA START LOGTABLE                                                    HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0       HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0   HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0          HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  Ran ia.setcoordsys                                                     HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  ia.setcoordsys(csys={...})                                             HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  impbcor(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter&HISTORY  1.                                                                     HISTORY  >image.tt0", pbimage="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >1.pb.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.it&HISTORY  er                                                                     HISTORY  >.image.pbcor.tt0", overwrite=False, box="", region="", chans="", stok&HISTORY  es                                                                     HISTORY  >"", mask="", mode="divide", cutoff=-1.0, stretch=False)               HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  Ran ia.deviation                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  ia.deviation(outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", region={...}, mask="", overwrite=true, stret&HISTORY  ch                                                                     HISTORY  >false, grid=[10,10], anchor="ref", xlength="60arcsec", ylength="60arc&HISTORY  se                                                                     HISTORY  >", interp="cubic", stattype="xmadm", statalg="chauvenet", zscore=-1.0&HISTORY  00                                                                     HISTORY  >00, maxiter=-1)                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  imdev(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.&HISTORY  im                                                                     HISTORY  >age.pbcor.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1&HISTORY  .I                                                                     HISTORY  >iter1.image.pbcor.tt0.rms", region="", box="", chans="", stokes="", m&HISTORY  as                                                                     HISTORY  >="", overwrite=True, stretch=False, grid=[10, 10], anchor="ref", xlen&HISTORY  gt                                                                     HISTORY  >="60arcsec", ylength="60arcsec", interp="cubic", stattype="xmadm", st&HISTORY  at                                                                     HISTORY  >lg="chauvenet", zscore=-1.0, maxiter=-1)                              HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  imsubimage(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", outfile="VLASS2.2.ql.T24t20.J194312+533000.1&HISTORY  0.                                                                     HISTORY  >048.v1.I.iter1.image.pbcor.tt0.rms.subim", box="1785.0,1785.0,5506.0,&HISTORY  55                                                                     HISTORY  >6.0", region="", chans="", stokes="", mask="", dropdeg=False, overwri&HISTORY  te                                                                     HISTORY  >False, verbose=True, stretch=False, keepaxes=[])                      HISTORY  CASA END LOGTABLE                                                      HISTORY  Uncorrected CRVAL1 = 2.958006625000E+02 deg                            HISTORY  Uncorrected CRVAL2 = 5.350000000000E+01 deg                            HISTORY  Position correction (-2.603E-01/cos(CRVAL2), -5.902E-04) arcsec appliedNEXTEND =                    0 / Number of standard extensions                  END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             9	Î9	Î¾9	Ïp9	Ð"9	ÐÔ9	Ñ‡9	Ò99	Òë9	íÏ9
+²9
+#–9
+>y9
+Y]9
+tA9
+$9
+ª9
+Äë9
+ßÏ9
+õ79
+Ÿ9 95o9J×9`?9u§9‹9 w9µß9ÿ…9
+Z¶9
+WÀ9
+TÊ9
+QÔ9
+NÞ9
+Kç9
+Hñ9
+Eû9
+_z9
+xú9
+’y9
+«ø9
+Åx9
+Þ÷9
+øv9õ9+u9Dô9Wm9iå9|^9ŽÖ9¡N9³Ç9Æ@9Ø¸9ë09ý©9Iœ9
+5È9
+/9
+(n9
+!Â9
+9
+h9
+»9
+9
+!29
+;V9
+Uz9
+o9
+‰Á9
+£å9
+¾	9
+Ø-9
+òP9t9"a98N9N;9d(9z99¥ï9»Ü9ÑÈ9çµ9269
+Ú9
+v9	ü9	ñ¯9	çL9	Üè9	Ò…9	È!9	âê9	ý²9
+z9
+3B9
+N9
+hÓ9
+ƒ›9
+žd9
+¹,9
+Óô9
+íV9·9 99z9RÛ9l<9…ž9žÿ9¸`9ÑÂ9Ð9	ëì9	ÝÒ9	Ï·9	Á9	³ƒ9	¥i9	—O9	‰49	¤¡9	À9	Û{9	öè9
+T9
+-Á9
+I.9
+d›9
+€9
+›u9
+¸J9
+Õ 9
+ñö9Ì9+¡9Hw9eM9‚#9žø9»Î9j9	Æþ9	µ-9	£\9	‘‹9	º9	mé9	\9	JG9	fY9	‚j9	ž{9	º9	Öž9	ò¯9
+Á9
+*Ò9
+Fã9
+bõ9
+ƒ?9
+£‰9
+ÃÓ9
+ä9h9$²9Dü9eF9…9¥Û9ì9	¢9	Œˆ9	w 9	ay9	Kñ9	6j9	 â9	Z9	(9	DÆ9	a|9	~29	šè9	·ž9	ÔS9	ñ	9
+¿9
+*u9
+N49
+qò9
+•±9
+¹o9
+Ý.9 í9$«9Hj9l(9ç9Ôž9	}!9	cã9	J¥9	1f9	(9þê9å¬9Ìn9éÈ9	"9	$}9	A×9	_19	|Œ9	™æ9	·@9	Ô›9	ñõ9
+(9
+@[9
+gŽ9
+ŽÁ9
+µô9
+Ý'9Z9+9RÀ9yó9½89	X39	;>9	I9	T9ä_9Çj9ªv99«€9É~9ç}9	|9	#{9	Az9	_y9	}x9	›w9	¹u9	ä9
+Ä9
+9l9
+d9
+Ž»9
+¹b9
+ä	9±99X9d 9¥Ò9	3E9	™9ñî9ÑB9°–9ë9o?9N”9m79‹Û9ª~9É!9çÅ9	h9	%9	C¯9	bR9	€ö9	¯9	Ý-9
+I9
+9e9
+g9
+•9
+Ã¹9
+ñÔ9ð9N9Žl9	W9éô9Å’9¡09|Î9Xk94	9§9.ï9N79m9ŒÆ9¬9ËV9êž9		æ9	).9	Hv9	z9	«–9	Ý'9
+·9
+@G9
+q×9
+£h9
+Ôø9ˆ989w9éh9ÁO9™69q9I9 ì9øÓ9Ðº9ð¦9“909Pl9pX9D9°19Ð9ð
+9	ö9	Dû9	yÿ9	¯9	ä	9
+9
+N9
+ƒ9
+¸9
+í 9"%9_ 9û|9ÙA9·9”Ë9r9PU9.9ß9'Ã9C¦9_‰9{m9—P9³39Ï9êú9	Ý9	"Á9	Y¹9	°9	Ç¨9	þ 9
+5—9
+l9
+£‡9
+Ú9v9Hn9Š‹9	9ñ29ÔÕ9¸x9œ9¾9ca9G9^ß9v¹9Ž“9¦n9¾H9Ö"9íý9	×9	±9	5Œ9	nv9	§a9	àL9
+79
+R!9
+‹9
+Ã÷9
+üâ95Ì9n·9µu9	¢9		#9ò¤9Ü%9Å¦9¯(9˜©9‚*9•û9©Ì9½9Ño9å@9ù9	ã9	 ´9	4…9	HV9	ƒ49	¾9	øð9
+3Í9
+n«9
+©‰9
+äg9D9Z"9• 9à`9	1¶9	!9	t9ÿÓ9ï29Þ‘9Íð9½O9Í9Üß9ì¨9üp9	89	 9	+È9	;‘9	KY9	[!9	—ò9	ÔÃ9
+”9
+Nd9
+‹59
+È9×9A§9~x9»I9J9	CÉ9	99	.C9	#€9	½9	ú9	79øt9	39	ò9	²9	'q9	309	>ï9	J®9	Vn9	b-9	mì9	¬°9	ët9
+*79
+hû9
+§¿9
+æƒ9%G9d
+9¢Î9á’9659	UÜ9	P÷9	L9	G-9	BH9	=c9	8~9	3™9	;O9	C9	J¼9	Rr9	Z(9	aÞ9	i”9	qJ9	y9	€·9	Án9
+$9
+BÛ9
+ƒ’9
+ÄI9 9E·9†m9Ç$9Û9a 9	gð9	hé9	iâ9	jÛ9	kÔ9	lÌ9	mÅ9	n¾9	rl9	v9	yÆ9	}s9	 9	„Í9	ˆz9	Œ'9	Ô9	“‚9	Ö+9
+Õ9
+[9
+ž)9
+àÓ9#}9f&9¨Ð9ëz9.$9Œ
+9	z9	€Ú9	‡±9	Žˆ9	•_9	œ69	£9	©ä9	©ˆ9	©,9	¨Ð9	¨t9	¨9	§¼9	§`9	§9	¦¨9	¦L9	êé9
+/†9
+t#9
+¸À9
+ý]9Aú9†–9Ë39Ð9Tm9¶õ9	Œ9	˜Ë9	¥€9	²59	¾ê9	ËŸ9	ØT9	å	9	à¤9	Ü?9	×Ú9	Óu9	Ï9	Ê«9	ÆF9	Áá9	½|9	¹9	ÿ§9
+F79
+ŒÇ9
+ÓW9ç9`v9§9í–94&9z¶9áß9	ž*9	°½9	ÃP9	Õâ9	èu9	û9
+›9
+ .9
+À9
+R9
+ä9	þv9	ö9	íš9	å,9	Ü¾9	ÔP9	Ëâ9
+e9
+\è9
+¥k9
+íî96p9~ó9Çv9ù9X|9 ÿ9Ê9	-9	@9	S9	eþ9	xó9	‹é9	žÞ9	±Ô9	®Ó9	«Ó9	¨Ó9	¥Ó9	¢Ò9	ŸÒ9	œÒ9	™Ò9	–Ñ9	“Ñ9	áÞ9
+/ë9
+}ø9
+Ì99h9¶,999RF9 S989¼9Ïh9âÁ9ö9		q9	É9	0!9	Cy9	Eç9	HT9	JÂ9	M/9	O9	R
+9	Tx9	Vå9	YS9	[À9	¯W9
+î9
+V†9
+ª9
+ý´9QK9¤â9øy9L9Ÿ§9¦9K9^¾9ry9†49™ï9­©9Ád9Õ9Üú9äÕ9ì±9ôŒ9üg9	B9	9	ù9	Ô9	#°9	|Ñ9	Õò9
+/9
+ˆ49
+áU9:v9“—9ì¸9EÚ9žû9ÿ9Ù÷9î929O9*l9>Š9R§9fÄ9t9V9Ž 9›é9©29¶{9ÃÄ9Ñ9ÞV9ëŸ9	JJ9	¨õ9
+ 9
+fL9
+Ä÷9#¢9‚M9àø9?£9žO9ú‚9hê9}j9‘ê9¦j9ºê9Ïj9ãê9øj9!9Ø90Ž9CE9Uü9h³9{j9Ž 9 ×9³Ž9	Ã9	{ø9	à.9
+Dc9
+¨˜9Î9q9Õ899m9¢9õð9÷Ý9À9!¢96…9Kh9`J9u-9Š9¢49ºY9Ò}9ê¢9Æ9ë939K49cY9{}9å=9	Nü9	¸»9
+"z9
+Œ:9
+õù9_¸9Éx9379œö9ñ^9†Ñ9œ9±[9Æ 9Ûå9ñ+9p9µ99H9VÚ9tl9‘þ9¯‘9Í#9êµ9H9%Ú9Cl9²¶9	!ÿ9	‘I9
+ ’9
+oÛ9
+ß%9Nn9½¸9-9œJ9ìÌ                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            XTENSION= 'IMAGE   '           / HDU extension type                             BITPIX  =                  -32 / Floating point (32 bit)                        NAXIS   =                    4                                                  NAXIS1  =                   29 / n'th data dimension                            NAXIS2  =                   29 / n'th data dimension                            NAXIS3  =                    1 / n'th data dimension                            NAXIS4  =                    1 / n'th data dimension                            PCOUNT  =                    0 / associated parameter count                     GCOUNT  =                    1 / group count                                    BSCALE  =                  1.0 / PHYSICAL = PIXEL*BSCALE + BZERO                BZERO   =                 0.E0                                                  BMAJ    =     8.45713880327E-4                                                  BMIN    =     6.49599035581E-4                                                  BPA     =       -87.3307800293                                                  BTYPE   = 'Intensity'                                                           OBJECT  = 'J194312+533000'                                                      BUNIT   = 'Jy/beam '           / Brightness (pixel) unit                        EQUINOX =                 2.E3                                                  RADESYS = 'ICRS    '                                                            LONPOLE =                180.0                                                  LATPOLE =                 53.5                                                  PC1_1   =                  1.0                                                  PC2_1   =                 0.E0                                                  PC3_1   =                 0.E0                                                  PC4_1   =                 0.E0                                                  PC1_2   =                 0.E0                                                  PC2_2   =                  1.0                                                  PC3_2   =                 0.E0                                                  PC4_2   =                 0.E0                                                  PC1_3   =                 0.E0                                                  PC2_3   =                 0.E0                                                  PC3_3   =                  1.0                                                  PC4_3   =                 0.E0                                                  PC1_4   =                 0.E0                                                  PC2_4   =                 0.E0                                                  PC3_4   =                 0.E0                                                  PC4_4   =                  1.0                                                  CTYPE1  = 'RA---SIN'                                                            CRVAL1  =    295.8005409226443                                                  CDELT1  =   -2.777777777778E-4                                                  CRPIX1  =               -978.0                                                  CUNIT1  = 'deg     '                                                            CTYPE2  = 'DEC--SIN'                                                            CRVAL2  =    53.49999983606202                                                  CDELT2  =    2.777777777778E-4                                                  CRPIX2  =               -292.0                                                  CUNIT2  = 'deg     '                                                            CTYPE3  = 'FREQ    '                                                            CRVAL3  =                 3.E9                                                  CDELT3  =     2.072152310327E9                                                  CRPIX3  =                  1.0                                                  CUNIT3  = 'Hz      '                                                            CTYPE4  = 'STOKES  '                                                            CRVAL4  =                  1.0                                                  CDELT4  =                  1.0                                                  CRPIX4  =                  1.0                                                  CUNIT4  = '        '                                                            PV2_1   =                 0.E0                                                  PV2_2   =                 0.E0                                                  RESTFRQ =     2.987888186695E9 / Rest Frequency (Hz)                            SPECSYS = 'LSRK    '           / Spectral reference frame                       ALTRVAL =    -1.215249719738E6 / Alternate frequency reference value            ALTRPIX =                  1.0 / Alternate frequency reference pixel            VELREF  =                  257 / 1 LSR, 2 HEL, 3 OBS, +256 Radio                COMMENT  casacore non-standard usage: 4 LSD, 5 GEO, 6 SOU, 7 GAL                TELESCOP= 'EVLA    '                                                            OBSERVER= 'Dr. Vlass Scientist'                                                 DATE-OBS= '2021-09-28T06:08:35.700000' / First scan started                     DATE-END= '2021-09-28T06:43:26.850000' / Last scan finished                     TIMESYS = 'UTC     '                                                            OBSRA   =          295.8006625                                                  OBSDEC  =                 53.5                                                  OBSGEO-X=    -1.601156673287E6                                                  OBSGEO-Y=    -5.041988986066E6                                                  OBSGEO-Z=     3.554879236821E6                                                  INSTRUME= 'EVLA    '                                                            CASAVER = '6.1.3.3 '                                                            DATAMAX =     0.05312457680702                                                  DATAMIN =   -8.590525831096E-4                                                  DISTANCE=                 0.E0                                                  FIELD   = '3913    '                                                            FILNAM01= 'VLASS2  '                                                            FILNAM02= '2       '                                                            FILNAM03= 'ql      '                                                            FILNAM04= 'T24t20  '                                                            FILNAM05= 'J194312+533000'                                                      FILNAM06= '10      '                                                            FILNAM07= '2048    '                                                            FILNAM08= 'v1      '                                                            FILNAM09= 'I       '                                                            FILNAM10= 'iter1   '                                                            FILNAM11= 'image   '                                                            FILNAM12= 'tt0     '                                                            GROUP   = 'N/A     '                                                            INTENT  = 'TARGET  '                                                            ITER    =                    1                                                  MEMBER  = 'unknown '                                                            NFIELD  =                    1                                                  NFILNAM =                   12                                                  NPOL    =                    2                                                  NSPWNAM =                   16                                                  OFFDEC  =               -999.0                                                  OFFRA   =               -999.0                                                  PER_EB  =                    F                                                  PIPEVER = '2021.1.1.32'                                                         PROPCODE= 'VLASS   '                                                            ROBUST  =                  1.0                                                  SGOAL   = 'N/A     '                                                            SPECMODE= 'mfs     '                                                            SPW     = '10,11,12,13,14,15,16,17,2,3,4,5,6,7,8,9'                             SPWNAM01= 'EVLA_S#B0D0#10'                                                      SPWNAM02= 'EVLA_S#B0D0#11'                                                      SPWNAM03= 'EVLA_S#B0D0#12'                                                      SPWNAM04= 'EVLA_S#B0D0#13'                                                      SPWNAM05= 'EVLA_S#B0D0#14'                                                      SPWNAM06= 'EVLA_S#B0D0#15'                                                      SPWNAM07= 'EVLA_S#B0D0#16'                                                      SPWNAM08= 'EVLA_S#B0D0#17'                                                      SPWNAM09= 'EVLA_S#A0C0#2'                                                       SPWNAM10= 'EVLA_S#A0C0#3'                                                       SPWNAM11= 'EVLA_S#A0C0#4'                                                       SPWNAM12= 'EVLA_S#A0C0#5'                                                       SPWNAM13= 'EVLA_S#A0C0#6'                                                       SPWNAM14= 'EVLA_S#A0C0#7'                                                       SPWNAM15= 'EVLA_S#A0C0#8'                                                       SPWNAM16= 'EVLA_S#A0C0#9'                                                       TYPE    = 'image   '                                                            USEWEIGH=                    F                                                  DATE    = '2021-11-06T07:55:23.722000' / Date FITS file was written             ORIGIN  = 'CASA 6.1.3-3 CASAtools:v1.0.0'                                       HISTORY  CASA START LOGTABLE                                                    HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0       HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0   HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0          HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  Ran ia.setcoordsys                                                     HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  ia.setcoordsys(csys={...})                                             HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  impbcor(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter&HISTORY  1.                                                                     HISTORY  >image.tt0", pbimage="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >1.pb.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.it&HISTORY  er                                                                     HISTORY  >.image.pbcor.tt0", overwrite=False, box="", region="", chans="", stok&HISTORY  es                                                                     HISTORY  >"", mask="", mode="divide", cutoff=-1.0, stretch=False)               HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  Ran ia.deviation                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  ia.deviation(outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", region={...}, mask="", overwrite=true, stret&HISTORY  ch                                                                     HISTORY  >false, grid=[10,10], anchor="ref", xlength="60arcsec", ylength="60arc&HISTORY  se                                                                     HISTORY  >", interp="cubic", stattype="xmadm", statalg="chauvenet", zscore=-1.0&HISTORY  00                                                                     HISTORY  >00, maxiter=-1)                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  imdev(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.&HISTORY  im                                                                     HISTORY  >age.pbcor.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1&HISTORY  .I                                                                     HISTORY  >iter1.image.pbcor.tt0.rms", region="", box="", chans="", stokes="", m&HISTORY  as                                                                     HISTORY  >="", overwrite=True, stretch=False, grid=[10, 10], anchor="ref", xlen&HISTORY  gt                                                                     HISTORY  >="60arcsec", ylength="60arcsec", interp="cubic", stattype="xmadm", st&HISTORY  at                                                                     HISTORY  >lg="chauvenet", zscore=-1.0, maxiter=-1)                              HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  imsubimage(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", outfile="VLASS2.2.ql.T24t20.J194312+533000.1&HISTORY  0.                                                                     HISTORY  >048.v1.I.iter1.image.pbcor.tt0.rms.subim", box="1785.0,1785.0,5506.0,&HISTORY  55                                                                     HISTORY  >6.0", region="", chans="", stokes="", mask="", dropdeg=False, overwri&HISTORY  te                                                                     HISTORY  >False, verbose=True, stretch=False, keepaxes=[])                      HISTORY  CASA END LOGTABLE                                                      HISTORY  Uncorrected CRVAL1 = 2.958006625000E+02 deg                            HISTORY  Uncorrected CRVAL2 = 5.350000000000E+01 deg                            HISTORY  Position correction (-2.603E-01/cos(CRVAL2), -5.902E-04) arcsec appliedNEXTEND =                    0 / Number of standard extensions                  END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             9Cµ92Q9a¨9‘ 9ÀW9ï¯99N^9}¶9­9Üe9¼9Æ9'Ð95Ú9Cä9Qí9_÷9n9|9Š9˜9ÓÔ9Š9K@9†ö9Â¬9þa9:9;s9-L9Ux9}¥9¥Ò9Íþ9ö+9W9F„9n±9–Ý9¿
+9Ó	9ç9û99#979K9_9s 9†þ9Á½9ü{97:9qø9¬·9çu9"39319(F9IH9jJ9‹L9¬M9ÍO9îQ9R90T9QV9rX9ŒK9¦?9À39Ú'9ô99(9A÷9[ë9uÞ9¯¦9él9#49\ú9–Â9Ð‰9
+O9*ï9#A9=9Vï9pÆ9Šœ9¤s9¾J9Ø!9ñ÷9Î9%¥9EŽ9ew9…`9¥I9Å29å99$í9DÖ9d¿9Ž9Ö^9-9Gý9€Ì9¹œ9òl9"­9<90è9C”9V@9hì9{—9ŽC9 ï9³›9ÆG9Øó9þÑ9$¯9J9pk9–I9¼'9â9ã9-Á9SŸ9‹w9ÃO9û'92ÿ9jØ9¢°9Úˆ9k979$¸9099;º9G;9R¼9^<9i½9u>9€¿9Œ@9¸9ãæ9¹9;Œ9g_9“29¿9êÙ9¬9B9y`9°@9ç!99Tâ9‹Ã9Â¤9)929ˆ9Þ9!49%Š9)à9.692Œ96â9;89?Ž9qV9£9Ôæ9®98v9j>9œ9ÍÏ9ÿ—91_9gH929Ó9	9>î9t×9ªÀ9	ç9-9X9	ƒ9®9Ù99þ/9ûZ9ø…9õ°9òÛ9*˜9bU9š9ÑÐ9	9AJ9y9°Å9è‚9 ?9U19Š#9¿9ô9(ø9]ê9’Ü9dç9dp9^¨9Xà9S9MP9Gˆ9AÀ9;ø96190i9*¡9^&9‘«9Å19ø¶9,;9_À9“E9ÆË9úP9-Õ9c¯9™‰9Ïd9>9;9pò9¦Ì9¿æ9¹²9°÷9¨=9Ÿ‚9–Ç9Ž9…R9|—9sÜ9k"9bg9‘´9Á9ðN9œ9Né9~69­ƒ9ÜÑ99;k9r.9¨ð9ß²9u9M89ƒú9º¼9æ9õ9G9÷™9ëì9à>9Ô‘9Èã9½59±ˆ9¥Ú9š-9ÅB9ðW9l9F‚9q—9œ¬9ÇÁ9ò×9ì9I9€¬9¸W9ð9'¬9_W9—9Î­9uå9d79U—9Fö98V9)µ99t9ýÔ9ï39à“9Ñó9øÐ9­9FŠ9mh9”E9»"9áÿ9Ý9/º9V—9*9Ç½9 P98ã9qv9ª
+9â9Ðä9¹z9§æ9–S9„À9s,9a™9P9>r9,ß9L9	¸9,^9O9q¨9”M9¶ó9Ù˜9ü=9â9Aˆ9d-9¨9×$9Ÿ9J9ƒ–9½9ö9+ä9¼9ú69å°9Ñ*9¼£9¨9“—99j‹9V9A~9_ì9~Y9œÆ9»39Ù¡9ø9{94è9SV9qÃ9¬'9æŠ9 î9[R9•¶9Ð9
+}9†ã9cþ9L…959“99î¡9×(9¿¯9¨69½9yD9“z9­¯9Çä9â9üO9„90¹9Jî9e$9Y9º¥9õñ91=9l‰9§Õ9ã!9m9áã9¹A9žÕ9„i9iý9O‘95&9º9 N9åâ9Ëv9±
+9Ç9Ý9ó9ÿ9ý94ú9J÷9`ô9vò9Œï9É#9X9AŒ9}À9¹ô9ö)92]9<â9ƒ9ñ%9ÓÆ9¶g9™	9{ª9^K9@ì9#Ž9/9èÐ9ú•9[9 9/å9A«9Sp9e59vú9ˆÀ9š…9×¢9¾9QÛ9Ž÷9Ì9	19FM9—â9cÆ9Ct9##9Ñ9â€9Â.9¡Ü9‹9a99@è9 –9.#9;±9I>9VË9dX9qæ9s9 9šŽ9¨9æ 9$%9b*9 /9Þ4989Z=9ô¤9½s9œW9{;9Z999ç9öË9Õ¯9´“9“w9r[9€ÿ9¢9žF9¬ê9»Ž9Ê29ØÕ9çy9ö9Á9@¯9|ž9¸Œ9ô{90i9lX9¨G9Qg9 9õ99ÓS9±l9†9m 9K¹9)Ó9ì9æ9Ä9ÓÚ9ã”9óN9	9Ã9"}9279Aò9Q¬9af9›?9Õ9ï9HÇ9‚Ÿ9¼x9öP9®)9pÍ9N9+k9º9æ	9ÃX9 ¨9}÷9[F98•9ä9&µ97†9HW9Y'9iø9zÉ9‹š9œk9­;9¾9õÎ9-9eR99ÔÕ9	—9	DY9	
+ì9Êz9¦þ9ƒƒ9`9<Œ99õ–9Ò9®Ÿ9‹$9g©9y9‹w9_9¯F9Á-9Ó9äü9öã9Ê9²9P]9†	9»´9ñ`9	'9	\·9	’b9	g®9	$&9ÿá9Û›9·U9“9nÊ9J„9&?9ù9Ý³9¹n9Ìk9ßi9òg9e9b9+`9>^9Q\9dZ9wX9ªí9Þ‚9	9	E¬9	yA9	¬Ö9	àl9	Äq9	}Ó9	XÃ9	3³9	£9é“9Äƒ9Ÿs9zc9UR90B929G93[9Go9[ƒ9o˜9ƒ¬9—À9«Õ9¿é9Óý9	|9	6û9	hz9	™ø9	Ëw9	üö9
+.u9
+!39	×€9	±¦9	‹Ë9	eñ9	@9	<9ôa9Î‡9¨¬9‚Ñ9\÷9r"9‡L9œw9±¢9ÆÍ9Ûø9ñ"9	M9	x9	0£9	`9	t9	¾Ü9	îE9
+­9
+M9
+|~9
+}ö9
+1-9
+
+ˆ9	ãã9	½>9	–™9	oô9	IO9	"ª9ü9Õa9®¼9Äý9Û>9ñ€9	Á9	9	4C9	J…9	`Æ9	w9	I9	º›9	çí9
+?9
+B‘9
+oã9
+59
+Ê‡9
+Ú¸9
+ŠÚ9
+ck9
+;û9
+Œ9	í9	Å­9	ž>9	vÎ9	O_9	'ð9	 €9	Ø9	/09	Fˆ9	]ß9	u79	Œ9	£ç9	»?9	Ò–9	éî9
+*9
+@f9
+k¢9
+–Ý9
+Â9
+íU9‘97{9
+ä‡9
+¼M9
+”9
+kÚ9
+C 9
+f9	ó,9	Êò9	¢¹9	z9	RE9	j³9	ƒ"9	›9	³þ9	Ìl9	äÛ9	ýI9
+·9
+.&9
+F”9
+o¹9
+˜ß9
+Â9
+ë*9O9=t9fš9™Ó9JŠ9Š9
+ð‹9
+ÃŒ9
+–Œ9
+i9
+<Ž9
+Ž9	â9	µ9	ˆ9	Ÿ59	µÙ9	Ì}9	ã"9	ùÆ9
+j9
+'9
+=³9
+TW9
+jû9
+Žþ9
+³9
+×9
+û99C9g                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            XTENSION= 'IMAGE   '           / HDU extension type                             BITPIX  =                  -32 / Floating point (32 bit)                        NAXIS   =                    4                                                  NAXIS1  =                   29 / n'th data dimension                            NAXIS2  =                   29 / n'th data dimension                            NAXIS3  =                    1 / n'th data dimension                            NAXIS4  =                    1 / n'th data dimension                            PCOUNT  =                    0 / associated parameter count                     GCOUNT  =                    1 / group count                                    BSCALE  =                  1.0 / PHYSICAL = PIXEL*BSCALE + BZERO                BZERO   =                 0.E0                                                  BMAJ    =     8.45713880327E-4                                                  BMIN    =     6.49599035581E-4                                                  BPA     =       -87.3307800293                                                  BTYPE   = 'Intensity'                                                           OBJECT  = 'J194312+533000'                                                      BUNIT   = 'Jy/beam '           / Brightness (pixel) unit                        EQUINOX =                 2.E3                                                  RADESYS = 'ICRS    '                                                            LONPOLE =                180.0                                                  LATPOLE =                 53.5                                                  PC1_1   =                  1.0                                                  PC2_1   =                 0.E0                                                  PC3_1   =                 0.E0                                                  PC4_1   =                 0.E0                                                  PC1_2   =                 0.E0                                                  PC2_2   =                  1.0                                                  PC3_2   =                 0.E0                                                  PC4_2   =                 0.E0                                                  PC1_3   =                 0.E0                                                  PC2_3   =                 0.E0                                                  PC3_3   =                  1.0                                                  PC4_3   =                 0.E0                                                  PC1_4   =                 0.E0                                                  PC2_4   =                 0.E0                                                  PC3_4   =                 0.E0                                                  PC4_4   =                  1.0                                                  CTYPE1  = 'RA---SIN'                                                            CRVAL1  =    295.8005409226443                                                  CDELT1  =   -2.777777777778E-4                                                  CRPIX1  =                705.0                                                  CUNIT1  = 'deg     '                                                            CTYPE2  = 'DEC--SIN'                                                            CRVAL2  =    53.49999983606202                                                  CDELT2  =    2.777777777778E-4                                                  CRPIX2  =              -1569.0                                                  CUNIT2  = 'deg     '                                                            CTYPE3  = 'FREQ    '                                                            CRVAL3  =                 3.E9                                                  CDELT3  =     2.072152310327E9                                                  CRPIX3  =                  1.0                                                  CUNIT3  = 'Hz      '                                                            CTYPE4  = 'STOKES  '                                                            CRVAL4  =                  1.0                                                  CDELT4  =                  1.0                                                  CRPIX4  =                  1.0                                                  CUNIT4  = '        '                                                            PV2_1   =                 0.E0                                                  PV2_2   =                 0.E0                                                  RESTFRQ =     2.987888186695E9 / Rest Frequency (Hz)                            SPECSYS = 'LSRK    '           / Spectral reference frame                       ALTRVAL =    -1.215249719738E6 / Alternate frequency reference value            ALTRPIX =                  1.0 / Alternate frequency reference pixel            VELREF  =                  257 / 1 LSR, 2 HEL, 3 OBS, +256 Radio                COMMENT  casacore non-standard usage: 4 LSD, 5 GEO, 6 SOU, 7 GAL                TELESCOP= 'EVLA    '                                                            OBSERVER= 'Dr. Vlass Scientist'                                                 DATE-OBS= '2021-09-28T06:08:35.700000' / First scan started                     DATE-END= '2021-09-28T06:43:26.850000' / Last scan finished                     TIMESYS = 'UTC     '                                                            OBSRA   =          295.8006625                                                  OBSDEC  =                 53.5                                                  OBSGEO-X=    -1.601156673287E6                                                  OBSGEO-Y=    -5.041988986066E6                                                  OBSGEO-Z=     3.554879236821E6                                                  INSTRUME= 'EVLA    '                                                            CASAVER = '6.1.3.3 '                                                            DATAMAX =     0.05312457680702                                                  DATAMIN =   -8.590525831096E-4                                                  DISTANCE=                 0.E0                                                  FIELD   = '3913    '                                                            FILNAM01= 'VLASS2  '                                                            FILNAM02= '2       '                                                            FILNAM03= 'ql      '                                                            FILNAM04= 'T24t20  '                                                            FILNAM05= 'J194312+533000'                                                      FILNAM06= '10      '                                                            FILNAM07= '2048    '                                                            FILNAM08= 'v1      '                                                            FILNAM09= 'I       '                                                            FILNAM10= 'iter1   '                                                            FILNAM11= 'image   '                                                            FILNAM12= 'tt0     '                                                            GROUP   = 'N/A     '                                                            INTENT  = 'TARGET  '                                                            ITER    =                    1                                                  MEMBER  = 'unknown '                                                            NFIELD  =                    1                                                  NFILNAM =                   12                                                  NPOL    =                    2                                                  NSPWNAM =                   16                                                  OFFDEC  =               -999.0                                                  OFFRA   =               -999.0                                                  PER_EB  =                    F                                                  PIPEVER = '2021.1.1.32'                                                         PROPCODE= 'VLASS   '                                                            ROBUST  =                  1.0                                                  SGOAL   = 'N/A     '                                                            SPECMODE= 'mfs     '                                                            SPW     = '10,11,12,13,14,15,16,17,2,3,4,5,6,7,8,9'                             SPWNAM01= 'EVLA_S#B0D0#10'                                                      SPWNAM02= 'EVLA_S#B0D0#11'                                                      SPWNAM03= 'EVLA_S#B0D0#12'                                                      SPWNAM04= 'EVLA_S#B0D0#13'                                                      SPWNAM05= 'EVLA_S#B0D0#14'                                                      SPWNAM06= 'EVLA_S#B0D0#15'                                                      SPWNAM07= 'EVLA_S#B0D0#16'                                                      SPWNAM08= 'EVLA_S#B0D0#17'                                                      SPWNAM09= 'EVLA_S#A0C0#2'                                                       SPWNAM10= 'EVLA_S#A0C0#3'                                                       SPWNAM11= 'EVLA_S#A0C0#4'                                                       SPWNAM12= 'EVLA_S#A0C0#5'                                                       SPWNAM13= 'EVLA_S#A0C0#6'                                                       SPWNAM14= 'EVLA_S#A0C0#7'                                                       SPWNAM15= 'EVLA_S#A0C0#8'                                                       SPWNAM16= 'EVLA_S#A0C0#9'                                                       TYPE    = 'image   '                                                            USEWEIGH=                    F                                                  DATE    = '2021-11-06T07:55:23.722000' / Date FITS file was written             ORIGIN  = 'CASA 6.1.3-3 CASAtools:v1.0.0'                                       HISTORY  CASA START LOGTABLE                                                    HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0       HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0   HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0          HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  Ran ia.setcoordsys                                                     HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  ia.setcoordsys(csys={...})                                             HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  impbcor(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter&HISTORY  1.                                                                     HISTORY  >image.tt0", pbimage="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >1.pb.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.it&HISTORY  er                                                                     HISTORY  >.image.pbcor.tt0", overwrite=False, box="", region="", chans="", stok&HISTORY  es                                                                     HISTORY  >"", mask="", mode="divide", cutoff=-1.0, stretch=False)               HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  Ran ia.deviation                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  ia.deviation(outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", region={...}, mask="", overwrite=true, stret&HISTORY  ch                                                                     HISTORY  >false, grid=[10,10], anchor="ref", xlength="60arcsec", ylength="60arc&HISTORY  se                                                                     HISTORY  >", interp="cubic", stattype="xmadm", statalg="chauvenet", zscore=-1.0&HISTORY  00                                                                     HISTORY  >00, maxiter=-1)                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  imdev(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.&HISTORY  im                                                                     HISTORY  >age.pbcor.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1&HISTORY  .I                                                                     HISTORY  >iter1.image.pbcor.tt0.rms", region="", box="", chans="", stokes="", m&HISTORY  as                                                                     HISTORY  >="", overwrite=True, stretch=False, grid=[10, 10], anchor="ref", xlen&HISTORY  gt                                                                     HISTORY  >="60arcsec", ylength="60arcsec", interp="cubic", stattype="xmadm", st&HISTORY  at                                                                     HISTORY  >lg="chauvenet", zscore=-1.0, maxiter=-1)                              HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  imsubimage(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", outfile="VLASS2.2.ql.T24t20.J194312+533000.1&HISTORY  0.                                                                     HISTORY  >048.v1.I.iter1.image.pbcor.tt0.rms.subim", box="1785.0,1785.0,5506.0,&HISTORY  55                                                                     HISTORY  >6.0", region="", chans="", stokes="", mask="", dropdeg=False, overwri&HISTORY  te                                                                     HISTORY  >False, verbose=True, stretch=False, keepaxes=[])                      HISTORY  CASA END LOGTABLE                                                      HISTORY  Uncorrected CRVAL1 = 2.958006625000E+02 deg                            HISTORY  Uncorrected CRVAL2 = 5.350000000000E+01 deg                            HISTORY  Position correction (-2.603E-01/cos(CRVAL2), -5.902E-04) arcsec appliedNEXTEND =                    0 / Number of standard extensions                  END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             9	¼9	V9ñ9‹‹9&
+9JO9n“9’Ø9·9Û`9ÿ¥9	#é9	H.9	lr9	·9	 9	°F9	À9	ÏÖ9	ßž9	ïe9	ÿ-9
+õ9
+¼9
+.„9	Ó¤9	xÃ9	ã9Ã9	ä¶9	‚¶9	 ¶9¾µ9\µ9zä9™9·B9Õq9ó 9	Î9	/ý9	N,9	l[9	ŠŠ9	;9	¯í9	Âž9	ÕP9	è9	ú³9
+e9
+ 9
+2È9
+Ey9	ñ³9	ì9	J%9ö^9
+^9	®Þ9	P_9ñà9“a9«z9Ã“9Û¬9óÅ9	ß9	#ø9	<9	T*9	lC9	„]9	™ø9	¯“9	Å/9	ÚÊ9	ðf9
+9
+œ9
+189
+FÓ9
+\o9
+Á9	Ã9	vg9	)º9
+69	Û9	€	9	%
+9Ê9Ü9î9	 9	9	$9	6!9	H%9	Z(9	l,9	~/9	–µ9	¯:9	Ç¿9	àD9	øÊ9
+O9
+)Ô9
+BY9
+Zß9
+sd9
+-Ð9	è=9	¢©9	]9
+^­9
+09	¯²9	X59	 ·9	¥9	“9	$9	0o9	<]9	HK9	T89	`&9	l9	x9	“q9	®à9	ÊP9	å¿9
+.9
+9
+89
+S{9
+nê9
+ŠY9
+Kß9
+e9	Îë9	q9
+‡U9
+3Y9	ß\9	‹_9	7b9	=;9	C9	Hë9	NÄ9	Tœ9	Zt9	`L9	f$9	ký9	qÕ9	.9	®‡9	Ìà9	ë99
+	’9
+'ë9
+FD9
+d9
+‚ö9
+¡N9
+iî9
+2Ž9	û-9	ÃÍ9
+¯ý9
+_9
+9	¾Š9	n9	mÐ9	m“9	mV9	m9	lÛ9	l9	l`9	l#9	kå9	k¨9	Œë9	®-9	Ïp9	ð³9
+ö9
+399
+T{9
+u¾9
+—9
+¸D9
+‡ý9
+W¶9
+'o9	÷(9
+Ø¥9
+‹ª9
+>¯9	ñ´9	¤¹9	žf9	˜9	‘À9	‹m9	…9	~Ç9	xt9	r!9	kÎ9	e{9	‰§9	­Ô9	Ò9	ö-9
+Z9
+>‡9
+b³9
+†à9
+«9
+Ï99
+¦9
+|Þ9
+S±9
+*„9M9
+·Ó9
+nY9
+$ß9	Ûd9	Îü9	Â“9	¶*9	©Â9	Y9	ð9	„‡9	x9	k¶9	_M9	†d9	­z9	Ô‘9	û§9
+"¾9
+IÔ9
+pë9
+˜9
+¿9
+æ.9
+Ä9
+¢9
+ó9
+]ß9)õ9
+ãû9
+ž9
+X	9
+9	ÿ‘9	í9	Ú•9	È9	µ˜9	£9	›9	~9	kŸ9	Y 9	ƒ!9	­!9	×!9
+"9
++"9
+U"9
+#9
+©#9
+Ó#9
+ý$9
+â*9
+Ç/9
+¬59
+‘;9R9$9
+Í¬9
+‹39
+H»9
+0'9
+“9	þÿ9	æk9	Í×9	µC9	œ¯9	„9	k‡9	Ró9	Ý9	¬Ç9	Ù²9
+œ9
+3†9
+`p9
+Z9
+ºE9
+ç/99 89
+ìX9
+Øw9
+Ä—909
+í9
+ª9
+g‘9
+$‘9
+õ9	÷Y9	à¼9	Ê 9	³„9	œç9	†K9	o¯9	Y9	Bv9	m‹9	˜ 9	Ãµ9	îÊ9
+ß9
+Dô9
+p	9
+›9
+Æ39
+ñG9
+ßS9
+Í_9
+»j9
+©v9ƒ9
+Êü9
+‡u9
+Cî9
+ g9	ëÃ9	×9	Ây9	­Õ9	™09	„‹9	oç9	[B9	F9	1ù9	[99	„x9	­¸9	Öø9
+ 79
+)w9
+R·9
+{÷9
+¥69
+Îv9
+¾n9
+®f9
+ž^9
+ŽV9
+ìv9
+¨h9
+dZ9
+ L9	Ü>9	É‘9	¶ä9	¤79	‘Š9	~Ý9	l09	Yƒ9	FÖ9	4)9	!|9	Hæ9	pQ9	—»9	¿&9	æ9
+û9
+5e9
+\Ð9
+„:9
+«¥9
+‰9
+m9
+Q9
+s59
+Êi9
+…Ô9
+A>9	ü©9	¸9	§^9	–©9	…ô9	u?9	d‰9	SÔ9	C9	2i9	!´9	ÿ9	6”9	\)9	¾9	§T9	Ìé9	ò~9
+9
+=©9
+c>9
+ˆÓ9
+|£9
+pt9
+dD9
+X9
+¨\9
+c@9
+#9	Ù9	“ê9	…,9	vo9	g±9	Xó9	J69	;x9	,º9	ý9	?9	 ‚9	$B9	H9	kÂ9	9	³B9	×9	úÁ9
+‚9
+BA9
+f9
+[¾9
+Q{9
+G79
+<ô9
+†O9
+@¬9	û9	µd9	oÀ9	bú9	V49	In9	<¨9	/â9	#9	V9		9üÊ9ð9	ï9	3Ú9	UÅ9	w¯9	™š9	»…9	Ýp9	ÿZ9
+!E9
+C09
+:Ù9
+2‚9
+*+9
+!Ó9
+dB9
+9	×ì9	‘Á9	K–9	@È9	5ú9	++9	 ]9	9	
+Á9ÿò9õ$9êV9ß‡9ÿ9	²9	?È9	_Ý9	ó9	 9	À9	à39
+ I9
+ ^9
+ô9
+‰9
+9
+³9
+B69	ûƒ9	´Ñ9	n9	'm9	–9	¿9	é9	9û;9òe9éŽ9à·9×á9Ï
+9íJ9	‹9	)Ë9	H9	fL9	„Œ9	¢Ì9	Á9	ßM9	ý9	ù9	ô9	ð9	ë’9
+ )9	Øï9	‘¶9	J|9	C9üd9õ…9î¦9çÇ9àè9Ú	9Ó*9ÌK9Ål9¾9Úø9÷c9	Î9	099	L¤9	i9	…z9	¡å9	¾P9	Ú¼9	Ø)9	Õ—9	Ó9	Ðr9	þ9	¶[9	nš9	&Ú9ß9Ú29ÕJ9Ðc9Ë|9Æ”9Á­9¼Æ9·ß9²÷9®9È¦9ã<9ýÑ9	g9	2ý9	M“9	h)9	‚¾9	T9	·ê9	·D9	¶ž9	µ÷9	µQ9
+9	Óg9	ŒM9	E49þ9û9ù9öy9óï9ñd9îÙ9ìN9éÃ9ç89ä®9	 /9	°9	719	R²9	n49	‰µ9	¥69	À·9	Ü89	÷º9	ö¹9	õ¸9	ô·9	ó¶9
+6æ9	ðs9	ª 9	cŽ9	9	ì9	¾9	9	a9	39	9	Ö9	¨9	z9	K9	7¸9	T$9	p‘9	Œþ9	©j9	Å×9	âD9	þ°9
+9
+7‰9
+6.9
+4Ò9
+3v9
+29
+SK9
+9	Ç³9	è9	<9	>J9	@x9	B¦9	DÔ9	G9	I09	K^9	M9	O»9	Qé9	oA9	Œ™9	©ñ9	ÇI9	ä¡9
+ù9
+Q9
+<©9
+Z9
+wY9
+u£9
+sì9
+r69
+p9
+o°9
+*‹9	åf9	 B9	[9	_§9	d29	h¼9	mG9	qÑ9	v\9	zç9	q9	ƒü9	ˆ†9	¦Ê9	Å9	ãQ9
+”9
+Ø9
+>9
+\^9
+z¢9
+˜å9
+·)9
+µ9
+³9
+°õ9
+®ä9
+Œ9
+G˜9
+9	¾œ9	z9	9	‡ì9	ŽÓ9	•º9	œ¡9	£ˆ9	ªo9	±V9	¸=9	¿$9	ÞS9	ý‚9
+±9
+;ß9
+[9
+z=9
+™l9
+¸›9
+×Ê9
+öø9
+ô9
+ò!9
+ïµ9
+íI9
+¨{9
+d¤9
+ Í9	Üõ9	™9	¢b9	«¥9	´é9	¾,9	Çp9	Ð´9	Ù÷9	ã;9	ì~9	õÂ9
+Ü9
+5ö9
+V9
+v+9
+–E9
+¶_9
+Öy9
+ö”9®96È9491;9.t9+­9
+Äà9
+°9
+>€9	ûO9	¸9	Ã¿9	Ï_9	Úÿ9	æŸ9	ò?9	ýß9
+	9
+9
+ ¿9
+,_9
+Me9
+nk9
+p9
+°v9
+Ñ|9
+ò9‡949U’9v˜9sv9pU9m49j9
+áE9
+ž¼9
+\39
+©9	× 9	å9	ó9
+9
+9
+9
++9
+99
+G9
+U 9
+bý9
+„î9
+¦ß9
+ÈÐ9
+êÁ9²9.£9P”9r…9”w9¶h9²ë9¯o9«ó9¨w                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            XTENSION= 'IMAGE   '           / HDU extension type                             BITPIX  =                  -32 / Floating point (32 bit)                        NAXIS   =                    4                                                  NAXIS1  =                   29 / n'th data dimension                            NAXIS2  =                   29 / n'th data dimension                            NAXIS3  =                    1 / n'th data dimension                            NAXIS4  =                    1 / n'th data dimension                            PCOUNT  =                    0 / associated parameter count                     GCOUNT  =                    1 / group count                                    BSCALE  =                  1.0 / PHYSICAL = PIXEL*BSCALE + BZERO                BZERO   =                 0.E0                                                  BMAJ    =     8.45713880327E-4                                                  BMIN    =     6.49599035581E-4                                                  BPA     =       -87.3307800293                                                  BTYPE   = 'Intensity'                                                           OBJECT  = 'J194312+533000'                                                      BUNIT   = 'Jy/beam '           / Brightness (pixel) unit                        EQUINOX =                 2.E3                                                  RADESYS = 'ICRS    '                                                            LONPOLE =                180.0                                                  LATPOLE =                 53.5                                                  PC1_1   =                  1.0                                                  PC2_1   =                 0.E0                                                  PC3_1   =                 0.E0                                                  PC4_1   =                 0.E0                                                  PC1_2   =                 0.E0                                                  PC2_2   =                  1.0                                                  PC3_2   =                 0.E0                                                  PC4_2   =                 0.E0                                                  PC1_3   =                 0.E0                                                  PC2_3   =                 0.E0                                                  PC3_3   =                  1.0                                                  PC4_3   =                 0.E0                                                  PC1_4   =                 0.E0                                                  PC2_4   =                 0.E0                                                  PC3_4   =                 0.E0                                                  PC4_4   =                  1.0                                                  CTYPE1  = 'RA---SIN'                                                            CRVAL1  =    295.8005409226443                                                  CDELT1  =   -2.777777777778E-4                                                  CRPIX1  =                716.0                                                  CUNIT1  = 'deg     '                                                            CTYPE2  = 'DEC--SIN'                                                            CRVAL2  =    53.49999983606202                                                  CDELT2  =    2.777777777778E-4                                                  CRPIX2  =              -1321.0                                                  CUNIT2  = 'deg     '                                                            CTYPE3  = 'FREQ    '                                                            CRVAL3  =                 3.E9                                                  CDELT3  =     2.072152310327E9                                                  CRPIX3  =                  1.0                                                  CUNIT3  = 'Hz      '                                                            CTYPE4  = 'STOKES  '                                                            CRVAL4  =                  1.0                                                  CDELT4  =                  1.0                                                  CRPIX4  =                  1.0                                                  CUNIT4  = '        '                                                            PV2_1   =                 0.E0                                                  PV2_2   =                 0.E0                                                  RESTFRQ =     2.987888186695E9 / Rest Frequency (Hz)                            SPECSYS = 'LSRK    '           / Spectral reference frame                       ALTRVAL =    -1.215249719738E6 / Alternate frequency reference value            ALTRPIX =                  1.0 / Alternate frequency reference pixel            VELREF  =                  257 / 1 LSR, 2 HEL, 3 OBS, +256 Radio                COMMENT  casacore non-standard usage: 4 LSD, 5 GEO, 6 SOU, 7 GAL                TELESCOP= 'EVLA    '                                                            OBSERVER= 'Dr. Vlass Scientist'                                                 DATE-OBS= '2021-09-28T06:08:35.700000' / First scan started                     DATE-END= '2021-09-28T06:43:26.850000' / Last scan finished                     TIMESYS = 'UTC     '                                                            OBSRA   =          295.8006625                                                  OBSDEC  =                 53.5                                                  OBSGEO-X=    -1.601156673287E6                                                  OBSGEO-Y=    -5.041988986066E6                                                  OBSGEO-Z=     3.554879236821E6                                                  INSTRUME= 'EVLA    '                                                            CASAVER = '6.1.3.3 '                                                            DATAMAX =     0.05312457680702                                                  DATAMIN =   -8.590525831096E-4                                                  DISTANCE=                 0.E0                                                  FIELD   = '3913    '                                                            FILNAM01= 'VLASS2  '                                                            FILNAM02= '2       '                                                            FILNAM03= 'ql      '                                                            FILNAM04= 'T24t20  '                                                            FILNAM05= 'J194312+533000'                                                      FILNAM06= '10      '                                                            FILNAM07= '2048    '                                                            FILNAM08= 'v1      '                                                            FILNAM09= 'I       '                                                            FILNAM10= 'iter1   '                                                            FILNAM11= 'image   '                                                            FILNAM12= 'tt0     '                                                            GROUP   = 'N/A     '                                                            INTENT  = 'TARGET  '                                                            ITER    =                    1                                                  MEMBER  = 'unknown '                                                            NFIELD  =                    1                                                  NFILNAM =                   12                                                  NPOL    =                    2                                                  NSPWNAM =                   16                                                  OFFDEC  =               -999.0                                                  OFFRA   =               -999.0                                                  PER_EB  =                    F                                                  PIPEVER = '2021.1.1.32'                                                         PROPCODE= 'VLASS   '                                                            ROBUST  =                  1.0                                                  SGOAL   = 'N/A     '                                                            SPECMODE= 'mfs     '                                                            SPW     = '10,11,12,13,14,15,16,17,2,3,4,5,6,7,8,9'                             SPWNAM01= 'EVLA_S#B0D0#10'                                                      SPWNAM02= 'EVLA_S#B0D0#11'                                                      SPWNAM03= 'EVLA_S#B0D0#12'                                                      SPWNAM04= 'EVLA_S#B0D0#13'                                                      SPWNAM05= 'EVLA_S#B0D0#14'                                                      SPWNAM06= 'EVLA_S#B0D0#15'                                                      SPWNAM07= 'EVLA_S#B0D0#16'                                                      SPWNAM08= 'EVLA_S#B0D0#17'                                                      SPWNAM09= 'EVLA_S#A0C0#2'                                                       SPWNAM10= 'EVLA_S#A0C0#3'                                                       SPWNAM11= 'EVLA_S#A0C0#4'                                                       SPWNAM12= 'EVLA_S#A0C0#5'                                                       SPWNAM13= 'EVLA_S#A0C0#6'                                                       SPWNAM14= 'EVLA_S#A0C0#7'                                                       SPWNAM15= 'EVLA_S#A0C0#8'                                                       SPWNAM16= 'EVLA_S#A0C0#9'                                                       TYPE    = 'image   '                                                            USEWEIGH=                    F                                                  DATE    = '2021-11-06T07:55:23.722000' / Date FITS file was written             ORIGIN  = 'CASA 6.1.3-3 CASAtools:v1.0.0'                                       HISTORY  CASA START LOGTABLE                                                    HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0       HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0   HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0          HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  Ran ia.setcoordsys                                                     HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  ia.setcoordsys(csys={...})                                             HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  impbcor(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter&HISTORY  1.                                                                     HISTORY  >image.tt0", pbimage="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >1.pb.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.it&HISTORY  er                                                                     HISTORY  >.image.pbcor.tt0", overwrite=False, box="", region="", chans="", stok&HISTORY  es                                                                     HISTORY  >"", mask="", mode="divide", cutoff=-1.0, stretch=False)               HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  Ran ia.deviation                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  ia.deviation(outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", region={...}, mask="", overwrite=true, stret&HISTORY  ch                                                                     HISTORY  >false, grid=[10,10], anchor="ref", xlength="60arcsec", ylength="60arc&HISTORY  se                                                                     HISTORY  >", interp="cubic", stattype="xmadm", statalg="chauvenet", zscore=-1.0&HISTORY  00                                                                     HISTORY  >00, maxiter=-1)                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  imdev(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.&HISTORY  im                                                                     HISTORY  >age.pbcor.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1&HISTORY  .I                                                                     HISTORY  >iter1.image.pbcor.tt0.rms", region="", box="", chans="", stokes="", m&HISTORY  as                                                                     HISTORY  >="", overwrite=True, stretch=False, grid=[10, 10], anchor="ref", xlen&HISTORY  gt                                                                     HISTORY  >="60arcsec", ylength="60arcsec", interp="cubic", stattype="xmadm", st&HISTORY  at                                                                     HISTORY  >lg="chauvenet", zscore=-1.0, maxiter=-1)                              HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  imsubimage(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", outfile="VLASS2.2.ql.T24t20.J194312+533000.1&HISTORY  0.                                                                     HISTORY  >048.v1.I.iter1.image.pbcor.tt0.rms.subim", box="1785.0,1785.0,5506.0,&HISTORY  55                                                                     HISTORY  >6.0", region="", chans="", stokes="", mask="", dropdeg=False, overwri&HISTORY  te                                                                     HISTORY  >False, verbose=True, stretch=False, keepaxes=[])                      HISTORY  CASA END LOGTABLE                                                      HISTORY  Uncorrected CRVAL1 = 2.958006625000E+02 deg                            HISTORY  Uncorrected CRVAL2 = 5.350000000000E+01 deg                            HISTORY  Position correction (-2.603E-01/cos(CRVAL2), -5.902E-04) arcsec appliedNEXTEND =                    0 / Number of standard extensions                  END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             9Ðª9êz9	J9	9	7ë9	Q»9	OY9	L÷9	J•9	H39	EÑ9	Co9	A9	>«9	<H9	9æ9	iF9	˜¥9	È9	÷c9
+&Â9
+V!9
+…9
+´à9
+ä?9ž9#93`9CA9	29	#œ9	?9	Zo9	uÙ9	‘B9	ý9	Š·9	‡q9	„,9	€æ9	}¡9	z[9	w9	sÐ9	pŠ9	#9	É½9	öV9
+"ï9
+O‰9
+|"9
+¨»9
+ÕT9î9.‡9Fã9_?9w›9	?º9	\½9	yÀ9	–Ã9	³Æ9	ÐÉ9	Ì 9	Èw9	ÄN9	À%9	»ü9	·Ò9	³©9	¯€9	«W9	§.9	Ñ9	úÕ9
+$¨9
+N{9
+xO9
+¢"9
+Ëö9
+õÉ99Ip9jG9‹9«õ9	wB9	•ß9	´{9	Ó9	ñ´9
+P9
+D9
+79
+*9	ü9	÷9	ò9	ìø9	çë9	âÞ9	ÝÒ9
+ß9
++í9
+Rú9
+z9
+¡9
+È#9
+ï09>9=K9dY9«9¶ý9àO9	®Ê9	Ï 9	ï69
+l9
+/¢9
+OØ9
+Iç9
+C÷9
+>9
+89
+2&9
+,69
+&F9
+ V9
+e9
+u9
+8½9
+]9
+L9
+¥”9
+ÉÜ9
+î#9k96³9Zú9B9±9âÜ9©9	æS9
+"9
+)ñ9
+KÀ9
+m9
+_9
+ˆ‹9
+·9
+zã9
+t9
+m<9
+fh9
+_”9
+XÀ9
+Qí9
+K9
+l›9
+Ž9
+¯ž9
+Ñ 9
+ò¢9$95¦9W'9x©9š+9Ôs9»9I9
+Û9
+AC9
+d¬9
+ˆ9
+«}9
+Îæ9
+Ç.9
+¿w9
+·À9
+°	9
+¨Q9
+ š9
+˜ã9
+‘+9
+‰t9
+½9
+ y9
+¿49
+Ýð9
+ü¬9h9:$9Xà9wœ9–X9µ9÷×9:š9}\9
+Uc9
+ze9
+Ÿg9
+Äi9
+ék9m9Ò9
+ý79
+ôœ9
+ì9
+ãg9
+ÚÌ9
+Ò19
+É–9
+Àû9
+¸`9
+ÔV9
+ðL9C9(99D/9`%9|9˜9´9Ïý9;9fy9±¶9
+Œë9
+³†9
+Ú"9 ½9'Y9Mô9Dv9:÷91y9'ú9|9þ999
+ø‚9
+ï949!d9:•9SÅ9lõ9†%9ŸU9¸†9Ñ¶9êæ9>Ÿ9’X9æ9
+¯±9
+Ô÷9
+ú>9…9DÌ9j9_”9U9J–9@95™9+9 œ99ž9949-H9C]9Yr9o†9…›9›¯9±Ä9ÇØ9Ýí929†9Ú(9
+Òv9
+öh9Z9>M9b?9†19z²9o39c´9X59L¶9A795¸9*99º9;9&499-9L%9_9r9…9˜	9«9½û9Ðó9%b9yÑ9Î@9
+õ<9Ù9:w9]9²9¢O9•Ð9‰Q9|Ñ9pR9cÓ9WS9JÔ9>U91Ö9%V9539E9Tî9dË9t¨9„…9”c9¤@9´9Ãú9Ä9mŽ9ÂX999J9Z“9{Ü9%9¾n9°î9£n9•ï9ˆo9zð9mp9_ð9Rq9Dñ97r9D39Põ9]¶9jx9w99ƒû9¼9~9ª?9·9&9aJ9¶o9:Ç9Z»9z°9š¤9º˜9ÚŒ9Ì9½Œ9¯9 Œ9’9ƒ9u9f9X9I9S39\Ù9f9p$9yÊ9ƒp99–¼9 b9ª9ÿ‡9U9ª‡9]9|,9šÌ9¹k9Ø9öª9ç*9×ª9È*9¸ª9©)9™©9Š)9z©9k)9[¨9b39h½9oG9uÑ9|[9‚å9‰p9ú9–„99òé9HÄ9žŸ9€S99ºè9Ø39õ~9É9H9ñÈ9áG9ÐÇ9ÀF9¯Æ9ŸE9ŽÅ9~D9mÄ9q29t¡9x9{~9~ì9‚[9…É9‰89Œ¦99æK9<9’·9£9¿9Û9öû9ñ9.ç9f9æ9úe9èä9×c9Åâ9´b9¢á9‘`9ß9€29€…9€Ø9+9}9Ð9‚#9‚v9‚É9ƒ9Ù¬90=9†Î9ÅÞ9à9û!9Â90d9K98„9&9‚99î€9Ûÿ9É~9¶ý9¤|9‘û929Œi9‰ 9†×9„9F9~}9{´9xë9v"9Í9#ú9zæ9è¤9ð9=94Š9M×9g$9S£9@!9, 999ò9Þš9Ë9·—9¤9ž29˜M9’h9Œ„9† 9€»9zÖ9tò9o9i)9Àp9·9nþ99/@9Fl9]™9tÅ9‹ò9tK9\¤9Dý9-V9¯9þ9æa9Îº9·9Ÿl9”j9‰g9~d9sa9h_9]\9RY9GV9<T91Q9k9í…9Kž9Gƒ9\9q›9†§9›³9°¿9”ó9y&9]Z9A9%Á9	õ9î(9Ò\9¶9šÃ9Š¢9z9j`9Z?9J99ý9)Ü9»9	š9
+ùy9^f9ÃR9(?9vô9‰ß9œË9¯¶9Â¢9Õ9µ›9•©9u·9UÅ95Ó9á9õï9Õý9¶9–9€Ú9k›9V[9A9+Ý9ž9_9
+ì9
+Öà9
+Á¡9-`9™ 9ß9¦c9·/9Çú9ØÅ9é9ú[9ÖC9²,9Ž9iý9Eå9!Í9ý¶9Ùž9µ‡9‘o9w9\´9BW9'ú9œ9
+ó?9
+Øá9
+¾„9
+¤&9
+‰É9
+ü[9nî9á€9ÕÔ9ä~9ó)9Ó9~9(9öë9Î®9¦q9~49U÷9-º9}9Ý@9µ9ŒÆ9mJ9MÎ9.S9×9
+ï[9
+Ïà9
+°d9
+è9
+qm9
+Qñ9
+ËV9D»9¾!9D9Î9X9*â97l9Cö9”9ë19¾Î9’l9f	99¦9D9àá9´~9ˆ9c‚9>è9N9
+õ´9
+Ñ9
+¬9
+‡ç9
+cM9
+>³9
+9
+šQ9‰9šÁ94³9?9I‡9Sñ9^Z9hÄ98<9´9×+9¦£9v9E“99ä‚9³ú9ƒr9Yº909J9
+Ü’9
+²Ú9
+‰!9
+_i9
+5±9
+ù9	âA9
+iL9
+ðW9wb9d$9lm9t¶9|ÿ9…H9’9Xä9$69ïˆ9ºÛ9†-9Q9Ò9è$9³v9~È9Oò9!9
+òE9
+Ão9
+”™9
+eÂ9
+6ì9
+9	Ù?9	ªi9
+8G9
+Æ%9T9““9™¼9Ÿå9¦9¬79²_9yŒ9@¹9æ9Ï9–?9]l9$˜9ëÅ9²ò9z9F*969
+ÞA9
+ªL9
+vX9
+Bc9
+o9	Úz9	¦†9	r‘9
+B9
+›ò90£9Ã9Ç9Ë9Ï9Ó%9×-9š49];9 C9ãJ9¦Q9iX9,_9ïg9²n9uu9<b9O9
+Ê=9
+‘*9
+X9
+9	åñ9	¬ß9	sÌ9	:¹9	Ö=9
+qÀ9D                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            XTENSION= 'IMAGE   '           / HDU extension type                             BITPIX  =                  -32 / Floating point (32 bit)                        NAXIS   =                    4                                                  NAXIS1  =                   29 / n'th data dimension                            NAXIS2  =                   29 / n'th data dimension                            NAXIS3  =                    1 / n'th data dimension                            NAXIS4  =                    1 / n'th data dimension                            PCOUNT  =                    0 / associated parameter count                     GCOUNT  =                    1 / group count                                    BSCALE  =                  1.0 / PHYSICAL = PIXEL*BSCALE + BZERO                BZERO   =                 0.E0                                                  BMAJ    =     8.45713880327E-4                                                  BMIN    =     6.49599035581E-4                                                  BPA     =       -87.3307800293                                                  BTYPE   = 'Intensity'                                                           OBJECT  = 'J194312+533000'                                                      BUNIT   = 'Jy/beam '           / Brightness (pixel) unit                        EQUINOX =                 2.E3                                                  RADESYS = 'ICRS    '                                                            LONPOLE =                180.0                                                  LATPOLE =                 53.5                                                  PC1_1   =                  1.0                                                  PC2_1   =                 0.E0                                                  PC3_1   =                 0.E0                                                  PC4_1   =                 0.E0                                                  PC1_2   =                 0.E0                                                  PC2_2   =                  1.0                                                  PC3_2   =                 0.E0                                                  PC4_2   =                 0.E0                                                  PC1_3   =                 0.E0                                                  PC2_3   =                 0.E0                                                  PC3_3   =                  1.0                                                  PC4_3   =                 0.E0                                                  PC1_4   =                 0.E0                                                  PC2_4   =                 0.E0                                                  PC3_4   =                 0.E0                                                  PC4_4   =                  1.0                                                  CTYPE1  = 'RA---SIN'                                                            CRVAL1  =    295.8005409226443                                                  CDELT1  =   -2.777777777778E-4                                                  CRPIX1  =                820.0                                                  CUNIT1  = 'deg     '                                                            CTYPE2  = 'DEC--SIN'                                                            CRVAL2  =    53.49999983606202                                                  CDELT2  =    2.777777777778E-4                                                  CRPIX2  =                194.0                                                  CUNIT2  = 'deg     '                                                            CTYPE3  = 'FREQ    '                                                            CRVAL3  =                 3.E9                                                  CDELT3  =     2.072152310327E9                                                  CRPIX3  =                  1.0                                                  CUNIT3  = 'Hz      '                                                            CTYPE4  = 'STOKES  '                                                            CRVAL4  =                  1.0                                                  CDELT4  =                  1.0                                                  CRPIX4  =                  1.0                                                  CUNIT4  = '        '                                                            PV2_1   =                 0.E0                                                  PV2_2   =                 0.E0                                                  RESTFRQ =     2.987888186695E9 / Rest Frequency (Hz)                            SPECSYS = 'LSRK    '           / Spectral reference frame                       ALTRVAL =    -1.215249719738E6 / Alternate frequency reference value            ALTRPIX =                  1.0 / Alternate frequency reference pixel            VELREF  =                  257 / 1 LSR, 2 HEL, 3 OBS, +256 Radio                COMMENT  casacore non-standard usage: 4 LSD, 5 GEO, 6 SOU, 7 GAL                TELESCOP= 'EVLA    '                                                            OBSERVER= 'Dr. Vlass Scientist'                                                 DATE-OBS= '2021-09-28T06:08:35.700000' / First scan started                     DATE-END= '2021-09-28T06:43:26.850000' / Last scan finished                     TIMESYS = 'UTC     '                                                            OBSRA   =          295.8006625                                                  OBSDEC  =                 53.5                                                  OBSGEO-X=    -1.601156673287E6                                                  OBSGEO-Y=    -5.041988986066E6                                                  OBSGEO-Z=     3.554879236821E6                                                  INSTRUME= 'EVLA    '                                                            CASAVER = '6.1.3.3 '                                                            DATAMAX =     0.05312457680702                                                  DATAMIN =   -8.590525831096E-4                                                  DISTANCE=                 0.E0                                                  FIELD   = '3913    '                                                            FILNAM01= 'VLASS2  '                                                            FILNAM02= '2       '                                                            FILNAM03= 'ql      '                                                            FILNAM04= 'T24t20  '                                                            FILNAM05= 'J194312+533000'                                                      FILNAM06= '10      '                                                            FILNAM07= '2048    '                                                            FILNAM08= 'v1      '                                                            FILNAM09= 'I       '                                                            FILNAM10= 'iter1   '                                                            FILNAM11= 'image   '                                                            FILNAM12= 'tt0     '                                                            GROUP   = 'N/A     '                                                            INTENT  = 'TARGET  '                                                            ITER    =                    1                                                  MEMBER  = 'unknown '                                                            NFIELD  =                    1                                                  NFILNAM =                   12                                                  NPOL    =                    2                                                  NSPWNAM =                   16                                                  OFFDEC  =               -999.0                                                  OFFRA   =               -999.0                                                  PER_EB  =                    F                                                  PIPEVER = '2021.1.1.32'                                                         PROPCODE= 'VLASS   '                                                            ROBUST  =                  1.0                                                  SGOAL   = 'N/A     '                                                            SPECMODE= 'mfs     '                                                            SPW     = '10,11,12,13,14,15,16,17,2,3,4,5,6,7,8,9'                             SPWNAM01= 'EVLA_S#B0D0#10'                                                      SPWNAM02= 'EVLA_S#B0D0#11'                                                      SPWNAM03= 'EVLA_S#B0D0#12'                                                      SPWNAM04= 'EVLA_S#B0D0#13'                                                      SPWNAM05= 'EVLA_S#B0D0#14'                                                      SPWNAM06= 'EVLA_S#B0D0#15'                                                      SPWNAM07= 'EVLA_S#B0D0#16'                                                      SPWNAM08= 'EVLA_S#B0D0#17'                                                      SPWNAM09= 'EVLA_S#A0C0#2'                                                       SPWNAM10= 'EVLA_S#A0C0#3'                                                       SPWNAM11= 'EVLA_S#A0C0#4'                                                       SPWNAM12= 'EVLA_S#A0C0#5'                                                       SPWNAM13= 'EVLA_S#A0C0#6'                                                       SPWNAM14= 'EVLA_S#A0C0#7'                                                       SPWNAM15= 'EVLA_S#A0C0#8'                                                       SPWNAM16= 'EVLA_S#A0C0#9'                                                       TYPE    = 'image   '                                                            USEWEIGH=                    F                                                  DATE    = '2021-11-06T07:55:23.722000' / Date FITS file was written             ORIGIN  = 'CASA 6.1.3-3 CASAtools:v1.0.0'                                       HISTORY  CASA START LOGTABLE                                                    HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0       HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0   HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0          HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  Ran ia.setcoordsys                                                     HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  ia.setcoordsys(csys={...})                                             HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  impbcor(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter&HISTORY  1.                                                                     HISTORY  >image.tt0", pbimage="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >1.pb.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.it&HISTORY  er                                                                     HISTORY  >.image.pbcor.tt0", overwrite=False, box="", region="", chans="", stok&HISTORY  es                                                                     HISTORY  >"", mask="", mode="divide", cutoff=-1.0, stretch=False)               HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  Ran ia.deviation                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  ia.deviation(outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", region={...}, mask="", overwrite=true, stret&HISTORY  ch                                                                     HISTORY  >false, grid=[10,10], anchor="ref", xlength="60arcsec", ylength="60arc&HISTORY  se                                                                     HISTORY  >", interp="cubic", stattype="xmadm", statalg="chauvenet", zscore=-1.0&HISTORY  00                                                                     HISTORY  >00, maxiter=-1)                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  imdev(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.&HISTORY  im                                                                     HISTORY  >age.pbcor.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1&HISTORY  .I                                                                     HISTORY  >iter1.image.pbcor.tt0.rms", region="", box="", chans="", stokes="", m&HISTORY  as                                                                     HISTORY  >="", overwrite=True, stretch=False, grid=[10, 10], anchor="ref", xlen&HISTORY  gt                                                                     HISTORY  >="60arcsec", ylength="60arcsec", interp="cubic", stattype="xmadm", st&HISTORY  at                                                                     HISTORY  >lg="chauvenet", zscore=-1.0, maxiter=-1)                              HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  imsubimage(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", outfile="VLASS2.2.ql.T24t20.J194312+533000.1&HISTORY  0.                                                                     HISTORY  >048.v1.I.iter1.image.pbcor.tt0.rms.subim", box="1785.0,1785.0,5506.0,&HISTORY  55                                                                     HISTORY  >6.0", region="", chans="", stokes="", mask="", dropdeg=False, overwri&HISTORY  te                                                                     HISTORY  >False, verbose=True, stretch=False, keepaxes=[])                      HISTORY  CASA END LOGTABLE                                                      HISTORY  Uncorrected CRVAL1 = 2.958006625000E+02 deg                            HISTORY  Uncorrected CRVAL2 = 5.350000000000E+01 deg                            HISTORY  Position correction (-2.603E-01/cos(CRVAL2), -5.902E-04) arcsec appliedNEXTEND =                    0 / Number of standard extensions                  END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             9’\96‘9ÚÆ9~û9#/9Çd9k™9Î9´9X89¹`9ˆ9{±9ÜÙ9>9Ÿ*9 R9a{9Â£9#Ë989LB9`}9t¸9ˆó9.9±j9Å¥9Ùà9E¤9éa990Ú9Ô—9xS99¿Í9c‰9F9jÝ9Îu929•¤9ù;9\Ó9Àk9$9‡š9ë19üÑ9p9 91°9CO9Tï9f9x.9‰Î9øì9œ19?u9â¹9…þ9)B9Ì‡9oË99¶T9[9‚a9èh9No9´v9|9€ƒ9æŠ9L9²—9Á›9ÐŸ9ß£9î§9ý«9¯9´9*¸99¼9¬49O 9ñÍ9”™97e9Ú19|ý9Ê9Â–9eb9ÍØ96N9žÄ9:9o°9Ø%9@›9©9‡9yý9†f9’Î9Ÿ69«Ÿ9¸9Äp9ÐØ9ÝA9é©9Œš9'õ9ÃQ9^¬9ú9•c90¿9Ì9gu9Ñ9o\9Ûè9Hs9´ÿ9!Š9Ž9ú¡9g,9Ó¸9@C9S@9f=9y:9Œ79Ÿ49²19Å.9Ø+9ë(9m 9 ë9”Õ9(À9¼«9P•9ä€9xj9U9
+ @9á9‚9ò#9bÄ9Óe9D9´§9%H9•é9Š9 99¬9S>9lÏ9†a9Ÿò9¹ƒ9Ó9ì¦9Mf9Ùà9fY9òÓ9M9Ç9˜A9$»9
+±59
+=¯9
+²e9'9›Ò9‰9…?9ùö9n¬9ãc9X9ÌÐ9ìö99-A9Mg9m9³9­Ù9Íÿ9î%9-Ì9²Õ97Þ9¼ç9Að9Æù9L9
+Ñ9
+V9	Û9
+Sê9
+Ì¶9E‚9¾N979¯æ9(²9¡~9J9“9¹Ñ9à‹9E9-ÿ9Tº9{t9¢.9Èé9ï£919‹Ê9	b9†ú9“9‚+9
+ÿÃ9
+}\9	úô9	xŒ9	õn9
+rP9
+ï19l9èô9eÖ9â¸9_™9Ü{9Y\9†«9³ú9áI9—9;æ9i59–„9ÃÓ9ñ!9î—9d¿9Úæ9Q9Ç59=]9
+³…9
+)¬9	ŸÔ9	û9	–ó9
+ê9
+˜á9Ø9šÏ9Æ9œ½9µ9ž¬9£9S†9‡i9»L9ï09#9Vö9ŠÙ9¾¼9ò 9Îý9=´9¬k9!9‰Ø9
+ø9
+gF9	Õý9	D³9³j9	8w9	½„9
+B9
+Ç9Lª9Ñ¶9VÃ9ÛÐ9`Ü9åé9 a9ZØ9•P9ÏÈ9
+?9D·9/9¹¦9ô9¯c9©9}ï9å59L{9
+³Á9
+9	‚M9é“9PÙ9Ùû9	c9	ì@9
+ub9
+þ„9‡§9É9™ë9#9¬/9í<9.H9oT9°`9ñl92x9s„9´9õœ9É9ïž9Os9¯H99
+nó9	ÎÈ9	.ž9Žs9îH9{€9	¸9	•ï9
+#'9
+°_9=—9ÊÎ9X9å>9rv9º9·9IW9ø9Ø˜9 99gÚ9¯z9÷9p.9È“9 ÷9y\9
+ÑÀ9
+*%9	‚Š9Úî93S9‹·99®R9	?Ÿ9	Ðì9
+b:9
+ó‡9„Ô9!9§o98¼9†ñ9Õ&9#[9q9¿Å9ú9\/9ªd9ø™9P+9©Ä9]9\ö9
+¶9
+(9	iÁ9ÃZ9ó9vŒ9#9»9	S9	¤ê9
+0‚9
+¼9G±9ÓH9^à9êw95Ø999Ìš9ú9c[9®¼9ú9E}9Þ90'9Šõ9åÂ9@9
+›]9	ö+9	Pø9«Æ9“9aa9çC9m$9ó9	xè9	þÊ9
+„¬9
+9o9Q9œ39ä¿9-L9uØ9¾d9ñ9O}9˜
+9à–9)#9$9l&9È(9$*9
+€,9	Ü.9	809”29ð49L69Ìb9LŽ9Ìº9	Læ9	Í9
+M>9
+Íj9M–9ÍÂ9Mî9“¦9Ù^99dÏ9ª‡9ð?95÷9{¯9Ág9ð 9MW9ª9Ä9
+dú9	Â19	g9|ž9ÙÔ979±9+÷9¦n9	 ä9	›Z9
+Ð9
+G9
+½9…39ÿª9B9…q9ÈU999N9‘9Óä9È9Y¬9Ð9.ˆ9Œò9
+ë^9
+IÈ9	¨39	Ÿ9e	9Ãu9!à9– 9a9€!9ôâ9	i¢9	Þc9
+S#9
+Çä9<¤9±e9ñu91„9q”9±£9ñ³91Â9qÒ9±á9ññ9°9¸9oX9
+Î÷9
+.—9	Ž69íÖ9Mu9­9´9{¿9êÊ9YÕ9Èà9	7ê9	¦õ9
+ 9
+…9
+ô9c 9 \9Ý—9Ò9X9•I9Ò„9¿9Lú9Š699ðé9Q½9
+²‘9
+e9	t99Õ95á9–µ9÷‰9`Þ9Ê393ˆ9œÝ9	39	oˆ9	ØÝ9
+B29
+«‡9Ü9OC9‰ª9Ä9þx98ß9sF9­­9è9"{9p9Ò94#9
+–+9	ø49	Z<9¼E9M9€V9â^9Eþ9©9<9pÛ9Ô{9	89	›¹9	ÿY9
+bø9
+Æ—9
+þ*95½9mO9¤â9Üu99Kš9ƒ-9º¿9P9³K9ˆ9
+yÅ9	Ý9	@?9£|9¹9iö9Í39+9‰9æð9DÙ9¢Ã9	 ¬9	^–9	¼€9
+i9
+xS9
+­9
+áÏ9Ž9KL9€9´É9é‡9F9S90
+9”|9
+øí9
+]_9	ÁÐ9	&B9Š´9ï%9S—9¸9<9hp9À£9×9q9É?9	!s9	y¦9	ÑÚ9
+*9
+[ø9
+â9
+¿Ì9
+ñ¶9# 9U‹9‡u9¹_9ëI9	9v79
+ãg9
+P—9	½Ç9	*÷9˜&9V9r†9ß¶9-^9{9È¯9W9d 9±¨9ÿP9	Lø9	š¡9	èI9
+™9
+Bé9
+p:9
+Š9
+ÊÚ9
+ø*9%z9RË9€9â9Wó9
+Íá9
+CÏ9	¹½9	/«9¥™9ˆ9‘v9d9J99Ðº9×9Vô9š9Ý.9	 K9	cg9	¦„9	Ï;9	÷ñ9
+ §9
+I]9
+r9
+šÊ9
+Ã€9
+ì79í9»99®9
+¸[9
+79	µ´9	4`9³91¹9°e9/9g£9 49ØÆ9W9Iè9‚z9»9ó9	,.9	d¿9	ˆÜ9	¬ø9	Ñ9	õ19
+M9
+=j9
+a†9
+…¢9
+©¿9“ÿ9j9
+¢Ô9
+*?9	±ª9	99À9Gê9ÏU9VÀ9„Å9²Ë9àÑ9×9<Ý9jã9˜é9Æï9ôõ9	"ú9	B}9	aÿ9	‚9	¡9	À‡9	à	9	ÿŒ9
+9
+>‘9lü9
+ý%9
+N9
+w9	­ 9	=É9Íò9^9îD9~n9¡è9Åb9èÝ9W9/Ò9SL9vÆ9šA9½»9á69ü9	9	1ï9	LØ9	gÀ9	‚©9	’9	¸z9	Óc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            XTENSION= 'IMAGE   '           / HDU extension type                             BITPIX  =                  -32 / Floating point (32 bit)                        NAXIS   =                    4                                                  NAXIS1  =                   29 / n'th data dimension                            NAXIS2  =                   29 / n'th data dimension                            NAXIS3  =                    1 / n'th data dimension                            NAXIS4  =                    1 / n'th data dimension                            PCOUNT  =                    0 / associated parameter count                     GCOUNT  =                    1 / group count                                    BSCALE  =                  1.0 / PHYSICAL = PIXEL*BSCALE + BZERO                BZERO   =                 0.E0                                                  BMAJ    =     8.45713880327E-4                                                  BMIN    =     6.49599035581E-4                                                  BPA     =       -87.3307800293                                                  BTYPE   = 'Intensity'                                                           OBJECT  = 'J194312+533000'                                                      BUNIT   = 'Jy/beam '           / Brightness (pixel) unit                        EQUINOX =                 2.E3                                                  RADESYS = 'ICRS    '                                                            LONPOLE =                180.0                                                  LATPOLE =                 53.5                                                  PC1_1   =                  1.0                                                  PC2_1   =                 0.E0                                                  PC3_1   =                 0.E0                                                  PC4_1   =                 0.E0                                                  PC1_2   =                 0.E0                                                  PC2_2   =                  1.0                                                  PC3_2   =                 0.E0                                                  PC4_2   =                 0.E0                                                  PC1_3   =                 0.E0                                                  PC2_3   =                 0.E0                                                  PC3_3   =                  1.0                                                  PC4_3   =                 0.E0                                                  PC1_4   =                 0.E0                                                  PC2_4   =                 0.E0                                                  PC3_4   =                 0.E0                                                  PC4_4   =                  1.0                                                  CTYPE1  = 'RA---SIN'                                                            CRVAL1  =    295.8005409226443                                                  CDELT1  =   -2.777777777778E-4                                                  CRPIX1  =               1466.0                                                  CUNIT1  = 'deg     '                                                            CTYPE2  = 'DEC--SIN'                                                            CRVAL2  =    53.49999983606202                                                  CDELT2  =    2.777777777778E-4                                                  CRPIX2  =                235.0                                                  CUNIT2  = 'deg     '                                                            CTYPE3  = 'FREQ    '                                                            CRVAL3  =                 3.E9                                                  CDELT3  =     2.072152310327E9                                                  CRPIX3  =                  1.0                                                  CUNIT3  = 'Hz      '                                                            CTYPE4  = 'STOKES  '                                                            CRVAL4  =                  1.0                                                  CDELT4  =                  1.0                                                  CRPIX4  =                  1.0                                                  CUNIT4  = '        '                                                            PV2_1   =                 0.E0                                                  PV2_2   =                 0.E0                                                  RESTFRQ =     2.987888186695E9 / Rest Frequency (Hz)                            SPECSYS = 'LSRK    '           / Spectral reference frame                       ALTRVAL =    -1.215249719738E6 / Alternate frequency reference value            ALTRPIX =                  1.0 / Alternate frequency reference pixel            VELREF  =                  257 / 1 LSR, 2 HEL, 3 OBS, +256 Radio                COMMENT  casacore non-standard usage: 4 LSD, 5 GEO, 6 SOU, 7 GAL                TELESCOP= 'EVLA    '                                                            OBSERVER= 'Dr. Vlass Scientist'                                                 DATE-OBS= '2021-09-28T06:08:35.700000' / First scan started                     DATE-END= '2021-09-28T06:43:26.850000' / Last scan finished                     TIMESYS = 'UTC     '                                                            OBSRA   =          295.8006625                                                  OBSDEC  =                 53.5                                                  OBSGEO-X=    -1.601156673287E6                                                  OBSGEO-Y=    -5.041988986066E6                                                  OBSGEO-Z=     3.554879236821E6                                                  INSTRUME= 'EVLA    '                                                            CASAVER = '6.1.3.3 '                                                            DATAMAX =     0.05312457680702                                                  DATAMIN =   -8.590525831096E-4                                                  DISTANCE=                 0.E0                                                  FIELD   = '3913    '                                                            FILNAM01= 'VLASS2  '                                                            FILNAM02= '2       '                                                            FILNAM03= 'ql      '                                                            FILNAM04= 'T24t20  '                                                            FILNAM05= 'J194312+533000'                                                      FILNAM06= '10      '                                                            FILNAM07= '2048    '                                                            FILNAM08= 'v1      '                                                            FILNAM09= 'I       '                                                            FILNAM10= 'iter1   '                                                            FILNAM11= 'image   '                                                            FILNAM12= 'tt0     '                                                            GROUP   = 'N/A     '                                                            INTENT  = 'TARGET  '                                                            ITER    =                    1                                                  MEMBER  = 'unknown '                                                            NFIELD  =                    1                                                  NFILNAM =                   12                                                  NPOL    =                    2                                                  NSPWNAM =                   16                                                  OFFDEC  =               -999.0                                                  OFFRA   =               -999.0                                                  PER_EB  =                    F                                                  PIPEVER = '2021.1.1.32'                                                         PROPCODE= 'VLASS   '                                                            ROBUST  =                  1.0                                                  SGOAL   = 'N/A     '                                                            SPECMODE= 'mfs     '                                                            SPW     = '10,11,12,13,14,15,16,17,2,3,4,5,6,7,8,9'                             SPWNAM01= 'EVLA_S#B0D0#10'                                                      SPWNAM02= 'EVLA_S#B0D0#11'                                                      SPWNAM03= 'EVLA_S#B0D0#12'                                                      SPWNAM04= 'EVLA_S#B0D0#13'                                                      SPWNAM05= 'EVLA_S#B0D0#14'                                                      SPWNAM06= 'EVLA_S#B0D0#15'                                                      SPWNAM07= 'EVLA_S#B0D0#16'                                                      SPWNAM08= 'EVLA_S#B0D0#17'                                                      SPWNAM09= 'EVLA_S#A0C0#2'                                                       SPWNAM10= 'EVLA_S#A0C0#3'                                                       SPWNAM11= 'EVLA_S#A0C0#4'                                                       SPWNAM12= 'EVLA_S#A0C0#5'                                                       SPWNAM13= 'EVLA_S#A0C0#6'                                                       SPWNAM14= 'EVLA_S#A0C0#7'                                                       SPWNAM15= 'EVLA_S#A0C0#8'                                                       SPWNAM16= 'EVLA_S#A0C0#9'                                                       TYPE    = 'image   '                                                            USEWEIGH=                    F                                                  DATE    = '2021-11-06T07:55:23.722000' / Date FITS file was written             ORIGIN  = 'CASA 6.1.3-3 CASAtools:v1.0.0'                                       HISTORY  CASA START LOGTABLE                                                    HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0       HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:16 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:28 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.image.tt0   HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  History of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/quicklo&HISTORY  ok                                                                     HISTORY  >/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/work&HISTORY  in                                                                     HISTORY  >/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0          HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-04T14:12:54 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  Ran ia.setcoordsys                                                     HISTORY  2021-11-04T14:12:55 INFO SRCCODE='::image::setcoordsys'                HISTORY  ia.setcoordsys(csys={...})                                             HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  Ran ia.setmiscinfo                                                     HISTORY  2021-11-06T07:49:17 INFO SRCCODE='::image::setmiscinfo'                HISTORY  ia.setmiscinfo(info={...})                                             HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::ImagePrimaryBeamCorrector::correct&HISTORY   (                                                                     HISTORY  >file casa-source/code/imageanalysis/ImageAnalysis/ImagePrimaryBeamCor&HISTORY  re                                                                     HISTORY  >tor.cc, line 208)'                                                    HISTORY  End history of image /lustre/aoc/cluster/pipeline/vlass_prod/spool/qui&HISTORY  ck                                                                     HISTORY  >look/VLASS2.2_T24t20.J194312+533000_P80518v1_2021_09_28T21_14_20.735/&HISTORY  wo                                                                     HISTORY  >king/VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.pb.tt0      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:50:35 INFO SRCCODE='::impbcor'                           HISTORY  impbcor(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter&HISTORY  1.                                                                     HISTORY  >image.tt0", pbimage="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >1.pb.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.it&HISTORY  er                                                                     HISTORY  >.image.pbcor.tt0", overwrite=False, box="", region="", chans="", stok&HISTORY  es                                                                     HISTORY  >"", mask="", mode="divide", cutoff=-1.0, stretch=False)               HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  Ran ia.deviation                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::image::deviation'                  HISTORY  ia.deviation(outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", region={...}, mask="", overwrite=true, stret&HISTORY  ch                                                                     HISTORY  >false, grid=[10,10], anchor="ref", xlength="60arcsec", ylength="60arc&HISTORY  se                                                                     HISTORY  >", interp="cubic", stattype="xmadm", statalg="chauvenet", zscore=-1.0&HISTORY  00                                                                     HISTORY  >00, maxiter=-1)                                                       HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:52:44 INFO SRCCODE='::imdev'                             HISTORY  imdev(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.iter1.&HISTORY  im                                                                     HISTORY  >age.pbcor.tt0", outfile="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1&HISTORY  .I                                                                     HISTORY  >iter1.image.pbcor.tt0.rms", region="", box="", chans="", stokes="", m&HISTORY  as                                                                     HISTORY  >="", overwrite=True, stretch=False, grid=[10, 10], anchor="ref", xlen&HISTORY  gt                                                                     HISTORY  >="60arcsec", ylength="60arcsec", interp="cubic", stattype="xmadm", st&HISTORY  at                                                                     HISTORY  >lg="chauvenet", zscore=-1.0, maxiter=-1)                              HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  version: 6.1.3-3 CASAtools:v1.0.0                                      HISTORY  2021-11-06T07:53:06 INFO SRCCODE='::imsubimage'                        HISTORY  imsubimage(imagename="VLASS2.2.ql.T24t20.J194312+533000.10.2048.v1.I.i&HISTORY  te                                                                     HISTORY  >r1.image.pbcor.tt0.rms", outfile="VLASS2.2.ql.T24t20.J194312+533000.1&HISTORY  0.                                                                     HISTORY  >048.v1.I.iter1.image.pbcor.tt0.rms.subim", box="1785.0,1785.0,5506.0,&HISTORY  55                                                                     HISTORY  >6.0", region="", chans="", stokes="", mask="", dropdeg=False, overwri&HISTORY  te                                                                     HISTORY  >False, verbose=True, stretch=False, keepaxes=[])                      HISTORY  CASA END LOGTABLE                                                      HISTORY  Uncorrected CRVAL1 = 2.958006625000E+02 deg                            HISTORY  Uncorrected CRVAL2 = 5.350000000000E+01 deg                            HISTORY  Position correction (-2.603E-01/cos(CRVAL2), -5.902E-04) arcsec appliedNEXTEND =                    0 / Number of standard extensions                  END                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             9û`9jÙ9ÚR9IÊ9¹C9(»9}-9ÑŸ9	&9	z„9	Îö9
+#h9
+wÚ9
+ÌL9 ¾9u09tp9s°9rñ9r19qq9p±9oò9o29nr9m²99
+Æs9
+rÓ9èY9\Y9ÐZ9DZ9¸Z9,[9…ï9ß„9	99	’¬9	ìA9
+EÕ9
+Ÿi9
+øþ9R’9¬'9¬ù9­Ë9®9¯o9°A9±9±å9²·9³‰9´[9__9
+d9
+µi9ÕR9MÚ9Æb9>ê9·r9/ú9Ž±9íh9	L9	ªÕ9
+	Œ9
+hC9
+Æù9%°9„g9ã9å9çå9êI9ì­9ï9ñt9óØ9ö<9øŸ9û9¤¬9NU9
+÷þ9ÂJ9?Z9¼j99z9¶Š93š9—s9ûL9	_%9	Âþ9
+&×9
+Š°9
+î‰9Rb9¶;99
+9!ÿ9%õ9)ê9-à91Õ95Ë99Á9=¶9A¬9éù9’G9:”9¯C90Û9²r94
+9µ¡9799 49		09	r+9	Û'9
+D"9
+­999è9Q9V’9\9a¡9g(9l°9r79w¾9}E9‚Í9ˆT9/F9Ö89}*9!9Œ›99—99¢…9	
+9	q‡9	Ù9
+@‰9
+¨
+9‹9w9Þ9F9­9®­9¯Ì9°ê9²9³'9´E9µd9¶‚9·¡9¸¿9]á99¨#9^þ9è\9q¹9û9„t9	Ñ9	sØ9	ÙÞ9
+?å9
+¥ë9ò9qø9×ÿ9>9¤9
+9È9}9 39üé9ùž9öT9ó
+9ï¿9ìu9é*9Œ{9/Ì9Ó9¶Ü9D9Ñ\9^9ëÝ9	y9	Ý©9
+B59
+¦Á9N9oÚ9Ôf98ò9~9
+9f–9^ã9W/9O|9GÉ9@98b90¯9(ü9!I9–9»9\–9þ9º9ŸÝ91 9Â#9	SF9	äi9
+G{9
+ª9ž9p°9ÓÁ96Ó9™å9üö9`9Ã9¶ý9ªá9žÅ9’©9†9zq9nU9b99V9J9é°9‰`9)9f—9û9£9	%©9	º¯9
+O¶9
+±M9ä9t{9Ö97©9™@9úØ9\o9¾999þ“9î9Ý‰9Í9¼€9«û9›v9Šñ9zl9K9¶*9T	9¾u9W^9ðG9	‰09
+"9
+»99{;9ÛX9;t9›‘9û®9[Ë9»ç99|!9g39RE9=W9(j9|9þŽ9é 9Ô³9¿Å9ª×9Fæ9âô99S9³9	Oê9	ì¶9
+‰‚9&N9„ð9ã’9B49 ×9ÿy9^9¼½9`9z9Ø¤9¿N9¥÷9Œ 9sJ9Yó9@9'F9ð9ô™9ÛB9u€9¾9©ü9n09	ß9	¯Ž9
+P<9
+ðë9‘š9îÂ9Ké9©999ca9À‰9°9zØ9Ø 95(9h9ù©9Ûê9¾*9 k9‚«9dì9G,9)m9®9¤9<ˆ9Ôõ9Æ9	jŸ9
+19
+³Ã9XT9üæ9X“9´A9î9k›9ÇI9"ö9~£9ÚQ95þ9‘«9oƒ9M[9+39	
+9æâ9Äº9¢’9€i9^A9<9Òµ9iR9ÿï9	ì9	Æ`9
+nÔ9I9¿¾9h29Âe9˜9vË9Ðþ9+09…c9ß–99É9“ü9î/9Çž9¡9z|9Së9-Z9È9à79¹¦9“9l„9P9–9*è9	uÍ9
+9
+®=9Ju9æ­9‚å9Üö979‘9ë+9E<9ŸN9ù_9Sq9­‚9”9é9Ên9«Û9H9n¶9P#919ý9ôj9ÕØ9u9R9³9	Í¯9
+]ª9
+í¦9}¡9œ9—9÷‡9Qx9«h9X9_H9¹89(9m9Ç9 ø9
+d9óÏ9Ý;9Æ¦9°9™}9‚é9lT9UÀ9?+9èÚ9’ˆ9<79
+%‘9
+©O9-9°Í94‹9¸J99kç9Å¶9…9yS9Ó"9,ñ9†¿9àŽ9:\9+Æ909š9 9ñn9âØ9ÔB9Å«9·9¨9\Ÿ9¿9ÄÞ9
+}r9
+ôõ9lw9ãù9[{9Òý9,ª9†W9à99²9“_9í9F¹9 g9ú9SÁ9M)9F‘9?ú99b92Ê9,29%š99k9Ó9Ðd9Žõ9M†9
+ÕT9@š9«ß9%9‚j9í°9G;9 Ç9úS9Sß9­j9ö9`‚9º9š9m&9nŒ9oò9qY9rÀ9t&9uŒ9vó9xZ9yÀ9{&9D)9+9Ö-9-69Œ?9ëH9JQ9©Y9b9aÍ9»79¡9n9Çv9 à9zK9Óµ9- 9†Š9ï9™T9¢¸9¬9µ‚9¾ç9ÈL9Ñ±9Û9äz9·î9‹a9^Õ9…9×ä9*°9}|9ÐI9#9|^9Õ§9.ð9ˆ99á‚9:Ë9”9í]9F¦9Ÿî9±R9Âµ9Ô9å{9öÞ9A9¤9+9<k9MÎ9+³9	—9ç|9Üú9#‰9j9°¨9÷89=È9–ï9ð9I>9¢f9û9Tµ9­Ü99`+9¹S9Ò´9ì9w9Ù98:9Qœ9jý9„_9À9·"9Ÿx9‡Î9p$94Û9o.9©9ãÔ9'9Xz9±€9
+‡9c9¼“9™9nŸ9Ç¥9 «9y±9Ò·9ô9w96×9X79y–9šö9¼V9Ý¶9ÿ9 u9=99øË9Œ½9ºÓ9èê9 9E9s-9Ì9$ö9}Û9ÖÀ9/¤9ˆ‰9án9:S9“79ì9z9>Ø9h69‘”9ºò9äQ9¯979`k9‰É9‡9„:9r9±j9Ü'9ä91¢9\_9‡9ã9@9œs9øå9UX9±Ê9<9j®9Ç 9#“9O\9{&9¦ï9Ò¹9þ‚9*L9V9ß9­¨9Ùr9Ù®9Ùê9Ú&9Ö9ýz9$ß9LC9s§9›9û9[9»99{9Û
+9;
+9›
+9û
+9[	9‰>9·s9å¨9Ý9B9pG9ž|9Ì±9úæ9)9,Z9/š92Ú9úÃ9Î9BÙ9få9Šð9®û9ˆ9v9Ù£9=09 ¾9K9gØ9Ëf9.ó9’€9Ã 9óÁ9$a9U9…¢9¶B9æã9ƒ9H#9xÄ99…J9‹9o9@!9`Ô9†9¢89Âë9*9‘ 9ø;9_V9Æq9-Œ9”¦9ûÁ9bÜ9É÷9ý909c9–&9É29ü=9/I9bU9•a9Èm9Ñ³9Úú9äA                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

@@ -1,0 +1,18 @@
+# Files over GitHub's 100 MB per-file limit are attached to the GitHub release instead (see README,
+# 'Large files'); MANIFEST.sha256 still lists them so downloads can be verified.
+data/raw/vlass_ep1_ql_cutouts_41px.npz
+data/raw/vlass_e1ql_components.parquet
+# Per-strip download cache for 02_fetch_vlass_catalog.py; fully redundant with vlass_e1ql_components.parquet
+data/raw/vlass_strips/
+# caches and build products
+__pycache__/
+*.pyc
+.DS_Store
+.astropy/
+paper/*.aux
+paper/*.log
+paper/*.blg
+paper/*.out
+paper/*.synctex.gz
+paper/*.fdb_latexmk
+paper/*.fls

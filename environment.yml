@@ -1,0 +1,15 @@
+# Exact versions used to produce the results (Nov 2026). Create with:  conda env create -f environment.yml
+name: vlass-technosig
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11.18
+  - numpy=2.4.6
+  - scipy=1.17.1
+  - pandas=3.1.1
+  - astropy=8.0.2
+  - pyvo=1.10.0
+  - matplotlib=3.11.2
+  - pyarrow=26.0.1
+  - requests=2.34.2
+  - pillow=13.0.0

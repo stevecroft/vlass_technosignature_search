@@ -1,0 +1,15 @@
+{
+ "n_gaia": 321417,
+ "n_finite_bprp": 299746,
+ "n_ms": 218654,
+ "n_ms_dec41": 212057,
+ "n_in_vlass": 210191,
+ "n_components": 3381277,
+ "n_mainsample": 1880195,
+ "n_used_components": 2235687,
+ "n_subtiles": 35285,
+ "obs_epoch_min": 2017.6852223553121,
+ "obs_epoch_max": 2019.5385280249448,
+ "real_pairs_lt1": 53,
+ "offset_pairs_lt1_per_realisation": 2.8
+}
