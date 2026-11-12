@@ -47,13 +47,23 @@ def finalize(text):
     text = re.sub(r"(@inproceedings\{McKinney2010,) series=\{SciPy\},", r"\1", text)   # avoid "SciPy (SciPy)"
     text = re.sub(r"(McKinney2010,.*?) publisher=\{SciPy\},", r"\1", text, flags=re.S)
     text = text.replace("Guedel, Manuel", "G\u00fcdel, Manuel")
+    # MNRAS now uses article numbers (e.g. stag991) that CrossRef does not put in a pages field
+    def add_mnras_eid(e):
+        if "journal={\\mnras}" in e and "pages=" not in e:
+            d = re.search(r"DOI=\{10\.1093/mnras/(\w+)\}", e)
+            if d: e = re.sub(r"(year=\{\d{4}\})", r"\1, pages={" + d.group(1) + "}", e, count=1)
+        return e
+    text = "@".join(add_mnras_eid(e) if i else e for i, e in enumerate(text.split("@")))
+    # CrossRef 'issued' is the online date; use the volume year where they differ
+    text = re.sub(r"(Garrett2022,.*?year=\{)2022(\})", r"\g<1>2023\2", text, count=1, flags=re.S)
     return texify(text)
 
 DOIS = {
     "Price2020": "10.3847/1538-3881/ab65f1", "Enriquez2017": "10.3847/1538-4357/aa8d1b",
     "Isaacson2017": "10.1088/1538-3873/aa5800", "Tremblay2025": "10.3847/1538-3881/ad9ea5",
     "Painter2025": "10.3847/1538-3881/adbc5e", "Wlodarczyk2020": "10.1093/mnras/staa2672",
-    "Garrett2022": "10.1093/mnras/stac2607", "Wright2018": "10.3847/1538-3881/aae099",
+    "Garrett2022": "10.1093/mnras/stac2607",
+    "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378", "Wright2018": "10.3847/1538-3881/aae099",
     "Tarter2001": "10.1146/annurev.astro.39.1.511", "Lacy2020": "10.1088/1538-3873/ab63eb",
     "Gordon2021": "10.3847/1538-4365/ac05c0", "Gordon2020": "10.3847/2515-5172/abbe23",
     "GaiaDR3": "10.1051/0004-6361/202243940", "GaiaMission": "10.1051/0004-6361/201629272",

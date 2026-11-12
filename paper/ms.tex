@@ -36,11 +36,11 @@ Searches for radio technosignatures have concentrated on narrowband signals, whi
 
 \section{Introduction} \label{sec:intro}
 
-Radio searches for technosignatures have, since their inception, concentrated on narrowband emission \citep[e.g.,][]{Tarter2001}. A signal much narrower than any known natural maser line is an unambiguous marker of technology, and narrowband searches with modern spectrometers reach impressive sensitivity: the Breakthrough Listen (BL) survey of nearby stars \citep{Isaacson2017} placed limits of order $10^{12}$--$10^{13}$\,W on the equivalent isotropic radiated power (EIRP) of drifting narrowband transmitters around 1327 stars within 50\,pc \citep{Enriquez2017,Price2020}, and archival and commensal programs have since extended such searches to many more targets \citep[e.g.,][]{Painter2025,Tremblay2025}. Yet narrowband searches sample only a thin slice of the ``cosmic haystack'' \citep{Wright2018}. Terrestrial transmitters are increasingly broadband---spread-spectrum, frequency-hopped, chirped radar and multi-carrier modulations dominate modern usage---and a transmitter whose power is spread over kHz to GHz is effectively invisible to pipelines tuned to Hz-wide drifting lines.
+Radio searches for technosignatures have, since their inception, concentrated on narrowband emission \citep[e.g.,][]{Tarter2001}. A signal much narrower than any known natural maser line is an unambiguous marker of technology, and narrowband searches with modern spectrometers reach impressive sensitivity: the Breakthrough Listen (BL) survey of nearby stars \citep{Isaacson2017} placed limits of order $10^{12}$--$10^{13}$\,W on the equivalent isotropic radiated power (EIRP) of drifting narrowband transmitters around 1327 stars within 50\,pc \citep{Enriquez2017,Price2020}, and archival and commensal programs have since extended such searches to many more targets \citep[e.g.,][]{Tremblay2025}. \citet{Painter2025} took a step beyond the drifting-tone paradigm, searching thousands of stars in the BL Green Bank Telescope archive with a kurtosis statistic that flags any non-Gaussian structure within $\sim$3\,kHz-wide spectral blocks rather than matching a template of a single unresolved, Doppler-drifting line---a stepping stone toward searches for broader and more complex signals. Yet narrowband searches sample only a thin slice of the ``cosmic haystack'' \citep{Wright2018}. Terrestrial transmitters are increasingly broadband---spread-spectrum, frequency-hopped, chirped radar and multi-carrier modulations dominate modern usage---and a transmitter whose power is spread over kHz to GHz is effectively invisible to pipelines tuned to Hz-wide drifting lines. Earth's own leakage has shifted from a modest number of powerful broadcast carriers to a vast population of lower-power broadband emitters; \citet{Saide2023} simulated the leakage from the global network of mobile-communication towers as it would appear from nearby stellar systems. \citet{Garrett2026} argued that the aggregate output of such distributed infrastructure would appear to a distant observer as faint, compact continuum emission---a broadband radio technosignature (BRaT)---and, scaling Earth's present aggregate leakage ($\Lnu\sim400\,\WHz$ at L band) linearly with power consumption, estimated $\Lnu\sim4\times10^5\,\WHz$ for a Kardashev Type~I civilization. He proposed a hierarchical search in which wide-field continuum surveys identify compact sources coincident with nearby stars and very long baseline interferometry (VLBI) then tests them for high brightness temperature, negligible polarization, non-uniform spectra, scintillation, and co-motion with the host star, and noted that existing surveys can already place the first constraints on BRaT prevalence.
 
 Wide-area radio continuum surveys offer a complementary probe. They integrate the total power in a broad band irrespective of modulation, drift rate, or bandwidth, and they cover a large fraction of the sky to a uniform depth, so that every star in a volume-limited sample is observed. The cost is that a stellar continuum source is not intrinsically artificial: active stars emit gyrosynchrotron and coherent radio emission \citep{GudelBenz1993,Callingham2021,Vedantham2022}, and the overwhelming majority of mJy radio sources are extragalactic and can align with a foreground star by chance. A continuum technosignature search is therefore a search for \emph{unexplained} radio emission, and its power lies in the care with which natural explanations and chance alignments are eliminated.
 
-Here we carry out such a search using Epoch~1 of the VLA Sky Survey \citep[VLASS;][]{Lacy2020}, which covers the sky north of $\delta=-40^\circ$ at 2--4\,GHz with $\sim$2.5$''$ resolution and $\sim$0.12--0.15\,mJy\,beam$^{-1}$ noise, together with Gaia DR3 \citep{GaiaMission,GaiaDR3}. We cross-match all main-sequence stars within 100\,pc against the VLASS Quick Look component catalog \citep{Gordon2020,Gordon2021}, quantify chance alignments with offset catalogs, classify every association, follow up the one unexplained source with archival optical imaging and multi-epoch VLASS astrometry, derive limits on individual stars and on the population, and stack the images of all individually undetected stars. Section~\ref{sec:data} describes the data, Section~\ref{sec:methods} the methods, Section~\ref{sec:results} the results, and Section~\ref{sec:discussion} compares them with narrowband searches. All code and data needed to reproduce this work are publicly available (Section~\ref{sec:data_avail}).
+Here we carry out the first stage of such a search, for an entire volume-limited stellar sample, using Epoch~1 of the VLA Sky Survey \citep[VLASS;][]{Lacy2020}, which covers the sky north of $\delta=-40^\circ$ at 2--4\,GHz with $\sim$2.5$''$ resolution and $\sim$0.12--0.15\,mJy\,beam$^{-1}$ noise, together with Gaia DR3 \citep{GaiaMission,GaiaDR3}. We cross-match all main-sequence stars within 100\,pc against the VLASS Quick Look component catalog \citep{Gordon2020,Gordon2021}, quantify chance alignments with offset catalogs, classify every association, follow up the one unexplained source with archival optical imaging and multi-epoch VLASS astrometry, derive limits on individual stars and on the population, and stack the images of all individually undetected stars. Section~\ref{sec:data} describes the data, Section~\ref{sec:methods} the methods, Section~\ref{sec:results} the results, and Section~\ref{sec:discussion} compares them with narrowband searches and with broadband leakage benchmarks. All code and data needed to reproduce this work are publicly available (Section~\ref{sec:data_avail}).
 
 \section{Data} \label{sec:data}
 
@@ -62,7 +62,13 @@ For every star with a VLASS component within 2.5$''$ we retrieved the nearest RO
 
 Many nearby stars move by several arcseconds between the Gaia reference epoch (J2016.0) and the VLASS observations. We assigned each star to the QL image whose center is nearest, and propagated its position linearly to that image's observation date; for the final reliability analysis each star--component pair was re-propagated to the date of the image in which the component was measured. Parallactic displacement ($\le0.55''$, for Barnard's star) was neglected. We then found all components within 10$''$ of each star.
 
-To measure the rate of chance alignments directly, we repeated the match ten times after displacing every star by 3$'$ in a random direction. Figure~\ref{fig:summary}a compares the separation distributions: there are \NRealOne\ star--component pairs within 1$''$, against \NOffOne\ per offset realization, while beyond $\sim$2.5$''$ the two distributions agree.
+To measure the rate of chance alignments directly, we repeated the match ten times after displacing every star by 3$'$ in a random direction. Figure~\ref{fig:sep} compares the separation distributions: there are \NRealOne\ star--component pairs within 1$''$, against \NOffOne\ per offset realization, while beyond $\sim$2.5$''$ the two distributions agree.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{vlass_separation_histogram.pdf}
+\caption{Separations between epoch-propagated stars and VLASS components (solid) compared with the mean of ten 3$'$-offset realizations (dashed). The excess within 1$''$ is due to genuine stellar associations; beyond $\sim$2.5$''$ the two distributions agree.\label{fig:sep}}
+\end{figure}
 
 \subsection{Positional reliability} \label{sec:reliability}
 
@@ -106,21 +112,65 @@ A mean stack constrains the product of the fraction of stars with a transmitter 
 
 \subsection{Radio-detected stars are natural emitters} \label{sec:matches}
 
-Table~\ref{tab:matches} lists the \NSecure\ secure associations, and Figure~\ref{fig:summary}b shows them on the color--magnitude diagram. Of the \NCand\ stars with a VLASS component within 2.5$''$, \NRxs\ have a 2RXS and \NEra\ an eRASS1 counterpart; the chance of a random 2RXS source within 40$''$ is $\sim10^{-3}$. Among the secure associations, \NClassAB\ are active binaries (\NCBinX\ binary or over-luminous stars with X-ray counterparts, \NCRS\ RS~CVn systems, \NCBY\ BY~Dra variables, and \NCBin\ binary without X-ray detection), \NClassFL\ are flare stars or X-ray-active single stars, and \NClassOT\ are other known radio emitters: two young stars, two cataclysmic variables (including AE~Aqr), and the magnetic Ap star $\alpha^2$~CVn. The X-ray-detected stars have $\log(L_X/\Lnu)=\GBmin$--\GBmax\ (median \GBmed), $\sim$1\,dex radio-bright relative to the G\"udel--Benz relation, as expected for a radio flux-limited selection and consistent with the radio-loud tail of active stars \citep{Vedantham2022}. The remaining secure association is discussed next. Two lower-reliability unexplained matches, LP~732-30 and 2MASS~J14223872+0646143, are stationary in NVSS and FIRST respectively and are background sources.
+Table~\ref{tab:matches} lists the \NSecure\ secure associations, and Figure~\ref{fig:cmd} shows them on the color--magnitude diagram. Of the \NCand\ stars with a VLASS component within 2.5$''$, \NRxs\ have a 2RXS and \NEra\ an eRASS1 counterpart; the chance of a random 2RXS source within 40$''$ is $\sim10^{-3}$. Among the secure associations, \NClassAB\ are active binaries (\NCBinX\ binary or over-luminous stars with X-ray counterparts, \NCRS\ RS~CVn systems, \NCBY\ BY~Dra variables, and \NCBin\ binary without X-ray detection), \NClassFL\ are flare stars or X-ray-active single stars, and \NClassOT\ are other known radio emitters: two young stars, two cataclysmic variables (including AE~Aqr), and the magnetic Ap star $\alpha^2$~CVn. The X-ray-detected stars have $\log(L_X/\Lnu)=\GBmin$--\GBmax\ (median \GBmed), $\sim$1\,dex radio-bright relative to the G\"udel--Benz relation, as expected for a radio flux-limited selection and consistent with the radio-loud tail of active stars \citep{Vedantham2022}. The remaining secure association is discussed next. Two lower-reliability unexplained matches, LP~732-30 and 2MASS~J14223872+0646143, are stationary in NVSS and FIRST respectively and are background sources.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{vlass_detections_cmd.pdf}
+\caption{Color--magnitude diagram of the \NSample\ sample stars (grey) with the \NSecure\ secure associations colored by classification: active binaries (RS~CVn, BY~Dra, and other binary or over-luminous stars; blue), flare or X-ray-active single stars (orange), other natural emitters (young stars, cataclysmic variables, and a magnetic chemically peculiar star; green), and the background source near LSPM~J1943+5337 (red).\label{fig:cmd}}
+\end{figure}
+
+\input{tables/secure_matches}
 
 \subsection{LSPM J1943+5337: a background source} \label{sec:lspm}
 
 The radio component \LspmSep$''$ from the M dwarf LSPM~J1943+5337 ($d=\LspmDist$\,pc; $R=\LspmRel$) has a 3\,GHz flux density of \LspmS\,mJy and no X-ray counterpart, and the star has no SIMBAD activity classification; it is the only secure association without a natural explanation. Its catalogued deconvolved size, $\LspmMaj''\times\LspmMin''$, already argued for an extragalactic source. The star moves north at 153\,mas\,yr$^{-1}$, so in POSS-I (1953) it lay 9.8$''$ and in POSS-II (1989--1992) $\approx4''$ from the radio position. No optical source is present at the radio position on these plates to $g\gtrsim\PossIO$ and $r\gtrsim\PossIE$ (POSS-I) and $B_J,R_F\gtrsim\PossIIB$ (POSS-II; Figure~\ref{fig:lspm_optical}). Because only $\sim$30\% of mJy radio sources have optical counterparts even at $r\approx22$ \citep{Ivezic2002}, and fewer at plate depth \citep{deVries2004}, this non-detection is weak evidence on its own. The archival imaging also reveals a common-proper-motion companion, Gaia~DR3~2137474969749746048, 3.4$''$ south of the star, whose faintness and colors suggest a cool white dwarf.
 
+\begin{figure*}
+\centering
+\includegraphics[width=0.95\textwidth]{lspm1943_archival_imaging.pdf}
+\caption{Archival optical images ($24''\times24''$, north up, east left) around the VLASS component near LSPM~J1943+5337 (red ellipse: deconvolved size). The blue cross marks the star and the green cross its co-moving companion at each image epoch. The star was displaced by 9.8$''$ (POSS-I) and $\approx4''$ (POSS-II) from the radio position; 3$\sigma$ limits at the radio position are given in each panel. At the Pan-STARRS1 epoch the star is only 0.8$''$ away and dominates the light.\label{fig:lspm_optical}}
+\end{figure*}
+
 The decisive test is astrometric. Table~\ref{tab:lspm} and Figure~\ref{fig:lspm_vlass} show the radio position in VLASS epochs 1.2, 2.2, and 3.2, after tying each image to five compact reference sources; the reference frame agrees with Gaia to within $(\Delta\alpha^*,\Delta\delta)=(\FrameTieE'',\FrameTieN'')$ for the secure stellar associations. The source is detected at a steady $\approx$1\,mJy\,beam$^{-1}$ in every epoch while the star moved $\approx$0.8$''$ north; by 2024.4 the radio source lies $\LspmOffThree''$ from the star (\LspmSigThree$\sigma$ in declination), and a model in which the emission tracks the star is excluded with $\chi^2=\LspmChi$ for three degrees of freedom. LSPM~J1943+5337 is therefore a chance alignment with a background source. No unexplained secure association remains in the sample.
+
+\begin{figure*}
+\centering
+\includegraphics[width=0.95\textwidth]{lspm1943_vlass_multiepoch_astrometry.pdf}
+\caption{(a) Declination offset of the radio source near LSPM~J1943+5337 relative to its Epoch 1 catalog position (red), in a frame tied to compact reference sources, compared with the Gaia track of the star (blue). Filled symbols are independent epochs; open squares are Quick Look images sharing data with the Single Epoch images. (b) VLASS 3.2 Single Epoch image (2024.4) with contours at 3, 5, and 7 times the rms; the star (cross) has moved 1.1$''$ from the radio source.\label{fig:lspm_vlass}}
+\end{figure*}
+
+\input{tables/lspm_astrometry}
 
 \subsection{Limits on individual stars and on the population} \label{sec:limits}
 
-The median 95\% flux-density limit is \SlimMed\,mJy (5th--95th percentiles \SlimLo--\SlimHi\,mJy), corresponding to $\Lnu<\LlimMed\,\WHz$ (EIRP $<\EIRPlimMed$\,W across 2\,GHz) at the median distance. Figure~\ref{fig:summary}c shows the limits as a function of distance, and Table~\ref{tab:nearest} lists them for the twelve nearest stars; the most stringent, for Barnard's star, is $\Lnu<\BarnardL\,\WHz$ (EIRP $<\BarnardEIRP$\,W). With no unexplained detections, fewer than $\FpopSeven$, $\FpopEight$, and $\FpopNine$ of stars host a steady 2--4\,GHz transmitter with $\Lnu$ above $10^7$, $10^8$, and $10^9\,\WHz$ respectively (Figure~\ref{fig:summary}d); above $\sim3\times10^9\,\WHz$, where all \NpopFloor\ stars contribute, $f<\FpopFloor$.
+The median 95\% flux-density limit is \SlimMed\,mJy (5th--95th percentiles \SlimLo--\SlimHi\,mJy), corresponding to $\Lnu<\LlimMed\,\WHz$ (EIRP $<\EIRPlimMed$\,W across 2\,GHz) at the median distance. Figure~\ref{fig:limits} shows the limits as a function of distance, and Table~\ref{tab:nearest} lists them for the twelve nearest stars; the most stringent, for Barnard's star, is $\Lnu<\BarnardL\,\WHz$ (EIRP $<\BarnardEIRP$\,W). With no unexplained detections, fewer than $\FpopSeven$, $\FpopEight$, and $\FpopNine$ of stars host a steady 2--4\,GHz transmitter with $\Lnu$ above $10^7$, $10^8$, and $10^9\,\WHz$ respectively (Figure~\ref{fig:pop}); above $\sim3\times10^9\,\WHz$, where all \NpopFloor\ stars contribute, $f<\FpopFloor$.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{vlass_perstar_limits.pdf}
+\caption{95\% upper limits on the 3\,GHz spectral luminosity of individually undetected stars (grey) and luminosities of the secure associations (colors as in Figure~\ref{fig:cmd}) versus distance. The right axis gives the EIRP of a signal filling the 2\,GHz band.\label{fig:limits}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{vlass_population_limit.pdf}
+\caption{95\% upper limit on the fraction of stars hosting a steady 2--4\,GHz transmitter above a given spectral luminosity (bottom axis) or 2\,GHz-wide EIRP (top axis), from individual non-detections. The curve flattens where all \NpopFloor\ stars contribute.\label{fig:pop}}
+\end{figure}
+
+\input{tables/nearest_limits}
 
 \subsection{Stacked emission} \label{sec:stacks}
 
 Table~\ref{tab:stacks} and Figure~\ref{fig:stacks} present the stacks. The M-dwarf stacks show significant positive mean emission at 10--60\,pc, strongest at 20--40\,pc ($\StackMS\pm\StackMSerr\,\mu$Jy, \StackMSNR$\sigma$; median $\StackMMed\,\mu$Jy, \StackMMedSNR$\sigma$; $\langle\Lnu\rangle\approx\StackML\,\WHz$ from \StackMN\ stars). The signal is present in both halves of the sky and survives removal of the brightest 1\% of central pixels, so it is a property of the population rather than of a few sub-threshold flaring stars. Its amplitude is typical of quiescent emission from magnetically active M dwarfs \citep{GudelBenz1993,Callingham2021}. The apparent increase of $\langle\Lnu\rangle$ with distance is a selection effect: excluding individually detected stars removes the luminous tail of each shell above a threshold $\propto d^2$. No FGK stack exceeds \StackFGKmaxSNR$\sigma$.
+
+\begin{figure*}
+\centering
+\includegraphics[width=0.95\textwidth]{vlass_ep1_stacking_summary.pdf}
+\caption{(a) Inverse-variance-weighted mean 3\,GHz spectral luminosity of individually undetected stars in distance shells (filled: $\ge3\sigma$). (b) Flux-density stacks for M dwarfs and FGK stars at 20--40\,pc ($25''\times25''$). (c) 95\% upper limits on the fraction of stars hosting a transmitter of spectral luminosity $L_T$, from stacks (solid) and individual non-detections (dashed), cut at $f=1$; the shaded region is unconstrained by either method.\label{fig:stacks}}
+\end{figure*}
+
+\input{tables/stack_results}
 
 Treating the entire stacked signal as potentially artificial, the stacks limit transmitters 4--6 times fainter than the individual non-detections (Figure~\ref{fig:stacks}c): the constraint reaches $f<1$ at $L_T=\ReachFGK\,\WHz$ for FGK stars and $\ReachM\,\WHz$ for M dwarfs, compared with $\DetReachFGK$ and $\DetReachM\,\WHz$ from individual non-detections, and at $L_T=10^6\,\WHz$ gives $f<\FStackSixFGK$ (FGK) and $f<\FStackSixM$ (M). Above $\sim10^7\,\WHz$ the individual limits are more constraining. Because natural emission is detected in the M-dwarf stacks, their limits are conservative.
 
@@ -129,6 +179,12 @@ Treating the entire stacked signal as potentially artificial, the stacks limit t
 \subsection{Comparison with narrowband searches} \label{sec:bl}
 
 Table~\ref{tab:bl} compares our limits for a star at 50\,pc with those of \citet{Price2020}, whose GBT and Parkes bands overlap VLASS at 2.0--2.8 and 2.6--3.45\,GHz. In flux density VLASS is $\sim\FluxRatio$ times deeper (\VlassFiftyS\,mJy against $\approx$7\,Jy), because it integrates over 2\,GHz rather than a 2.79\,Hz channel. For a narrow line, however, the continuum dilutes the power over the band, and our in-band EIRP limit ($\VlassFiftyEIRP$\,W) is $\sim\BLratio$ times higher than the BL limit of $2.1\times10^{12}$\,W. For a signal of bandwidth $B$, the sensitivity of a single narrowband channel degrades roughly as $B$, whereas the continuum limit is independent of $B$: the two cross near $B\sim300$\,kHz, and for broader signals---radar chirps, spread-spectrum links, or broadband leakage---the continuum survey is the more sensitive, while the turboSETI pipeline used by \citet{Price2020} does not detect such signals at all. In occurrence, the continuum survey's large sample gives $f<\FFifty$ for the \NFifty\ stars within 50\,pc ($\FFiftyHalf$ with the 50\% detection probability adopted by \citealt{Price2020}), about 20 times tighter than the 0.37--0.45\% GBT narrowband limits under the same assumption, albeit at an EIRP threshold five orders of magnitude higher. The two approaches are complementary: narrowband searches constrain faint, narrow, long-duty-cycle signals around $\sim10^3$ stars, and continuum surveys constrain bright, broad signals around $\sim10^5$.
+
+\input{tables/bl_comparison}
+
+\subsection{Comparison with broadband leakage benchmarks} \label{sec:brats}
+
+Treating the band-averaged 3\,GHz luminosity as representative of a flat broadband spectrum, the Type~I leakage benchmark of \citet{Garrett2026}, $\Lnu\sim4\times10^5\,\WHz$ (EIRP $\approx8\times10^{14}$\,W across 2\,GHz), lies just below our most sensitive individual limit, $\Lnu<\BarnardL\,\WHz$ for Barnard's star; no star in the sample is individually constrained at that level. The stacks do reach it: at $4\times10^5\,\WHz$ they require $f<\FBratFGK$ for FGK stars and $f<\FBratM$ for M dwarfs, a weak but direct constraint on the prevalence of such leakage among nearby stars. Earth's present aggregate leakage of $\sim400\,\WHz$ would be detectable at the median VLASS sensitivity only to $\sim\EarthLeakAU$\,AU. Several of the diagnostics proposed by \citet{Garrett2026} are out of reach at VLASS resolution and depth---brightness temperature, polarization, spectral structure, and scintillation---but two are central to this work: association with a Gaia star, and co-motion with it (Section~\ref{sec:lspm}). A BRaT from a planet would be offset from its host by $\lesssim0.1''$ for orbits of a few AU at $d\gtrsim30$\,pc, well within our matching tolerance. Frequencies $\gtrsim1$\,GHz also avoid the elevated ionospheric cut-off expected for planets around active M dwarfs \citep{Garrett2026}, which favors 2--4\,GHz for the M dwarfs that make up most of our sample.
 
 \subsection{Interpretation and caveats} \label{sec:caveats}
 
@@ -161,37 +217,10 @@ Analysis code and an initial draft of this manuscript were prepared with assista
 
 \software{Astropy \citep{Astropy2013,Astropy2018,Astropy2022}, NumPy \citep{Harris2020}, SciPy \citep{Virtanen2020}, pandas \citep{McKinney2010}, Matplotlib \citep{Hunter2007}, PyVO \citep{Graham2014}}
 
-\begin{figure*}
-\centering
-\includegraphics[width=0.95\textwidth]{vlass_technosig_summary.pdf}
-\caption{(a) Separations between epoch-propagated stars and VLASS components (solid) compared with the mean of ten 3$'$-offset realizations (dashed). (b) Color--magnitude diagram of the \NSample\ sample stars (grey) with the \NSecure\ secure associations colored by classification. (c) 95\% upper limits on 3\,GHz spectral luminosity (grey) and luminosities of detected stars versus distance; the right axis gives the EIRP of a 2\,GHz-wide signal. (d) 95\% upper limit on the fraction of stars hosting a transmitter above a given $\Lnu$, from individual non-detections.\label{fig:summary}}
-\end{figure*}
 
-\begin{figure*}
-\centering
-\includegraphics[width=0.95\textwidth]{lspm1943_archival_imaging.pdf}
-\caption{Archival optical images ($24''\times24''$, north up, east left) around the VLASS component near LSPM~J1943+5337 (red ellipse: deconvolved size). The blue cross marks the star and the green cross its co-moving companion at each image epoch. The star was displaced by 9.8$''$ (POSS-I) and $\approx4''$ (POSS-II) from the radio position; 3$\sigma$ limits at the radio position are given in each panel. At the Pan-STARRS1 epoch the star is only 0.8$''$ away and dominates the light.\label{fig:lspm_optical}}
-\end{figure*}
 
-\begin{figure*}
-\centering
-\includegraphics[width=0.95\textwidth]{lspm1943_vlass_multiepoch_astrometry.pdf}
-\caption{(a) Declination offset of the radio source near LSPM~J1943+5337 relative to its Epoch 1 catalog position (red), in a frame tied to compact reference sources, compared with the Gaia track of the star (blue). Filled symbols are independent epochs; open squares are Quick Look images sharing data with the Single Epoch images. (b) VLASS 3.2 Single Epoch image (2024.4) with contours at 3, 5, and 7 times the rms; the star (cross) has moved 1.1$''$ from the radio source.\label{fig:lspm_vlass}}
-\end{figure*}
 
-\begin{figure*}
-\centering
-\includegraphics[width=0.95\textwidth]{vlass_ep1_stacking_summary.pdf}
-\caption{(a) Inverse-variance-weighted mean 3\,GHz spectral luminosity of individually undetected stars in distance shells (filled: $\ge3\sigma$). (b) Flux-density stacks for M dwarfs and FGK stars at 20--40\,pc ($25''\times25''$). (c) 95\% upper limits on the fraction of stars hosting a transmitter of spectral luminosity $L_T$, from stacks (solid) and individual non-detections (dashed), cut at $f=1$; the shaded region is unconstrained by either method.\label{fig:stacks}}
-\end{figure*}
 
-\clearpage  % flush figures so the long table starts on a fresh page
-\input{tables/secure_matches}
-\clearpage  % keep later floats after the end of the long table
-\input{tables/lspm_astrometry}
-\input{tables/nearest_limits}
-\input{tables/stack_results}
-\input{tables/bl_comparison}
 
 \clearpage
 \bibliography{refs}{}

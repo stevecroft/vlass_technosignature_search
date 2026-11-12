@@ -1,6 +1,8 @@
 """11 - Summary figures.
 results/vlass_technosig_summary.png : (a) separation histogram vs offset control, (b) CMD with classified detections,
-                                      (c) per-star limits vs distance, (d) population limit (clipped at f = 1)
+                                      (c) per-star limits vs distance, (d) population limit (clipped at f = 1);
+  the same four panels are also written as stand-alone figures vlass_separation_histogram, vlass_detections_cmd,
+  vlass_perstar_limits and vlass_population_limit (.png/.pdf) for the paper
 results/vlass_ep1_stacking_summary.png : (a) stacked mean L_nu per shell, (b) stacked images, (c) fraction vs power (clipped at f = 1)
 """
 import os, sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # PYTHONSAFEPATH-safe
@@ -17,48 +19,85 @@ GROUP = {"RS CVn / active binary": "Active binary (RS CVn, BY Dra, other binary)
 COLG = {"Active binary (RS CVn, BY Dra, other binary)": "#3b6ea8", "Flare / X-ray-active single star": "#e0a030",
         "Other natural (young, CV, magnetic CP)": "#6aa86a", "Background (LSPM J1943+5337, multi-epoch astrometry)": "#c0392b", "Unexplained": "k"}
 COLT = {"FGK": "#e0a030", "M": "#3b6ea8"}
+SHORT = {"Active binary (RS CVn, BY Dra, other binary)": "Active binary", "Flare / X-ray-active single star": "Flare / X-ray-active star",
+         "Other natural (young, CV, magnetic CP)": "Other natural (young, CV, CP)",
+         "Background (LSPM J1943+5337, multi-epoch astrometry)": "Background (LSPM J1943+5337)", "Unexplained": "Unexplained"}
 
 
 def clip1(f):
     f = np.asarray(f, float).copy(); f[~(f <= 1)] = np.nan; return f
 
 
-def summary(plt):
-    A = pd.read_parquet(os.path.join(C.DER, "matches_10arcsec.parquet")); offs = pd.read_parquet(os.path.join(C.DER, "offset_pairs.parquet"))
-    L = pd.read_parquet(os.path.join(C.RES, "vlass_perstar_limits_100pc_MS.parquet"))
+def load_summary():
+    D = dict(A=pd.read_parquet(os.path.join(C.DER, "matches_10arcsec.parquet")), offs=pd.read_parquet(os.path.join(C.DER, "offset_pairs.parquet")),
+             L=pd.read_parquet(os.path.join(C.RES, "vlass_perstar_limits_100pc_MS.parquet")),
+             pop=pd.read_csv(os.path.join(C.RES, "vlass_population_limit_curve.csv")))
     T = pd.read_csv(os.path.join(C.RES, "vlass_star_matches_classified.csv")); Ts = T[T.rel > 0.5].copy(); Ts["grp"] = Ts["class"].map(GROUP)
-    pop = pd.read_csv(os.path.join(C.RES, "vlass_population_limit_curve.csv"))
-    fig, axs = plt.subplots(2, 2, figsize=(7.2, 6.4)); (a, b), (c, d) = axs
+    D["Ts"] = Ts
+    return D
+
+
+def panel_separation(a, D, title=True):
+    A, offs = D["A"], D["offs"]
     bins = np.arange(0, 5.01, 0.25); hr, _ = np.histogram(A.sep, bins); ho, _ = np.histogram(offs.sep, bins)
     a.step(bins[:-1], hr, where="post", color="k", lw=1.2, label="Stars (epoch-propagated)")
     a.step(bins[:-1], ho / C.N_OFFSETS, where="post", color="0.55", lw=1.0, ls="--", label="3\u2032-offset positions (mean of 10)")
     a.set_xlabel("Star\u2013VLASS separation (arcsec)"); a.set_ylabel("Pairs per 0.25\u2033 bin")
-    a.set_title("Genuine stellar matches lie within 1\u2033", loc="left"); a.legend(frameon=False, loc="upper right")
+    if title: a.set_title("Genuine stellar matches lie within 1\u2033", loc="left")
+    a.legend(frameon=False, loc="upper right")
+
+
+def panel_cmd(b, D, title=True):
+    L, Ts = D["L"], D["Ts"]
     b.hexbin(L.bp_rp, L.MG, gridsize=120, bins="log", cmap="Greys", mincnt=1, linewidths=0, extent=(-0.2, 5, -1, 17))
     for k, cc in COLG.items():
         m = Ts.grp == k
-        if m.any(): b.scatter(Ts.bp_rp[m], Ts.MG[m], s=16, c=cc, edgecolor="k", lw=0.3, label=k, zorder=3)
+        if m.any(): b.scatter(Ts.bp_rp[m], Ts.MG[m], s=16, c=cc, edgecolor="k", lw=0.3, label=SHORT[k], zorder=3)
     b.invert_yaxis(); b.set_xlabel("Gaia $G_{BP}-G_{RP}$ (mag)"); b.set_ylabel("$M_G$ (mag)")
-    b.set_title("Detections are mostly active binaries", loc="left"); b.legend(frameon=False, fontsize=6, loc="upper right")
+    if title: b.set_title("Detections are mostly active binaries", loc="left")
+    b.legend(frameon=False, fontsize=6, loc="upper right", handletextpad=0.3)
+
+
+def panel_limits(c, D, title=True):
+    L, Ts = D["L"], D["Ts"]
     far = L.dist_pc >= 10
     c.hexbin(L.dist_pc[far], L.Lnu_lim_WHz[far], xscale="log", yscale="log", gridsize=60, bins="log", cmap="Greys", mincnt=1, linewidths=0, extent=(1, 2, 5.5, 10.3))
     c.scatter(L.dist_pc[~far], L.Lnu_lim_WHz[~far], s=2, c="0.45", lw=0, zorder=2)
     for k, cc in COLG.items():
         m = Ts.grp == k
-        if m.any(): c.scatter(Ts.dist_pc[m], Ts.Lnu_R_WHz[m], s=16, c=cc, edgecolor="k", lw=0.3, zorder=3)
+        if m.any(): c.scatter(Ts.dist_pc[m], Ts.Lnu_R_WHz[m], s=16, c=cc, edgecolor="k", lw=0.3, zorder=3, label=None if title else k)
     c.set_xscale("log"); c.set_yscale("log"); c.set_xlim(1.5, 120); c.set_ylim(2e5, 1e10)
-    c.set_xlabel("Distance (pc)"); c.set_ylabel("$L_\\nu$ at 3 GHz (W Hz$^{-1}$)"); c.set_title("Per-star 95% limits (grey) and detections", loc="left")
+    c.set_xlabel("Distance (pc)"); c.set_ylabel("$L_\\nu$ at 3 GHz (W Hz$^{-1}$)")
+    if title: c.set_title("Per-star 95% limits (grey) and detections", loc="left")
     c2 = c.secondary_yaxis("right", functions=(lambda y: y * C.BAND_HZ, lambda y: y / C.BAND_HZ)); c2.set_ylabel("EIRP, 2 GHz-wide (W)")
     r0 = L.nsmallest(1, "dist_pc").iloc[0]
     c.annotate("Barnard's star", (r0.dist_pc, r0.Lnu_lim_WHz), xytext=(4, 3e5), fontsize=6, arrowprops=dict(arrowstyle="-", lw=0.5), va="center")
+
+
+def panel_population(d, D, title=True):
+    pop = D["pop"]
     d.loglog(pop.Lnu_star_WHz, clip1(pop.f_UL95), color="k", lw=1.4)
     d.set_xlabel("Transmitter $L_\\nu$ threshold (W Hz$^{-1}$)"); d.set_ylabel("Fraction of stars hosting one (95% UL)")
     d2 = d.secondary_xaxis("top", functions=(lambda x: x * C.BAND_HZ, lambda x: x / C.BAND_HZ)); d2.set_xlabel("EIRP, 2 GHz-wide (W)")
     d.set_xlim(5e5, 3e10); d.set_ylim(1e-5, 1)
     i9 = np.argmin(np.abs(pop.Lnu_star_WHz - 1e9))
     d.text(0.97, 0.92, f"< 1 in {1/pop.f_UL95[i9]:,.0f} stars\nabove 10$^{{9}}$ W Hz$^{{-1}}$", transform=d.transAxes, ha="right", va="top", fontsize=7)
-    for ax, l in zip([a, b, c, d], "abcd"): C.panel_letter(ax, l)
+
+
+PANELS = [("vlass_separation_histogram", panel_separation), ("vlass_detections_cmd", panel_cmd),
+          ("vlass_perstar_limits", panel_limits), ("vlass_population_limit", panel_population)]
+
+
+def summary(plt):
+    """Combined 2x2 overview (results/) plus one stand-alone single-column figure per panel (used in the paper)."""
+    D = load_summary()
+    fig, axs = plt.subplots(2, 2, figsize=(7.2, 6.4))
+    for ax, (_, fn), l in zip(axs.ravel(), PANELS, "abcd"): fn(ax, D); C.panel_letter(ax, l)
     fig.tight_layout(); fig.savefig(os.path.join(C.RES, "vlass_technosig_summary.png"), dpi=300); fig.savefig(os.path.join(C.RES, "vlass_technosig_summary.pdf"), dpi=300); plt.close(fig)
+    for name, fn in PANELS:
+        fig, ax = plt.subplots(figsize=(3.5, 3.0) if fn is not panel_limits else (3.6, 3.0))
+        fn(ax, D, title=False); fig.tight_layout()
+        fig.savefig(os.path.join(C.RES, name + ".png"), dpi=300); fig.savefig(os.path.join(C.RES, name + ".pdf"), dpi=300); plt.close(fig)
 
 
 def stacking(plt):

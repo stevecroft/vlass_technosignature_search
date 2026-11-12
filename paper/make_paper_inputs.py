@@ -59,6 +59,7 @@ if __name__ == "__main__":
 
     # --- per-star limits and population
     L = pd.read_parquet(os.path.join(RES, "vlass_perstar_limits_100pc_MS.parquet"))
+    put("EarthLeakAU", com(round(np.sqrt(400.0 / (4 * np.pi * np.median(L.S_lim_mJy) * 1e-29)) / 1.496e11, -2)))  # Earth L_nu ~ 400 W/Hz
     p5, p50, p95 = np.percentile(L.S_lim_mJy, [5, 50, 95]); put("SlimMed", f"{p50:.2f}"); put("SlimLo", f"{p5:.2f}"); put("SlimHi", f"{p95:.2f}")
     put("LlimMed", sci(np.median(L.Lnu_lim_WHz))); put("EIRPlimMed", sci(np.median(L.EIRP_lim_W_2GHz)))
     put("NConfused", str(int(L.confused.sum()))); put("NDetected", str(int(L.detected.sum())))
@@ -96,6 +97,8 @@ if __name__ == "__main__":
         put(f"Reach{t}", sci(Lg[np.nanargmax(fv[f'f_UL95_stack_{t}'] < 1)], 2))
         put(f"DetReach{t}", sci(Lg[np.nanargmax(np.nan_to_num(fv[f'f_UL95_detection_{t}'], nan=9) < 1)], 1))
         i6 = np.argmin(np.abs(Lg - 1e6)); put(f"FStackSix{t}", f"{fv[f'f_UL95_stack_{t}'][i6]:.2f}")
+    iB = np.argmin(np.abs(np.log(Lg) - np.log(4e5)))      # Garrett (2026) Type I leakage benchmark, L_nu ~ 4e5 W/Hz
+    for t in ["FGK", "M"]: put(f"FBrat{t}", f"{fv[f'f_UL95_stack_{t}'][iB]:.2f}")
     put("ReachEIRP", sci(min(Lg[np.nanargmax(fv[f'f_UL95_stack_{t}'] < 1)] for t in ['FGK', 'M']) * 2e9))
     z = np.load(os.path.join(RAW, "vlass_ep1_ql_cutouts_41px.npz"), mmap_mode="r"); put("NCutouts", com(len(z["source_id"])))
 
@@ -121,7 +124,7 @@ if __name__ == "__main__":
         nm1 = clean_name(r.main_id, r.source_id); nm1 = r"\nodata" if nm1.startswith("{Gaia DR3") else nm1
         rows.append(f"{nm1} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & {r.dMG:+.2f} & {r.ruwe:.2f} & "
                     f"{r.sep:.2f} & {r.rel:.3f} & {r.Ftot/0.87:.2f} & {np.log10(r.Lnu_R_WHz):.2f} & {xflag} & {gbs} & {code.get(r['class'], r['class'])} " + r"\\")
-    open(os.path.join(HERE, "tables", "secure_matches.tex"), "w").write(r"""\setlength{\tabcolsep}{2.5pt}
+    open(os.path.join(HERE, "tables", "secure_matches.tex"), "w").write(r"""{\setlength{\tabcolsep}{2.5pt}  % group: keep the narrow spacing local to this table
 \begin{deluxetable*}{lrrrrrrrrrcrl}
 \tabletypesize{\scriptsize}
 \tablecaption{VLASS Epoch 1 components securely associated (reliability $R>0.5$) with \NSecure\ main-sequence stars within 100\,pc.\label{tab:matches}}
@@ -132,6 +135,7 @@ if __name__ == "__main__":
 \enddata
 \tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density divided by 0.87 (Quick Look flux-scale correction). X-ray: R = ROSAT 2RXS, E = eRASS1. Class: B+X binary/over-luminous with X-ray detection; RS = RS~CVn; BY = BY~Dra; B = binary/over-luminous; Fl = flare star; X = X-ray-active single star; Y = young star; CV = cataclysmic variable; CP = magnetic chemically peculiar star; BG = background source (Section~\ref{sec:lspm}). A machine-readable version with all columns is provided in the reproducibility package.}
 \end{deluxetable*}
+}
 """)
     rows = []
     for _, r in F.iterrows():
@@ -184,7 +188,8 @@ if __name__ == "__main__":
 \end{deluxetable}
 """)
     # figures
-    for f in ["vlass_technosig_summary", "vlass_ep1_stacking_summary", "lspm1943_archival_imaging", "lspm1943_vlass_multiepoch_astrometry"]:
+    for f in ["vlass_separation_histogram", "vlass_detections_cmd", "vlass_perstar_limits", "vlass_population_limit",
+              "vlass_technosig_summary", "vlass_ep1_stacking_summary", "lspm1943_archival_imaging", "lspm1943_vlass_multiepoch_astrometry"]:
         for ext in ("pdf", "png"):
             src = os.path.join(RES, f"{f}.{ext}")
             if os.path.exists(src): shutil.copy(src, os.path.join(HERE, "figures", f"{f}.{ext}"))

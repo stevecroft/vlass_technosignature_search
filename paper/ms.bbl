@@ -356,9 +356,15 @@ Flewelling, H.~A., Magnier, E.~A., Chambers, K.~C., {et~al.} 2020,
   properties},} \aap, 674, A1, \dodoi{10.1051/0004-6361/202243940}
 
 % type= article
-\bibitem[{M.~A. Garrett {\&} A.~P.~V. Siemion(2022)Garrett \&
+\bibitem[{M.~A. Garrett(2026)Garrett}]{Garrett2026}
+Garrett, M.~A. 2026, \bibinfo{title}{{Isolating broad-band radio
+  technosignatures (BRaTs): a framework for detecting planetary-scale
+  leakage},} \mnras, 549, stag991, \dodoi{10.1093/mnras/stag991}
+
+% type= article
+\bibitem[{M.~A. Garrett {\&} A.~P.~V. Siemion(2023)Garrett \&
   Siemion}]{Garrett2022}
-Garrett, M.~A., \& Siemion, A. P.~V. 2022, \bibinfo{title}{{Constraints on
+Garrett, M.~A., \& Siemion, A. P.~V. 2023, \bibinfo{title}{{Constraints on
   extragalactic transmitters via Breakthrough Listen observations of background
   sources},} \mnras, 519, 4581, \dodoi{10.1093/mnras/stac2607}
 
@@ -510,6 +516,14 @@ Pecaut, M.~J., \& Mamajek, E.~E. 2013, \bibinfo{title}{{INTRINSIC COLORS,
 Price, D.~C., Enriquez, J.~E., Brzycki, B., {et~al.} 2020, \bibinfo{title}{{The
   Breakthrough Listen Search for Intelligent Life: Observations of 1327 Nearby
   Stars Over 1.10--3.45 GHz},} \aj, 159, 86, \dodoi{10.3847/1538-3881/ab65f1}
+
+% type= article
+\bibitem[{R.~C. Saide {et~al.}(2023)Saide, Garrett, \&
+  Heeralall-Issur}]{Saide2023}
+Saide, R.~C., Garrett, M.~A., \& Heeralall-Issur, N. 2023,
+  \bibinfo{title}{{Simulation of the Earth's radio-leakage from mobile towers
+  as seen from selected nearby stellar systems},} \mnras, 522, 2393,
+  \dodoi{10.1093/mnras/stad378}
 
 % type= article
 \bibitem[{J. Tarter(2001)Tarter}]{Tarter2001}
