@@ -153,7 +153,8 @@ if __name__ == "__main__":
         tg = sorted(k for k in cal if k.startswith("ep"))
         put("KappaInj", f"{cal['kappa']:.3f}"); put("KappaCat", f"{cal['kappa_cat']:.3f}"); put("KappaCatErr", f"{cal['kappa_cat_err']:.3f}")
         put("KappaCatN", str(cal["kappa_cat_n"])); put("KappaSys", f"{100 * abs(cal['kappa_cat'] / cal['kappa'] - 1):.0f}")
-        put("EtaMin", f"{min(cal[t]['eta'] for t in tg):.2f}"); put("EtaMax", f"{max(cal[t]['eta'] for t in tg):.2f}")
+        _e0, _e1 = f"{min(cal[t]['eta'] for t in tg):.2f}", f"{max(cal[t]['eta'] for t in tg):.2f}"
+        put("EtaRange", _e0 if _e0 == _e1 else f"{_e0}$--${_e1}")
         put("CtrlStdMax", f"{max(cal[t]['ctrl_std'] for t in tg):.2f}")
         put("FPRawMin", sci(min(cal[t]["fp_rate_ge5"] for t in tg))); put("FPRawMax", sci(max(cal[t]["fp_rate_ge5"] for t in tg)))
         tb = pd.DataFrame(cal["ep1"]["inject"]["table"]).set_index("level")
@@ -335,20 +336,24 @@ if __name__ == "__main__":
         CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); U = CA[~CA.explained].sort_values("dist_pc")
         rows = []
         for _, r in U.iterrows():
-            nm = clean_name(r.main_id, r.source_id) if isinstance(r.main_id, str) else "---"
+            nm = clean_name(r.main_id, r.source_id) if isinstance(r.main_id, str) and not r.main_id.startswith("Gaia DR3") else "---"
             mult = r.multiplicity_evidence if isinstance(r.multiplicity_evidence, str) and r.multiplicity_evidence else "---"
+            mult = re.sub(r"over-luminous \((-?[0-9.]+) mag\)", lambda q: "$\\Delta M_G=" + q.group(1) + "$", mult)
+            mult = re.sub(r"SIMBAD [^;]+", "SIMBAD", mult)
             eps = (r.epoch_snr if isinstance(r.epoch_snr, str) else "").replace(";", ", ")
-            rows.append(f"{nm} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & ${r.S_coadd_mJy:.2f}\\pm{r.sigma_coadd_mJy:.2f}$ & {r.snr_coadd:.1f} & {eps} & {mult.replace('_', ' ')} \\\\")
-        open(os.path.join(HERE, "tables", "unexplained_candidates.tex"), "w").write(r"""\begin{deluxetable*}{lrrrrrll}
+            rows.append(f"{nm} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & ${r.S_coadd_mJy:.2f}\\pm{r.sigma_coadd_mJy:.2f}$ & {r.snr_coadd:.1f} & {eps} & {mult} \\\\")
+        open(os.path.join(HERE, "tables", "unexplained_candidates.tex"), "w").write(r"""{\setlength{\tabcolsep}{3pt}
+\begin{deluxetable*}{lrrrrrll}
 \tabletypesize{\scriptsize}
 \tablecaption{Candidates without activity evidence (any epoch or the coadd at $\ge5\sigma$).\label{tab:unexplained}}
-\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{Multiplicity evidence} \\
+\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$BP-RP$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{Multiplicity} \\
 \colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{} & \colhead{} & \colhead{}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) \KSteady\ unexplained candidates compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}).}
+\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) \KSteady\ unexplained candidates compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}). Multiplicity: SIMBAD binary type, RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge.}
 \end{deluxetable*}
+}
 """)
 
     # figures
