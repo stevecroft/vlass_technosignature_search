@@ -41,21 +41,21 @@ if __name__ == "__main__":
 
     # ---- population limit
     fig, d = plt.subplots(figsize=(3.6, 3.1))
-    d.loglog(POP.L_WHz, clip1(POP.f95), color="k", lw=1.6, label="All epochs, steady (individual)")
-    d.loglog(old.Lnu_star_WHz, clip1(old.f_UL95), color="0.55", lw=1.0, ls="--", label="Epoch 1 catalogue only")
+    d.loglog(POP.L_WHz, clip1(POP.f95), color="k", lw=1.6, label="All epochs, steady")
+    d.loglog(old.Lnu_star_WHz, clip1(old.f_UL95), color="0.55", lw=1.0, ls="--", label="Epoch 1 catalogue")
     d.loglog(POP.L_WHz, clip1(POP.fdelta95), color="k", lw=1.0, ls=":", label="Per snapshot ($f\\delta$)")
     for cl in ["AFGK", "M"]:
         s = SL[SL.cls == cl]
         ind = np.interp(np.log10(s.L_WHz), np.log10(POP.L_WHz), POP.f95)        # draw stacks only where they are tighter
         fm = clip1(s.f95_mean); fm[~(fm < ind)] = np.nan
-        d.loglog(s.L_WHz, fm, color=COLT[cl], lw=1.3, label=f"{cl}: mean stack ($f L_T$)")
+        d.loglog(s.L_WHz, fm, color=COLT[cl], lw=1.3, label=f"{cl} mean stack ($fL_T$)")
         m = s[s.f95_median.notna()]
         d.scatter(m.L_WHz, m.f95_median, s=14, marker="s", facecolor="white", edgecolor=COLT[cl], lw=1, zorder=3,
-                  label=f"{cl}: median stack")
+                  label=f"{cl} median stack")
     d.set_xlim(1e5, 3e10); d.set_ylim(1e-5, 1)
     d.set_xlabel("Transmitter $L_\\nu$ at 3 GHz (W Hz$^{-1}$)"); d.set_ylabel("Fraction of stars hosting one (95% UL)")
     d2 = d.secondary_xaxis("top", functions=(lambda x: x * C.BAND_HZ, lambda x: x / C.BAND_HZ)); d2.set_xlabel("EIRP, 2 GHz-wide (W)")
-    d.legend(frameon=False, fontsize=5.5, loc="lower left"); fig.tight_layout(); save(fig, "alleepoch_population_limit"); plt.close(fig)
+    d.legend(frameon=False, fontsize=5, loc="lower left", handlelength=1.6, borderaxespad=0.3); fig.tight_layout(); save(fig, "alleepoch_population_limit"); plt.close(fig)
 
     # ---- per-star steady limits
     fig, c = plt.subplots(figsize=(3.6, 3.0))

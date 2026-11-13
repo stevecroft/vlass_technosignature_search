@@ -689,4 +689,9 @@ Yiu, T. W.~H., Vedantham, H.~K., Callingham, J.~R., \& G{\"u}nther, M.~N. 2024,
   \bibinfo{title}{{Radio emission as a stellar activity indicator},} \aap, 684,
   A3, \dodoi{10.1051/0004-6361/202347657}
 
+% type= article
+\bibitem[{G. Zech(1989)Zech}]{Zech1989}
+Zech, G. 1989, \bibinfo{title}{{Upper limits in experiments with background or
+  measurement errors},} NIMPA, 277, 608, \dodoi{10.1016/0168-9002(89)90795-x}
+
 \end{thebibliography}

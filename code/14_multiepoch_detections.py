@@ -38,6 +38,7 @@ from scipy import stats
 from concurrent.futures import ThreadPoolExecutor
 
 ap = argparse.ArgumentParser(); ap.add_argument("--threads", type=int, default=2); ap.add_argument("--limit", type=int, default=0)
+ap.add_argument("--candidates", action="store_true", help="measure the unexplained all-epoch candidates of 18 instead of the secure associations")
 a = ap.parse_args()
 CACHE = os.path.join(C.RAW, "multiepoch_detections"); os.makedirs(CACHE, exist_ok=True)
 HB = 30                     # half-box in pixels (1"/px): 61x61 cutouts
@@ -83,8 +84,14 @@ def measure(d, x0, y0, search=3.0, box=10, force=False):
 
 
 def main():
-    T = pd.read_csv(os.path.join(C.RES, "vlass_star_matches_classified.csv"))
-    T = T[T.rel > 0.5].drop_duplicates("source_id").reset_index(drop=True)
+    if a.candidates:      # unexplained all-epoch candidates (18); same measurement, frame tie taken from the secure run
+        T = pd.read_csv(os.path.join(C.RES, "alleepoch_candidates.csv")); T = T[~T.explained.astype(bool)].copy()
+        T["class"] = "unexplained candidate"; T["rel"] = np.nan; T["RAJ2000"] = np.nan; T["DEJ2000"] = np.nan
+        T = T.drop(columns=["dist_pc"]).reset_index(drop=True)
+    else:
+        T = pd.read_csv(os.path.join(C.RES, "vlass_star_matches_classified.csv"))
+        T = T[T.rel > 0.5].drop_duplicates("source_id").reset_index(drop=True)
+    SUF = "_candidates" if a.candidates else ""
     sv = pd.read_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"), columns=["source_id", "ra", "dec", "pmra", "pmdec", "parallax", "dist_pc"])
     T = T[["source_id", "main_id", "class", "rel", "RAJ2000", "DEJ2000"]].merge(sv, on="source_id", how="left")
     if a.limit: T = T.head(a.limit)
@@ -191,10 +198,13 @@ def main():
     # global Gaia tie: median radio - star offset over all detections (most detected stars are genuine)
     det = M[M.detected & M.dE_star.notna()]
     gE, gN = det.dE_star.median(), det.dN_star.median()
+    if a.candidates:      # use the tie measured on the secure associations
+        Ms = pd.read_csv(os.path.join(C.RES, "vlass_detections_multiepoch.csv")); Ms = Ms[Ms.detected]
+        gE, gN = (Ms.dE_raw - Ms.frame_E).median(), (Ms.dN_raw - Ms.frame_N).median()
     M["dE_star"] -= gE; M["dN_star"] -= gN
     M["eE"] = np.sqrt(M.pos_err**2 + M.frame_eE.fillna(0.1)**2 + SYS_POS**2)
     M["eN"] = np.sqrt(M.pos_err**2 + M.frame_eN.fillna(0.1)**2 + SYS_POS**2)
-    M.to_csv(os.path.join(C.RES, "vlass_detections_multiepoch.csv"), index=False)
+    M.to_csv(os.path.join(C.RES, f"vlass_detections_multiepoch{SUF}.csv"), index=False)
 
     S = []
     for sid, g in M.groupby("source_id"):
@@ -227,7 +237,7 @@ def main():
     dc = S.get("dchi2_stationary_minus_comove", pd.Series(np.nan, index=S.index))
     S["motion"] = np.select([S.n_det < 2, dc > 9, dc < -9], ["single detection", "co-moving", "stationary"], "inconclusive")
     S["variable"] = S.p_const_flux < 0.01
-    S.to_csv(os.path.join(C.RES, "vlass_detections_variability.csv"), index=False)
+    S.to_csv(os.path.join(C.RES, f"vlass_detections_variability{SUF}.csv"), index=False)
     print("per-epoch flux scale vs Epoch-1 catalog:", scale.round(3).to_dict())
     print(f"global Gaia tie: dE={gE:+.3f}\" dN={gN:+.3f}\"; images with detections {int(M.detected.sum())}/{len(M)}")
     print(S[["main_id", "dist_pc", "pm_masyr", "n_images", "n_det", "S_mean_mJy", "S_max_mJy", "mod_index", "p_const_flux",

@@ -19,6 +19,12 @@ python 13_transmitter_rate.py      # transmitter rate vs EIRP; literature points
 python 14_multiepoch_detections.py # secure associations in every VLASS QL epoch 1.1-4.1 (~5 min; fetches 61x61 px cutouts from CADC)
 python 15_compare_de2024.py        # overlap with De et al. 2024 (VLASS-Gaia radio stars)
 python 16_compare_srsc.py          # overlap with the Sydney Radio Star Catalogue (Driessen et al. 2024)
+# All-epoch analysis (needs the four cutout arrays, see 'Large files'):
+python 17_forced_photometry.py     # forced photometry, every star x epoch; injection-recovery calibration (~3 min)
+python 18_alleepoch_candidates.py  # candidates, confusion veto, control background, SIMBAD/X-ray (cached; --offline)
+python 14_multiepoch_detections.py --candidates   # astrometry of the unexplained candidates
+python 19_alleepoch_limits_stacks.py  # per-star, population and stack limits (~1 min)
+python 20_alleepoch_figures.py
 ```
 
 Re-fetching from the archives (only needed to rebuild `data/raw`):
@@ -28,7 +34,7 @@ Re-fetching from the archives (only needed to rebuild `data/raw`):
 `09_download_cutouts.py --epochs 1.1,1.2 --tag ep1` then `--consolidate` (**~8 h** at 4 threads; please keep concurrency low;
 later epochs use `--epochs 2.1,2.2 --tag ep2`, `3.1,3.2 --tag ep3`, `4.1 --tag ep4`).
 
-Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 08b → 09 → 10 → 14 → 15 → 16 → 11 → 12 → 13.
+Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 08b → 09 (ep1–ep4) → 10 → 14 → 15 → 16 → 17 → 18 → 14 --candidates → 19 → 20 → 11 → 12 → 13.
 
 ## Layout
 
@@ -67,7 +73,10 @@ instead of being committed. After cloning, download them into `data/raw/` and ch
 
 | File | Size | Rebuild from the archives with |
 |---|---|---|
-| `data/raw/vlass_ep1_ql_cutouts_41px.npz` | 1.4 GB | `09_download_cutouts.py` (~8 h) |
+| `data/raw/vlass_ep1_ql_cutouts_41px.npz` | 1.4 GB | `09_download_cutouts.py --epochs 1.1,1.2 --tag ep1` (~8 h) |
+| `data/raw/vlass_ep2_ql_cutouts_41px.npz` | 1.4 GB | `09_download_cutouts.py --epochs 2.1,2.2 --tag ep2` (7.8 h) |
+| `data/raw/vlass_ep3_ql_cutouts_41px.npz` | 1.4 GB | `09_download_cutouts.py --epochs 3.1,3.2 --tag ep3` (7.7 h) |
+| `data/raw/vlass_ep4_ql_cutouts_41px.npz` | 0.7 GB | `09_download_cutouts.py --epochs 4.1 --tag ep4` (4.0 h) |
 | `data/raw/vlass_e1ql_components.parquet` | 254 MB | `02_fetch_vlass_catalog.py` (~20 min) |
 
 `data/raw/vlass_strips/` is a resumable download cache for script 02. It is not distributed because the
@@ -104,12 +113,21 @@ component parquet holds exactly the same data.
 - **LSPM J1943+5337:** the radio emission is not at the star: χ² = 86.4 for 3 dof in declination, 105 for 6 dof in RA+Dec
   (VLASS 1.2/2.2/3.2; frame tied to Gaia within 0.11″). Stationary vs co-moving at a ~0.8″ offset is not yet decided; RA positions
   scatter beyond their errors (source extended E–W). Archival plates show no optical counterpart (POSS-I g ≳ 20.4, r ≳ 19.7–19.9; POSS-II ≳ 20.9).
-- **Per-star limits (95%):** median 1.11 mJy, giving L_ν < 8.3×10⁸ W Hz⁻¹. The best is Barnard's star, L_ν < 5.4×10⁵ W Hz⁻¹ (EIRP ≈ 1.1×10¹⁵ W if the signal fills 2 GHz).
-- **Population (individual non-detections):** f < 2.1×10⁻² / 6.5×10⁻⁴ / 2.2×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹, and f < 1.4×10⁻⁵ above about 3×10⁹ W Hz⁻¹.
-- **Stacking (Epoch 1):** natural sub-threshold M-dwarf emission is detected (20–40 pc: 11.6 ± 1.9 µJy, 6.2σ; L_ν ≈ 1.2×10⁶ W Hz⁻¹). FGK stacks are ≤ 2.6σ. The stacked limits on fraction × power reach f < 1 at L_T ≈ 2.65×10⁵ (FGK) and 2.43×10⁵ (M) W Hz⁻¹, 4–6× fainter than the individual non-detections.
+- **Forced photometry, all epochs (720,108 star-epochs; median 3 per star):** peak-loss factor κ = 0.861 from injection–recovery
+  (catalogue cross-check 0.899 ± 0.011, a 4% systematic); injected sources are recovered at 5σ in 51% of cases, as Φ(S/σ − 5) predicts.
+- **Candidates:** 160 stars at ≥ 5σ (coadd or any epoch), 143 with X-ray/SIMBAD activity evidence. Steady test (coadd): 7 unexplained
+  vs 11.9 expected at control positions → μ95 = 5.3. Single-epoch test: 16 vs 12.5 → μ95 = 12.2. The one candidate bright enough for
+  per-epoch astrometry (TYC 3573-1391-1) lies 1.7″ from its star.
+- **Per-star limits (95%, all epochs, steady):** median 0.55 mJy, L_ν < 4.1×10⁸ W Hz⁻¹; Barnard's star L_ν < 2.4×10⁵ W Hz⁻¹
+  (Epoch-1 catalogue analysis: median 1.11 mJy; Barnard 5.4×10⁵).
+- **Population (steady):** f < 8.1×10⁻³ / 2.4×10⁻⁴ / 2.6×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹; per snapshot f·δ < 1.7×10⁻⁵.
+  (Epoch-1 catalogue, with no unexplained associations by construction: 2.1×10⁻² / 6.5×10⁻⁴ / 2.2×10⁻⁵, floor 1.4×10⁻⁵.)
+- **Stacks (all epochs):** M-dwarf mean > 4σ in 4 of 6 shells, 20–40 pc: (8.2 ± 1.1)×10⁵ W Hz⁻¹ (7.5σ); median S/σ shift including
+  detected stars 0.084 ± 0.014 (5.8σ). AFGK ≤ 3.7σ. Mean stacks reach f < 1 at L_T ≈ 1.3×10⁵ (AFGK) and 1.6×10⁵ (M) W Hz⁻¹ (nearest
+  shells); median stacks give f < 0.08–0.09 at 10⁷ and 0.015–0.023 at 10⁹ W Hz⁻¹.
 - **Versus Breakthrough Listen (Price et al. 2020):**
-  - VLASS is about 6,300× deeper in flux density.
-  - For narrowband lines it is about 3.2×10⁵× less sensitive in EIRP.
+  - VLASS (all epochs) is about 12,600× deeper in flux density.
+  - For narrowband lines it is about 1.6×10⁵× less sensitive in EIRP.
   - A search of the same GBT data matched to bandwidth B would lose sensitivity only as √B, so the continuum advantage is coverage
     (signals the turboSETI pipeline does not search for) and sample size, not depth.
 

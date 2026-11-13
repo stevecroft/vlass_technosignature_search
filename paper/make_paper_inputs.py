@@ -194,12 +194,23 @@ if __name__ == "__main__":
         put("AllMNeffW", com(round(m.Neff_w, -1))); put("AllMDmed", f"{m.dmed_z:.3f}"); put("AllMDmedErr", f"{m.dmed_z_err:.3f}")
         put("AllMDmedSNR", f"{m.dmed_z / m.dmed_z_err:.1f}")
         put("AllAFGKmaxSNR", f"{SA[SA.cls == 'AFGK'].meanL_snr.max():.1f}")
+        put("AllAFGKmaxShell", SA[SA.cls == "AFGK"].sort_values("meanL_snr").iloc[-1].shell.replace("-", "--"))
+        put("NMShellsFour", str(int((SA[SA.cls == "M"].meanL_snr >= 4).sum())))
+        fc = os.path.join(RES, "vlass_detections_variability_candidates.csv")
+        if os.path.exists(fc):
+            vc_ = pd.read_csv(fc); multi = vc_[vc_.n_det >= 2]
+            put("NCandAstro", str(len(multi)))
+            if len(multi):
+                r_ = multi.sort_values("S_mean_mJy").iloc[-1]
+                put("CandAstroName", r_.main_id.replace("  ", " ")); put("CandAstroNdet", str(int(r_.n_det)))
+                put("CandAstroOff", f"{np.hypot(r_.offset_E, r_.offset_N):.1f}"); put("CandAstroChi", f"{r_.chi2_star:.0f}")
+                put("CandAstroDof", str(int(r_.dof_star))); put("CandAstroS", f"{r_.S_mean_mJy:.2f}")
         big = SA[SA.N_clean >= 1000]; put("TopTenMax", f"{100 * big.top10_wfrac.max():.1f}")
         put("NStackAll", com(SA.N_clean.sum()))
         SLm = pd.read_csv(os.path.join(RES, "alleepoch_stack_limits.csv"))
         for t in ["AFGK", "M"]:
             s = SLm[SLm.cls == t].reset_index(drop=True)
-            put(f"ReachAll{t}", sci(s.L_WHz[np.nanargmax(s.f95_mean.values < 1)], 2))
+            put(f"ReachAll{t}", sci(s.L_WHz[np.nanargmax(s.f95_mean.values < 1)], 1))
             fm = lambda L0: float(np.interp(np.log10(L0), np.log10(s.L_WHz), s.f95_mean))
             put(f"FMeanSix{t}", f"{fm(1e6):.2f}"); put(f"FBratAll{t}", f"{fm(4e5):.2f}")
             md = s.set_index("L_WHz").f95_median
