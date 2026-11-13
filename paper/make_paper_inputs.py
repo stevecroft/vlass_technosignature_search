@@ -141,7 +141,71 @@ if __name__ == "__main__":
     bl = pd.read_csv(os.path.join(RES, "vlass_vs_BL_Price2020_comparison.csv")); v = bl.iloc[-1]
     put("VlassFiftyS", f"{v.S_lim_Jy_at50pc*1e3:.2f}"); put("VlassFiftyEIRP", sci(v.EIRP_lim_W_at50pc)); put("BLratio", sci(v.EIRP_lim_W_at50pc / 2.1e12))
     put("FluxRatio", com(round((2.1e12 / (4*np.pi*(50*3.0857e16)**2)) / (v.S_lim_Jy_at50pc * 1e-26), -2))); put("NFifty", com(v.N_stars_constraining))
-    put("FFifty", sci(3.0 / v.N_stars_constraining)); put("FFiftyHalf", sci(6.0 / v.N_stars_constraining))
+    MU = json.load(open(os.path.join(DER, "alleepoch_candidates.json")))["mu95_hidden"] if os.path.exists(os.path.join(DER, "alleepoch_candidates.json")) else 3.0
+    put("FFifty", sci(MU / v.N_stars_constraining)); put("FFiftyHalf", sci(2 * MU / v.N_stars_constraining))
+
+    # --- all-epoch analysis (scripts 17-19)
+    ALL = None
+    if os.path.exists(os.path.join(DER, "alleepoch_summary.json")):
+        cal = json.load(open(os.path.join(DER, "forced_calibration.json")))
+        cj = json.load(open(os.path.join(DER, "alleepoch_candidates.json")))
+        sm = json.load(open(os.path.join(DER, "alleepoch_summary.json")))
+        tg = sorted(k for k in cal if k.startswith("ep"))
+        put("KappaInj", f"{cal['kappa']:.3f}"); put("KappaCat", f"{cal['kappa_cat']:.3f}"); put("KappaCatErr", f"{cal['kappa_cat_err']:.3f}")
+        put("KappaCatN", str(cal["kappa_cat_n"])); put("KappaSys", f"{100 * abs(cal['kappa_cat'] / cal['kappa'] - 1):.0f}")
+        put("EtaMin", f"{min(cal[t]['eta'] for t in tg):.2f}"); put("EtaMax", f"{max(cal[t]['eta'] for t in tg):.2f}")
+        put("CtrlStdMax", f"{max(cal[t]['ctrl_std'] for t in tg):.2f}")
+        put("FPRawMin", sci(min(cal[t]["fp_rate_ge5"] for t in tg))); put("FPRawMax", sci(max(cal[t]["fp_rate_ge5"] for t in tg)))
+        tb = pd.DataFrame(cal["ep1"]["inject"]["table"]).set_index("level")
+        put("InjFour", f"{tb.frac_det[4]:.2f}"); put("InjFive", f"{tb.frac_det[5]:.2f}"); put("InjSix", f"{tb.frac_det[6]:.2f}")
+        put("NInject", com(int(tb.n.sum()))); put("NEpochTags", str(len(tg)))
+        put("NStarEpochs", com(sum(cal[t]["n_good"] for t in tg)))
+        put("NCandStars", str(cj["n_candidate_stars"])); put("NCandExpl", str(cj["n_explained"])); put("NCandMult", str(cj["n_multiplicity_only"]))
+        put("KUnexpl", str(cj["k_unexplained"])); put("BExp", f"{cj['b_expected']:.1f}"); put("MuHidden", f"{cj['mu95_hidden']:.1f}")
+        put("KSteady", str(cj["k_steady"])); put("BSteady", f"{cj['b_steady']:.1f}"); put("MuSteady", f"{cj['mu95_steady']:.1f}")
+        put("KSnap", str(cj["k_snap"])); put("BSnap", f"{cj['b_snap']:.1f}"); put("MuSnap", f"{cj['mu95_snap']:.1f}")
+        put("NCandCoadd", str(cj["n_cand_coadd"])); put("NCandEpoch", str(cj["n_cand_epoch"]))
+        put("CtrlRateCo", sci(cj["ctrl_rate_coadd_per_star"])); put("NStarEpTrials", com(cj["n_star_epochs_trials"]))
+        put("NVetoStarEp", str(cj["n_vetoed_star_epochs"])); put("NStarsVeto", str(cj["n_stars_any_veto"]))
+        put("CtrlRateEp", sci(cj["ctrl_rate_per_epoch"])); put("CtrlRateAny", sci(cj["ctrl_rate_coadd_per_star"]))
+        put("MedEpochs", f"{sm['median_epochs']:.0f}")
+        PA = pd.read_parquet(os.path.join(RES, "alleepoch_perstar_limits.parquet")); PA = PA[PA.S_lim_steady.notna()]
+        q5, q50, q95 = np.percentile(PA.S_lim_steady, [5, 50, 95]); put("SlimAllMed", f"{q50:.2f}"); put("SlimAllLo", f"{q5:.2f}"); put("SlimAllHi", f"{q95:.2f}")
+        put("LlimAllMed", sci(PA.L_lim_steady.median())); put("EIRPlimAllMed", sci(PA.L_lim_steady.median() * 2e9))
+        put("SlimAnyMed", f"{PA.S_lim_anyepoch.median():.2f}")
+        bn = PA.nsmallest(1, "dist_pc").iloc[0]; put("BarnardLAll", sci(bn.L_lim_steady)); put("BarnardEIRPAll", sci(bn.L_lim_steady * 2e9))
+        put("BarnardSAll", f"{bn.S_lim_steady:.2f}"); put("BarnardNep", str(int(bn.n)))
+        put("EarthLeakAUAll", com(round(np.sqrt(400.0 / (4 * np.pi * PA.S_lim_steady.median() * 1e-29)) / 1.496e11, -2)))
+        put("NBelowBrat", com(int((PA.L_lim_steady < 4e5).sum())))
+        _s = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["bp_rp"]); put("NAstars", com(int((_s.bp_rp < 0.33).sum())))
+        put("FFiftyRatio", f"{0.0037 / (2 * MU / v.N_stars_constraining):.0f}")
+        PP = pd.read_csv(os.path.join(RES, "alleepoch_population_limits.csv"))
+        fi = lambda L0, col="f95": float(np.interp(np.log10(L0), np.log10(PP.L_WHz), PP[col]))
+        for x, k in [(1e7, "Seven"), (1e8, "Eight"), (1e9, "Nine")]:
+            put(f"FAll{k}", sci(fi(x))); put(f"NAll{k}", com(fi(x, "N_eff")))
+        put("FAllFloor", sci(PP.f95.min())); put("NAllFloor", com(PP.N_eff.max())); put("FDeltaFloor", sci(PP.fdelta95.min()))
+        put("FAllZeroFloor", sci(PP.f95_k0b0.min()))
+        put("OneInNineAll", com(round(1 / fi(1e9), -2)))
+        put("ReachIndAll", sci(PP.L_WHz[np.argmax(PP.f95.values < 1)], 1))
+        ST = pd.read_csv(os.path.join(RES, "alleepoch_stacks.csv")); SA = ST[ST.scope == "all"]
+        m = SA[(SA.shell == "20-40") & (SA.cls == "M")].iloc[0]
+        put("AllMSL", sci(m.meanL)); put("AllMSLErr", sci(m.meanL_err)); put("AllMSNR", f"{m.meanL_snr:.1f}"); put("AllMN", com(m.N_clean))
+        put("AllMNeffW", com(round(m.Neff_w, -1))); put("AllMDmed", f"{m.dmed_z:.3f}"); put("AllMDmedErr", f"{m.dmed_z_err:.3f}")
+        put("AllMDmedSNR", f"{m.dmed_z / m.dmed_z_err:.1f}")
+        put("AllAFGKmaxSNR", f"{SA[SA.cls == 'AFGK'].meanL_snr.max():.1f}")
+        big = SA[SA.N_clean >= 1000]; put("TopTenMax", f"{100 * big.top10_wfrac.max():.1f}")
+        put("NStackAll", com(SA.N_clean.sum()))
+        SLm = pd.read_csv(os.path.join(RES, "alleepoch_stack_limits.csv"))
+        for t in ["AFGK", "M"]:
+            s = SLm[SLm.cls == t].reset_index(drop=True)
+            put(f"ReachAll{t}", sci(s.L_WHz[np.nanargmax(s.f95_mean.values < 1)], 2))
+            fm = lambda L0: float(np.interp(np.log10(L0), np.log10(s.L_WHz), s.f95_mean))
+            put(f"FMeanSix{t}", f"{fm(1e6):.2f}"); put(f"FBratAll{t}", f"{fm(4e5):.2f}")
+            md = s.set_index("L_WHz").f95_median
+            put(f"FMedSix{t}", f"{md.get(1e6, np.nan):.2f}"); put(f"FMedSeven{t}", f"{md.get(1e7, np.nan):.3f}"); put(f"FMedNine{t}", f"{md.get(1e9, np.nan):.3f}")
+        reach = [SLm[SLm.cls == t].reset_index(drop=True).pipe(lambda s: s.L_WHz[np.nanargmax(s.f95_mean.values < 1)]) for t in ["AFGK", "M"]]
+        put("ReachEIRPAll", sci(min(reach) * 2e9))
+        ALL = dict(SA=SA)
 
     with open(os.path.join(HERE, "numbers.tex"), "w") as f:
         f.write("% AUTO-GENERATED by make_paper_inputs.py from ../results -- do not edit by hand\n")
@@ -201,8 +265,23 @@ if __name__ == "__main__":
 \tablecomments{Means are measured against the empirical null (stacked image at 10--18$''$ from the centre); uncertainties are the larger of the formal and null-ring scatter. $\langle L_\nu\rangle_{95}$ is the one-sided 95\% upper limit on the mean spectral luminosity; EIRP$_{95}$ assumes a flat signal filling 2\,GHz. FGK/M split at $G_{BP}-G_{RP}=1.84$.}
 \end{deluxetable*}
 """)
-    rows = [f"{clean_name(r.main_id, r.source_id)} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & ${sci(r.EIRP_lim_W_2GHz)}$ \\\\" for _, r in near.iterrows()]
-    open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable}{lrrrrr}
+    if ALL is not None:      # all-epoch steady limits for the same stars
+        nearA = near.merge(PA[["source_id", "n", "S_lim_steady", "L_lim_steady"]], on="source_id", how="left")
+        rows = [f"{clean_name(r.main_id, r.source_id)} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.dist_pc:.1f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & "
+                f"{int(r.n) if np.isfinite(r.n) else 0} & {r.S_lim_steady:.2f} & ${sci(r.L_lim_steady)}$ & ${sci(r.L_lim_steady * 2e9)}$ \\\\" for _, r in nearA.iterrows()]
+        open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable*}{lrrrrrrrrr}
+\tablecaption{95\% upper limits on steady 2--4\,GHz emission at the positions of the twelve nearest stars in the sample.\label{tab:nearest}}
+\tablehead{\colhead{Star} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$1''$} & \colhead{$S_{\rm lim}^{\rm E1}$} & \colhead{$L_{\nu,\rm lim}^{\rm E1}$} & \colhead{$N_{\rm ep}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
+\colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(au)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
+\startdata
+""" + "\n".join(rows) + r"""
+\enddata
+\tablecomments{E1: Epoch-1 catalogue analysis. $N_{\rm ep}$, $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star, i.e.\ to projected separations below roughly the value in the ``$1''$'' column; a transmitter on a planet at a wider separation would lie outside the measured position.}
+\end{deluxetable*}
+""")
+    else:
+        rows = [f"{clean_name(r.main_id, r.source_id)} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & ${sci(r.EIRP_lim_W_2GHz)}$ \\\\" for _, r in near.iterrows()]
+        open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable}{lrrrrr}
 \tablecaption{95\% upper limits on steady 2--4\,GHz emission from the twelve nearest stars in the sample.\label{tab:nearest}}
 \tablehead{\colhead{Star} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
 \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
@@ -237,9 +316,45 @@ if __name__ == "__main__":
 \tablecomments{Offsets are relative to the Epoch 1 catalogue position, after tying each image to five compact reference components. Subscript $\star$: Gaia position of the star at the image epoch.}
 \end{deluxetable}
 """)
+    # all-epoch tables
+    if ALL is not None:
+        rows = []
+        for _, r in ALL["SA"].iterrows():
+            rows.append(f"{r.shell.replace('-', '--')} & {r.cls} & {com(r.N_all)} & {com(r.N_clean)} & ${r.meanL/1e5:.1f}\\pm{r.meanL_err/1e5:.1f}$ & "
+                        f"${r.meanL_snr:.1f}$ & {com(round(r.Neff_w))} & {100*r.top10_wfrac:.1f} & ${r.dmed_z:+.3f}\\pm{r.dmed_z_err:.3f}$ \\\\")
+        open(os.path.join(HERE, "tables", "stack_results_all.tex"), "w").write(r"""\begin{deluxetable*}{llrrrrrrr}
+\tablecaption{Stacks of the all-epoch coadded forced photometry.\label{tab:stacks_all}}
+\tablehead{\colhead{Shell} & \colhead{Class} & \colhead{$N_{\rm all}$} & \colhead{$N_{\rm clean}$} & \colhead{$\langle L_\nu\rangle$} & \colhead{SNR} & \colhead{$N_{\rm eff,w}$} & \colhead{Top 10} & \colhead{$\Delta\,{\rm med}(S/\sigma)$} \\
+\colhead{(pc)} & \colhead{} & \colhead{} & \colhead{} & \colhead{($10^5$ W\,Hz$^{-1}$)} & \colhead{} & \colhead{} & \colhead{(\%)} & \colhead{}}
+\startdata
+""" + "\n".join(rows) + r"""
+\enddata
+\tablecomments{$\langle L_\nu\rangle$: inverse-variance-weighted mean spectral luminosity of clean stars (no secure association, no candidate, no epoch with predicted catalogue contamination $\ge0.5\sigma$), after subtracting the mean at the control positions; the error is the larger of the formal error and the scatter among the eight control positions. $N_{\rm eff,w}=(\sum w)^2/\sum w^2$; Top 10: weight fraction carried by the ten highest-weight stars. $\Delta\,{\rm med}(S/\sigma)$: median $S/\sigma$ of all unvetoed stars in the shell, including detected stars, minus the median at control positions; bootstrap error.}
+\end{deluxetable*}
+""")
+        CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); U = CA[~CA.explained].sort_values("dist_pc")
+        rows = []
+        for _, r in U.iterrows():
+            nm = clean_name(r.main_id, r.source_id) if isinstance(r.main_id, str) else "---"
+            mult = r.multiplicity_evidence if isinstance(r.multiplicity_evidence, str) and r.multiplicity_evidence else "---"
+            eps = (r.epoch_snr if isinstance(r.epoch_snr, str) else "").replace(";", ", ")
+            rows.append(f"{nm} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & ${r.S_coadd_mJy:.2f}\\pm{r.sigma_coadd_mJy:.2f}$ & {r.snr_coadd:.1f} & {eps} & {mult.replace('_', ' ')} \\\\")
+        open(os.path.join(HERE, "tables", "unexplained_candidates.tex"), "w").write(r"""\begin{deluxetable*}{lrrrrrll}
+\tabletypesize{\scriptsize}
+\tablecaption{Candidates without activity evidence (any epoch or the coadd at $\ge5\sigma$).\label{tab:unexplained}}
+\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{Multiplicity evidence} \\
+\colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{} & \colhead{} & \colhead{}}
+\startdata
+""" + "\n".join(rows) + r"""
+\enddata
+\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) \KSteady\ unexplained candidates compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}).}
+\end{deluxetable*}
+""")
+
     # figures
     for f in ["vlass_separation_histogram", "vlass_detections_cmd", "vlass_perstar_limits", "vlass_population_limit",
-              "vlass_technosig_summary", "vlass_ep1_stacking_summary", "transmitter_rate_vs_eirp", "lspm1943_archival_imaging", "lspm1943_vlass_multiepoch_astrometry", "vlass_detections_multiepoch"]:
+              "vlass_technosig_summary", "vlass_ep1_stacking_summary", "transmitter_rate_vs_eirp", "lspm1943_archival_imaging", "lspm1943_vlass_multiepoch_astrometry", "vlass_detections_multiepoch",
+              "alleepoch_perstar_limits", "alleepoch_population_limit", "alleepoch_stacks"]:
         for ext in ("pdf", "png"):
             src = os.path.join(RES, f"{f}.{ext}")
             if os.path.exists(src): shutil.copy(src, os.path.join(HERE, "figures", f"{f}.{ext}"))

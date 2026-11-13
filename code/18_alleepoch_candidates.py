@@ -97,17 +97,21 @@ if __name__ == "__main__":
                        "sig": g.w.sum() ** -0.5})
     CO["snr"] = CO.S / CO.sig
     # control coadds: z_coadd = sum(z_e / sigma_e) / sqrt(sum sigma_e^-2), over epochs where that control is unvetoed
-    ctrl_hits = ctrl_tot = 0; ep_hits = ep_tot = 0
+    # Two tests, each with its own trials and chance background:
+    #   steady   : one trial per star, the coadd S/N >= 5           -> k_steady, b_steady (limits on f)
+    #   snapshot : one trial per star-epoch, single-epoch S/N >= 5   -> k_snap, b_snap     (limits on f * delta)
+    co_hits = co_tot = 0; ep_hits = ep_tot = 0
     for j in range(N_CTRL):
         ok = ~U[f"cv{j}"].values & np.isfinite(U[f"c{j}"].values)
         Uj = U[ok]; ep_hits += int((Uj[f"c{j}"] >= THR).sum()); ep_tot += len(Uj)
         num = (Uj[f"c{j}"] / Uj.sigma_mJy).groupby(Uj.source_id).sum(); den = np.sqrt((1 / Uj.sigma_mJy ** 2).groupby(Uj.source_id).sum())
-        zc = num / den; anyep = (Uj[f"c{j}"] >= THR).groupby(Uj.source_id).any()
-        ctrl_hits += int(((zc >= THR) | anyep).sum()); ctrl_tot += len(zc)
-    rate_any = ctrl_hits / ctrl_tot                      # per star: any epoch >= 5 or coadd >= 5, at a blank position
+        zc = num / den; co_hits += int((zc >= THR).sum()); co_tot += len(zc)
+    rate_co, rate_ep = co_hits / co_tot, ep_hits / ep_tot
+    rate_any = rate_co                                    # (name kept for the summary)
     anyep_star = (U.snr >= THR).groupby(U.source_id).any()
-    CO["cand"] = (CO.snr >= THR) | anyep_star.reindex(CO.index).fillna(False)
-    b = rate_any * len(CO)
+    CO["cand_coadd"] = CO.snr >= THR; CO["cand_epoch"] = anyep_star.reindex(CO.index).fillna(False).astype(bool)
+    CO["cand"] = CO.cand_coadd | CO.cand_epoch
+    b_s = rate_co * len(CO); b_e = rate_ep * len(U); b = b_s
     for tag in LT.tag.unique():
         x = LT[LT.tag == tag]; per_tag[tag] = dict(n_star_epochs=int(len(x)), n_veto=int(x.veto.sum()), n_ge5=int(((x.snr >= THR) & ~x.detected).sum()))
     cand_ids = CO.index[CO.cand].values
@@ -131,19 +135,26 @@ if __name__ == "__main__":
     S["LX"] = np.where(S.era_F.notna() | S.rxs_crate.notna(), 1.0, np.nan)
     ev = S.apply(P07.evidence, axis=1); S["multiplicity_evidence"] = [e[0] for e in ev]; S["activity_evidence"] = [e[1] for e in ev]
     S["explained"] = S.activity_evidence.str.len() > 0
-    S = S.merge(CO[["n_ep", "S", "sig", "snr"]].rename(columns={"S": "S_coadd_mJy", "sig": "sigma_coadd_mJy", "snr": "snr_coadd"}),
+    S = S.merge(CO[["n_ep", "S", "sig", "snr", "cand_coadd", "cand_epoch"]].rename(columns={"S": "S_coadd_mJy", "sig": "sigma_coadd_mJy", "snr": "snr_coadd"}),
                 left_on="source_id", right_index=True)
+    n_ep_det = (U[U.source_id.isin(cand_ids)].snr >= THR).groupby(U.source_id[U.source_id.isin(cand_ids)]).sum().rename("n_ep_det")
+    S = S.merge(n_ep_det, left_on="source_id", right_index=True, how="left")
     ep_info = U[U.source_id.isin(cand_ids)].groupby("source_id").apply(
         lambda d: ";".join(f"{h}:{z:.1f}" for h, z in zip(d.half_epoch, d.snr)), include_groups=False).rename("epoch_snr")
     S = S.merge(ep_info, left_on="source_id", right_index=True, how="left")
     S[["source_id", "main_id", "dist_pc", "bp_rp", "dMG", "ruwe", "otypes", "multiplicity_evidence", "activity_evidence", "explained",
-       "n_ep", "S_coadd_mJy", "sigma_coadd_mJy", "snr_coadd", "epoch_snr"]].sort_values(["explained", "snr_coadd"], ascending=[True, False]).to_csv(
-        os.path.join(C.RES, "alleepoch_candidates.csv"), index=False)
+       "n_ep", "S_coadd_mJy", "sigma_coadd_mJy", "snr_coadd", "epoch_snr", "cand_coadd", "cand_epoch", "n_ep_det"]].sort_values(
+        ["explained", "snr_coadd"], ascending=[True, False]).to_csv(os.path.join(C.RES, "alleepoch_candidates.csv"), index=False)
     k = int((~S.explained).sum())
-    res = dict(per_tag=per_tag, n_stars_coadd=int(len(CO)), ctrl_rate_any_per_star=rate_any, ctrl_rate_per_epoch=ep_hits / ep_tot,
+    k_s = int(((~S.explained) & S.cand_coadd).sum()); k_e = int(S.loc[~S.explained, "n_ep_det"].fillna(0).sum())
+    res = dict(per_tag=per_tag, n_stars_coadd=int(len(CO)), n_star_epochs_trials=int(len(U)),
+               ctrl_rate_coadd_per_star=rate_co, ctrl_rate_per_epoch=rate_ep,
                n_candidate_stars=int(len(S)), n_explained=int(S.explained.sum()),
                n_multiplicity_only=int(((~S.explained) & (S.multiplicity_evidence.str.len() > 0)).sum()),
-               k_unexplained=k, b_expected=b, mu95_hidden=zech_ul(k, b),
+               n_cand_coadd=int(S.cand_coadd.sum()), n_cand_epoch=int(S.cand_epoch.sum()),
+               k_steady=k_s, b_steady=b_s, mu95_steady=zech_ul(k_s, b_s),
+               k_snap=k_e, b_snap=b_e, mu95_snap=zech_ul(k_e, b_e),
+               k_unexplained=k, b_expected=b_s, mu95_hidden=zech_ul(k_s, b_s),
                n_vetoed_star_epochs=int(LT.veto.sum()), n_stars_any_veto=int(LT.groupby("source_id").veto.any().sum()))
     json.dump(res, open(os.path.join(C.DER, "alleepoch_candidates.json"), "w"), indent=1)
     print(json.dumps(res, indent=1))

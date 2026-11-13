@@ -6,11 +6,12 @@ Per-star limits (95%), from the forced photometry of 17 and the vetoes of 18:
               every epoch is confusion-vetoed, the largest single-epoch S + 1.645 sigma.
   any-epoch : (5 + 1.645) sigma_e in the best (lowest-noise) unvetoed epoch, for a transmitter on in one snapshot.
 Population (steady transmitter of spectral luminosity L, flux S_L = L / 4 pi d^2):
-  p_i(L) = max( Phi((S_L - t_i) / sigma_coadd), max_e Phi((S_L - 5 sigma_e) / sigma_e) ),
+  p_i(L) = Phi((S_L - t_i) / sigma_coadd)   (steady test: coadd only, one trial per star),
   with t_i = 5 sigma_coadd, or S_coadd + 5 sigma_coadd for stars with natural emission (a transmitter must exceed it).
   The expected number of detected transmitters is f * sum_i p_i = f * N_eff(L); with k unexplained candidates over an
-  expected chance background b (18), f_95(L) = mu_95(k, b) / N_eff(L).
-  Duty cycle: a transmitter on in a random fraction delta of snapshots gives (f delta)_95 = mu_95 / sum_i sum_e p_ie(L).
+  expected chance background b (18, steady test), f_95(L) = mu_95(k, b) / N_eff(L).
+  Duty cycle: a transmitter on in a random fraction delta of snapshots gives (f delta)_95 = mu_95,snap / sum_i sum_e p_ie(L),
+  with mu_95,snap from the per-snapshot test (single-epoch S/N >= 5, one trial per star-epoch).
 Stacks, in distance shells x (AFGK: BP-RP < 1.84; M), per epoch and for the all-epoch coadd:
   mean     : inverse-variance-weighted mean L_nu of clean stars (not secure, not candidates, no epoch with predicted
              catalogue contamination >= 0.5 sigma). Null from the same weighted mean at each of the 8 control positions;
@@ -105,7 +106,8 @@ if __name__ == "__main__":
     Ue = U[~U.source_id.isin(natural | cand)]                # single-epoch route only for emission-free stars
     de, se = Ue.dist_pc.values, Ue.sigma_mJy.values; sid_e = Ue.source_id.values
     _, inv = np.unique(sid_e, return_inverse=True)
-    mu95, kk, bb = cj["mu95_hidden"], cj["k_unexplained"], cj["b_expected"]
+    mu95, kk, bb = cj["mu95_steady"], cj["k_steady"], cj["b_steady"]          # steady test: coadd, one trial per star
+    mu95e = cj["mu95_snap"]                                                       # per-snapshot test: one trial per star-epoch
     rows = []
     for Lg in LGRID:
         SL = Lg / lum(1.0, d)                                 # mJy at each star
@@ -113,11 +115,10 @@ if __name__ == "__main__":
         SLe = Lg / lum(1.0, de); p_e = norm.cdf((SLe - THR * se) / se)
         p_ep_max = np.zeros(inv.max() + 1); np.maximum.at(p_ep_max, inv, p_e)
         p = p_co.copy()
-        m = pd.Series(p_ep_max, index=np.unique(sid_e)).reindex(P.index[ok]).fillna(0).values; p = np.maximum(p, m)
         neff, nsnap = p.sum(), p_e.sum()
         rows.append(dict(L_WHz=Lg, N_eff=neff, f95=min(mu95 / neff, np.inf) if neff > 0 else np.inf,
                          f95_k0b0=3.0 / neff if neff > 0 else np.inf, N_snap=nsnap,
-                         fdelta95=mu95 / nsnap if nsnap > 0 else np.inf))
+                         fdelta95=mu95e / nsnap if nsnap > 0 else np.inf))
     POP = pd.DataFrame(rows); POP.to_csv(os.path.join(C.RES, "alleepoch_population_limits.csv"), index=False)
     # ---------------- stacks
     clean_ep = ~LT.detected & ~LT.source_id.isin(cand) & ~LT.veto
@@ -196,7 +197,7 @@ if __name__ == "__main__":
                 S_lim_steady_med=float(P.S_lim_steady.median()), L_lim_steady_med=float(P.L_lim_steady.median()),
                 S_lim_any_med=float(P.S_lim_anyepoch.median()),
                 f95_1e7=g(1e7), f95_1e8=g(1e8), f95_1e9=g(1e9), f95_floor=float(POP.f95.min()), Neff_max=float(POP.N_eff.max()),
-                mu95=mu95, k=kk, b=bb, fdelta95_floor=float(POP.fdelta95.min()),
+                mu95=mu95, k=kk, b=bb, mu95_snap=mu95e, k_snap=cj["k_snap"], b_snap=cj["b_snap"], fdelta95_floor=float(POP.fdelta95.min()),
                 n_unexplained_candidates=int(P.unexplained_candidate.sum()))
     json.dump(summ, open(os.path.join(C.DER, "alleepoch_summary.json"), "w"), indent=1)
     print(json.dumps(summ, indent=1))

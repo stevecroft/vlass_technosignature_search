@@ -41,7 +41,8 @@ def finalize(text):
         "Astronomy and Astrophysics Supplement Series": r"\aaps", "Monthly Notices of the Royal Astronomical Society": r"\mnras",
         "Publications of the Astronomical Society of the Pacific": r"\pasp", "Annual Review of Astronomy and Astrophysics": r"\araa",
         "Nature": r"\nat", "Nature Astronomy": "NatAs", "Nature Methods": "NatMe", "Research Notes of the AAS": "RNAAS",
-        r"Computing in Science \& Engineering": "CSE", "Publications of the Astronomical Society of Australia": "PASA"}
+        r"Computing in Science \& Engineering": "CSE", "Publications of the Astronomical Society of Australia": "PASA",
+        "Nuclear Instruments and Methods in Physics Research Section A: Accelerators, Spectrometers, Detectors and Associated Equipment": "NIMPA"}
     text = re.sub(r"journal=\{([^}]*)\}", lambda m: "journal={" + JOURNALS.get(m.group(1), m.group(1)) + "}", text)
     text = re.sub(r"\s*<sup>.*?</sup>", "", text)
     text = re.sub(r"(@inproceedings\{McKinney2010,) series=\{SciPy\},", r"\1", text)   # avoid "SciPy (SciPy)"
@@ -73,7 +74,7 @@ DOIS = {
     "HorowitzSagan1993": "10.1086/173157", "GrayMooley2017": "10.3847/1538-3881/153/3/110",
     "TremblayTingay2020": "10.1017/pasa.2020.27", "Uno2023": "10.1093/mnras/stad993",
     "De2024": "10.3847/1538-3881/ad84e7", "Driessen2023": "10.1017/pasa.2023.26", "Driessen2024": "10.1017/pasa.2024.72",
-    "Yiu2024": "10.1051/0004-6361/202347657", "Lehtinen2012": "10.1051/0004-6361/201219185", "LopezSantiago2003": "10.1051/0004-6361:20031377", "Wright2018": "10.3847/1538-3881/aae099",
+    "Yiu2024": "10.1051/0004-6361/202347657", "Zech1989": "10.1016/0168-9002(89)90795-X", "Lehtinen2012": "10.1051/0004-6361/201219185", "LopezSantiago2003": "10.1051/0004-6361:20031377", "Wright2018": "10.3847/1538-3881/aae099",
     "Tarter2001": "10.1146/annurev.astro.39.1.511", "Lacy2020": "10.1088/1538-3873/ab63eb",
     "Gordon2021": "10.3847/1538-4365/ac05c0", "Gordon2020": "10.3847/2515-5172/abbe23",
     "GaiaDR3": "10.1051/0004-6361/202243940", "GaiaMission": "10.1051/0004-6361/201629272",
