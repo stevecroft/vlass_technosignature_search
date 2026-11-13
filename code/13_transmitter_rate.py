@@ -25,15 +25,27 @@ BRAT_EIRP = 4e5 * C.BAND_HZ        # Garrett (2026) Type I leakage benchmark, L_
 
 
 def vlass_points():
-    pop = pd.read_csv(os.path.join(C.RES, "vlass_population_limit_curve.csv"))
-    fv = pd.read_csv(os.path.join(C.RES, "vlass_fraction_vs_power_limits.csv"))
+    """All-epoch limits (19) if present, else the Epoch-1 analysis (07, 10). With k unexplained candidates over a
+    background b, TR = f_95 / (3 nu_rel), i.e. N_equiv = 3 / f_95; this reduces to 1 / (N_eff nu_rel) for k = b = 0."""
     rows = []
-    for _, r in pop[pop.N_eff >= 3].iterrows():
-        rows.append(("individual", r.EIRP_2GHz_W, r.N_eff, np.nan, 1.0 / (r.N_eff * NU_REL)))
-    for t in ["FGK", "M"]:
-        col = f"f_UL95_stack_{t}"
-        for _, r in fv[fv[col] < 1].iterrows():
-            rows.append((f"stack_{t}", r.EIRP_2GHz_W, 3.0 / r[col], r[col], r[col] / (3.0 * NU_REL)))
+    fa = os.path.join(C.RES, "alleepoch_population_limits.csv")
+    if os.path.exists(fa):
+        pop = pd.read_csv(fa); sl = pd.read_csv(os.path.join(C.RES, "alleepoch_stack_limits.csv"))
+        for _, r in pop[pop.f95 < 1].iterrows():
+            rows.append(("individual", r.L_WHz * C.BAND_HZ, 3.0 / r.f95, r.f95, r.f95 / (3.0 * NU_REL)))
+        for t in ["AFGK", "M"]:
+            s = sl[(sl.cls == t) & (sl.f95_mean < 1)]
+            for _, r in s.iterrows():
+                rows.append((f"stack_{t}", r.L_WHz * C.BAND_HZ, 3.0 / r.f95_mean, r.f95_mean, r.f95_mean / (3.0 * NU_REL)))
+    else:
+        pop = pd.read_csv(os.path.join(C.RES, "vlass_population_limit_curve.csv"))
+        fv = pd.read_csv(os.path.join(C.RES, "vlass_fraction_vs_power_limits.csv"))
+        for _, r in pop[pop.N_eff >= 3].iterrows():
+            rows.append(("individual", r.EIRP_2GHz_W, r.N_eff, np.nan, 1.0 / (r.N_eff * NU_REL)))
+        for t, t2 in [("FGK", "AFGK"), ("M", "M")]:
+            col = f"f_UL95_stack_{t}"
+            for _, r in fv[fv[col] < 1].iterrows():
+                rows.append((f"stack_{t2}", r.EIRP_2GHz_W, 3.0 / r[col], r[col], r[col] / (3.0 * NU_REL)))
     P = pd.DataFrame(rows, columns=["kind", "EIRP_W", "N_equiv", "f_UL95", "transmitter_rate"])
     P.to_csv(os.path.join(C.RES, "vlass_transmitter_rate_points.csv"), index=False)
     return P
@@ -78,7 +90,7 @@ def main():
     hv, = ax.plot(np.log10(ind.EIRP_W), np.log10(ind.transmitter_rate), color="k", lw=4, zorder=20)
     tr_ind = lambda e: np.interp(np.log10(e), np.log10(ind.EIRP_W), np.log10(ind.transmitter_rate), left=np.inf)
     hs = []
-    for t, ls in [("FGK", "--"), ("M", ":")]:
+    for t, ls in [("AFGK", "--"), ("M", ":")]:
         s = P[P.kind == f"stack_{t}"].sort_values("EIRP_W")
         s = s[np.log10(s.transmitter_rate) < tr_ind(s.EIRP_W)]       # only where the stack is the tighter constraint
         h, = ax.plot(np.log10(s.EIRP_W), np.log10(s.transmitter_rate), color="k", lw=3, ls=ls, zorder=20); hs.append(h)
@@ -90,7 +102,7 @@ def main():
     ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: rf"$10^{{{v:.0f}}}$"))
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: rf"$10^{{{v:.0f}}}$"))
     handles = [hv] + hs + hl
-    labels = ["This work (VLASS)", "This work, stacks (FGK)", "This work, stacks (M)"] + ll
+    labels = ["This work (VLASS)", "This work, stacks (AFGK)", "This work, stacks (M)"] + ll
     ax.legend(handles, labels, labelspacing=1.2, ncol=1, fancybox=True, framealpha=0.95, loc="upper left", bbox_to_anchor=(1.01, 1.0), fontsize=fs - 4, borderaxespad=0)
     fig.tight_layout()
     for ext in ("pdf", "png"): fig.savefig(os.path.join(C.RES, f"transmitter_rate_vs_eirp.{ext}"), dpi=150, bbox_inches="tight")
