@@ -15,6 +15,9 @@ data/raw/vlass_ep4_ql_cutouts_41px.npz
 # Derived sample table (40 MB): regenerated bit-for-bit by code/03_sample_crossmatch.py in ~1 min. Not tracked because
 # Overleaf's GitHub sync cannot transfer files above ~40 MiB (GitHub blob-API limit).
 data/derived/ms_sample_vlass.parquet
+# Full later-epoch QL component lists (NRAO; 0.3-1.3 GB each), reduced by code/21_fetch_epoch_catalogs.py to
+# data/raw/vlass_ql_catalogs_near_stars.parquet, which is tracked
+data/raw/ql_catalogs_full/
 # run logs
 data/raw/*.log
 # caches and build products

@@ -108,6 +108,11 @@ MANUAL = r"""
   author = {{Graham}, Matthew and {Plante}, Ray and {Tody}, Doug and {Fitzpatrick}, Mike},
   title = "{PyVO: Python access to the Virtual Observatory}",
   journal = {Astrophysics Source Code Library, record ascl:1402.004}, year = 2014}
+@TECHREPORT{Lacy2025,
+  author = {{Lacy}, M. and {Dong}, D. and {VLASS Team}},
+  title = "{VLASS Epoch 3 Quick Look and Quick Look Median Stack Interim Component Lists}",
+  institution = {National Radio Astronomy Observatory}, type = {VLASS Memo}, number = {22}, year = 2025,
+  url = {https://library.nrao.edu/public/memos/vla/vlass/VLASS_022.pdf}}
 """
 
 if __name__ == "__main__":
@@ -129,4 +134,4 @@ if __name__ == "__main__":
         bib = re.sub(r"title=\{([^}]*)\}", lambda m: "title={{" + m.group(1).strip() + "}}", bib, count=1)  # protect capitalisation
         out.append(bib); time.sleep(0.5)
     open("refs.bib", "w").write(finalize("\n\n".join(out) + "\n" + MANUAL))
-    print(f"wrote refs.bib with {len(out)} CrossRef + 3 manual entries")
+    print(f"wrote refs.bib with {len(out)} CrossRef + 5 manual entries")

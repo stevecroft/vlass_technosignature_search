@@ -494,6 +494,13 @@ Ivezi{\'c}, {\v Z}., Menou, K., Knapp, G.~R., {et~al.} 2002,
   Observed by the FIRST Survey and the Sloan Digital Sky Survey},} \aj, 124,
   2364, \dodoi{10.1086/344069}
 
+% type= techreport
+\bibitem[{M. {Lacy} {et~al.}(2025){Lacy}, {Dong}, \& {VLASS Team}}]{Lacy2025}
+{Lacy}, M., {Dong}, D., \& {VLASS Team}. 2025, {VLASS Epoch 3 Quick Look and
+  Quick Look Median Stack Interim Component Lists}, VLASS Memo~22, National
+  Radio Astronomy Observatory.
+\newblock \url{https://library.nrao.edu/public/memos/vla/vlass/VLASS_022.pdf}
+
 % type= article
 \bibitem[{M. Lacy {et~al.}(2020)Lacy, Baum, Chandler, Chatterjee, Clarke,
   Deustua, English, Farnes, Gaensler, Gugliucci, Hallinan, Kent, Kimball, Law,

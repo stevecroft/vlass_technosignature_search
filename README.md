@@ -25,6 +25,7 @@ python 18_alleepoch_candidates.py  # candidates, confusion veto, control backgro
 python 14_multiepoch_detections.py --candidates   # astrometry of the unexplained candidates
 python 19_alleepoch_limits_stacks.py  # per-star, population and stack limits (~1 min)
 python 20_alleepoch_figures.py
+python 21_epoch_catalog_crosscheck.py --offline   # cross-check against per-epoch QL/SE/median-stack catalogues (~1 min)
 ```
 
 Re-fetching from the archives (only needed to rebuild `data/raw`):
@@ -34,7 +35,8 @@ Re-fetching from the archives (only needed to rebuild `data/raw`):
 `09_download_cutouts.py --epochs 1.1,1.2 --tag ep1` then `--consolidate` (**~8 h** at 4 threads; please keep concurrency low;
 later epochs use `--epochs 2.1,2.2 --tag ep2`, `3.1,3.2 --tag ep3`, `4.1 --tag ep4`).
 
-Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 08b → 09 (ep1–ep4) → 10 → 14 → 15 → 16 → 17 → 18 → 14 --candidates → 19 → 20 → 11 → 12 → 13.
+Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 08b → 09 (ep1–ep4) → 10 → 14 → 15 → 16 → 17 → 18 → 14 --candidates → 19 → 20 → 21 → 11 → 12 → 13.
+`21_epoch_catalog_crosscheck.py --reduce` rebuilds its reduced catalogue from the full NRAO lists (see `data/raw` below).
 
 ## Layout
 
@@ -100,6 +102,9 @@ component parquet holds exactly the same data.
 | `srsc/` | Sydney Radio Star Catalogue (Driessen et al. 2024; radiostars.org): ReadMe, stars.dat, radio.dat | 1.3 MB |
 | `xray_counterparts.csv` | ROSAT 2RXS (40″) and eRASS1 (20″) nearest counterparts for the 73 candidate stars (VizieR mirror) | — |
 | `simbad_candidates.csv`, `simbad_nearest.csv` | SIMBAD (CfA mirror) identifications and object types | — |
+| `vlass_ql_catalogs_near_stars.parquet` | Components within 60″ of any sample star from the NRAO per-epoch lists, de-duplicated (cat = QL3.1, QL3.2, QL4.1: interim QL lists, VLASS Memo 22; QLMED: QL median stack of Epochs 1–3; SE2.1–SE3.2: Single Epoch Continuum Imaging lists, 2026-06 versions). Position errors in on-sky arcsec. Built by `21 --reduce` | 7.4 MB |
+| `vlass_catalog_images.parquet` | Every image (QL subtile / SE pointing) present in each of those lists, with its component count; defines the partial SE sky coverage | 0.3 MB |
+| `ql_catalogs_full/` | *Not tracked* (0.2–1.3 GB each). The full lists, downloaded 2026-11-13 from the NRAO SharePoint folder `VLASS_catalogs/{QL,SECI}` (M. Lacy) linked from science.nrao.edu/vlass while vlass-dl.nrao.edu was offline: `QL3.1_components.fits`, `QL3.2_components.fits`, `QL4.1_components_v1.fits`, `QL_medstack_components_interim.fits`, `SECI{2.1,2.2,3.2}_components_20260601.fits`, `SECI3.1_components_20260620.fits`. A CIRADA Epoch-2 QL csv placed here is picked up automatically. | — |
 | `lspm1943/` | DSS POSS-I/II and PS1 cutouts, PS1 calibration stars, Gaia neighbours, and VLASS QL/SE multi-extension cutouts (target plus 5 references) from CADC | 24 MB |
 
 ## Key results (as reproduced by these scripts)
@@ -120,6 +125,13 @@ component parquet holds exactly the same data.
 - **Candidates:** 160 stars at ≥ 5σ (coadd or any epoch), 143 with X-ray/SIMBAD activity evidence. Steady test (coadd): 7 unexplained
   vs 11.9 expected at control positions → μ95 = 5.3. Single-epoch test: 16 vs 12.5 → μ95 = 12.2. The one candidate bright enough for
   per-epoch astrometry (TYC 3573-1391-1) lies 1.7″ from its star.
+- **Cross-check with per-epoch catalogues (21):** κ from the QL3.1–4.1 lists 0.83–0.87 (adopted 0.861). Our corrected fluxes are
+  1.15 ± 0.01 × the Single Epoch peaks, and SE/QL = 0.975 ± 0.006 for the same Epoch-3 sources, so the 0.87 QL correction makes
+  later-epoch fluxes and limits ≈15% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. Of the 17
+  unexplained candidates, G 133-48, MCC 401 and HD 317101A are detected at the star in independent catalogues (MCC 401 and
+  LP 198-661 also in the median stack); TYC 3573-1391-1 sits 1.7–1.8″ off in four catalogues. An own-epoch confusion veto gives
+  7→10 vs b 11.9→23.6 (steady); the union of both vetoes changes μ95 by −4% (steady) and +12% (single-epoch). The median stack
+  (152,511 low-motion stars) finds no steady emitters missed by the coadd (9 unclassified matches, all 1.9–2.3″ off; 22 chance).
 - **Per-star limits (95%, all epochs, steady):** median 0.55 mJy, L_ν < 4.1×10⁸ W Hz⁻¹; Barnard's star L_ν < 2.4×10⁵ W Hz⁻¹
   (Epoch-1 catalogue analysis: median 1.11 mJy; Barnard 5.4×10⁵).
 - **Population (steady):** f < 8.1×10⁻³ / 2.4×10⁻⁴ / 2.6×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹; per snapshot f·δ < 1.7×10⁻⁵.
@@ -157,5 +169,6 @@ component parquet holds exactly the same data.
 ## Citation of data
 
 Gaia DR3 (Gaia Collaboration 2023); VLASS (Lacy et al. 2020) and the CIRADA Epoch 1 QL catalogue (Gordon et al. 2021,
-ApJS 255, 30); ROSAT 2RXS (Boller et al. 2016); eRASS1 (Merloni et al. 2024); SIMBAD (Wenger et al. 2000);
+ApJS 255, 30); NRAO interim QL and median-stack component lists (Lacy, Dong et al. 2025, VLASS Memo 22) and Single Epoch
+component lists (NRAO); ROSAT 2RXS (Boller et al. 2016); eRASS1 (Merloni et al. 2024); SIMBAD (Wenger et al. 2000);
 DSS (STScI); Pan-STARRS1 (Chambers et al. 2016; Flewelling et al. 2020); CADC; VizieR (Ochsenbein et al. 2000).
