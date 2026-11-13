@@ -9,19 +9,13 @@ import os, sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  
 import common as C
 import numpy as np, pandas as pd
 
-GROUP = {"RS CVn / active binary": "Active binary (RS CVn, BY Dra, other binary)", "BY Dra / active binary": "Active binary (RS CVn, BY Dra, other binary)",
-         "binary/overluminous + X-ray": "Active binary (RS CVn, BY Dra, other binary)", "binary/overluminous": "Active binary (RS CVn, BY Dra, other binary)",
-         "flare star": "Flare / X-ray-active single star", "X-ray active single star": "Flare / X-ray-active single star",
-         "young star": "Other natural (young, CV, magnetic CP)", "accreting WD binary (CV)": "Other natural (young, CV, magnetic CP)",
-         "magnetic CP star": "Other natural (young, CV, magnetic CP)",
-         "background (multi-epoch astrometry)": "Background (LSPM J1943+5337, multi-epoch astrometry)",
-         "UNEXPLAINED": "Unexplained"}
-COLG = {"Active binary (RS CVn, BY Dra, other binary)": "#3b6ea8", "Flare / X-ray-active single star": "#e0a030",
-        "Other natural (young, CV, magnetic CP)": "#6aa86a", "Background (LSPM J1943+5337, multi-epoch astrometry)": "#c0392b", "Unexplained": "k"}
+# groups come from the 'group' column written by 07_classify_and_limits.py (multiplicity is evidence, not a mechanism)
+COLG = {"Active, with multiplicity evidence": "#3b6ea8", "Active, no multiplicity evidence": "#e0a030",
+        "Young, CV or magnetic CP": "#6aa86a", "Background (not coincident with the star)": "#c0392b", "Unexplained": "k"}
 COLT = {"FGK": "#e0a030", "M": "#3b6ea8"}
-SHORT = {"Active binary (RS CVn, BY Dra, other binary)": "Active binary", "Flare / X-ray-active single star": "Flare / X-ray-active star",
-         "Other natural (young, CV, magnetic CP)": "Other natural (young, CV, CP)",
-         "Background (LSPM J1943+5337, multi-epoch astrometry)": "Background (LSPM J1943+5337)", "Unexplained": "Unexplained"}
+SHORT = {"Active, with multiplicity evidence": "Active, multiplicity evidence", "Active, no multiplicity evidence": "Active, no multiplicity evidence",
+         "Young, CV or magnetic CP": "Young, CV or magnetic CP", "Background (not coincident with the star)": "Not coincident (LSPM J1943+5337)",
+         "Unexplained": "Unexplained"}
 
 
 def clip1(f):
@@ -32,7 +26,7 @@ def load_summary():
     D = dict(A=pd.read_parquet(os.path.join(C.DER, "matches_10arcsec.parquet")), offs=pd.read_parquet(os.path.join(C.DER, "offset_pairs.parquet")),
              L=pd.read_parquet(os.path.join(C.RES, "vlass_perstar_limits_100pc_MS.parquet")),
              pop=pd.read_csv(os.path.join(C.RES, "vlass_population_limit_curve.csv")))
-    T = pd.read_csv(os.path.join(C.RES, "vlass_star_matches_classified.csv")); Ts = T[T.rel > 0.5].copy(); Ts["grp"] = Ts["class"].map(GROUP)
+    T = pd.read_csv(os.path.join(C.RES, "vlass_star_matches_classified.csv")); Ts = T[T.rel > 0.5].copy(); Ts["grp"] = Ts["group"]
     D["Ts"] = Ts
     return D
 
@@ -136,5 +130,35 @@ def stacking(plt):
     fig.savefig(os.path.join(C.RES, "vlass_ep1_stacking_summary.png"), dpi=300); fig.savefig(os.path.join(C.RES, "vlass_ep1_stacking_summary.pdf"), dpi=300); plt.close(fig)
 
 
+def multiepoch(plt):
+    """Detected stars across VLASS epochs 1.1-4.1 (from 14_multiepoch_detections.py)."""
+    fv = os.path.join(C.RES, "vlass_detections_variability.csv")
+    if not os.path.exists(fv): print("multiepoch: run 14_multiepoch_detections.py first"); return
+    S = pd.read_csv(fv); M = pd.read_csv(os.path.join(C.RES, "vlass_detections_multiepoch.csv"))
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.2, 3.1))
+    col = {"co-moving": "#3b6ea8", "inconclusive": "0.55"}
+    t = S[S.motion.isin(list(col))]
+    for k, cc in col.items():
+        m = t.motion == k
+        a.scatter(t.lever_arm_arcsec[m], np.clip(t.dchi2_stationary_minus_comove[m], -20, None), s=16, c=cc, edgecolor="k", lw=0.3, label=k, zorder=3)
+    bg = S[S["cls"].str.startswith("background")]
+    a.scatter(bg.lever_arm_arcsec, bg.dchi2_stationary_minus_comove, s=40, marker="*", c="#c0392b", edgecolor="k", lw=0.3, zorder=4, label="LSPM J1943+5337 (not coincident)")
+    a.axhline(9, color="k", lw=0.6, ls="--"); a.axhline(-9, color="k", lw=0.6, ls="--"); a.axhline(0, color="0.7", lw=0.5)
+    a.set_xscale("log"); a.set_yscale("symlog", linthresh=10)
+    a.xaxis.set_minor_formatter(plt.NullFormatter())
+    a.set_xlabel("Proper-motion lever arm (arcsec)"); a.set_ylabel(r"$\chi^2_{\rm stationary}-\chi^2_{\rm co}$ (co-moving)")
+    a.legend(frameon=False, fontsize=6, loc="upper left")
+    for sid, g in M.groupby("source_id"):
+        f = g.peak_corr_mJy.where(g.detected, g.forced_peak_corr_mJy); mu = np.mean(f)
+        if not np.isfinite(mu) or mu <= 0: continue
+        isbg = S.loc[S.source_id == sid, "cls"].astype(str).str.startswith("background").any()
+        b.plot(g.epoch, f / mu, "-", color="#c0392b" if isbg else "0.6", lw=1.4 if isbg else 0.5, zorder=3 if isbg else 1)
+        b.scatter(g.epoch[g.detected], (f / mu)[g.detected], s=6, c="#c0392b" if isbg else "k", lw=0, zorder=4 if isbg else 2)
+    b.axhline(1, color="k", lw=0.5, ls=":"); b.set_xlabel("Epoch (yr)"); b.set_ylabel(r"$S\,/\,\langle S\rangle$")
+    C.panel_letter(a, "a"); C.panel_letter(b, "b"); fig.tight_layout()
+    for ext in ("png", "pdf"): fig.savefig(os.path.join(C.RES, f"vlass_detections_multiepoch.{ext}"), dpi=300)
+    plt.close(fig)
+
+
 if __name__ == "__main__":
-    plt = C.set_plot_style(); summary(plt); stacking(plt); print("figures written to", C.RES)
+    plt = C.set_plot_style(); summary(plt); stacking(plt); multiepoch(plt); print("figures written to", C.RES)

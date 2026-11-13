@@ -1,0 +1,234 @@
+                                                      (L. N. Driessen, 2024)
+================================================================================
+The Sydney Radio Star Catalogue: properties of radio stars at megahertz to 
+gigahertz frequencies
+    Driessen L. N., Pritchard J., Murphy T., Heald G., Robrade J., Das B.,
+    Duchesne S., Kaplan D. L., Lenc E., Lynch C., Mitchell-Bolton J.,
+    Pope B. J. S., Rose K., Stelzer B., Wang Y., Zic A.
+    <eprint arXiv:2404.07418>
+    =2024arXiv240407418D
+================================================================================
+ADC_Keywords: Radio continuum; Stars, flare; X-ray sources; Stars, Wolf-Rayet;
+Stars, radio
+Keywords: radio continuum: stars; stars: flare; stars: variables: general;
+ X-rays: stars; stars: Wolf-Rayet
+
+Abstract:
+  We present the Sydney Radio Star Catalogue, a new catalogue of stars detected
+  at megahertz to gigahertz radio frequencies. It consists of 839 unique stars
+  with 3405 radio detections, more than doubling the previously known number of
+  radio stars. We have included stars from large area searches for radio stars
+  found using circular polarisation searches, cross-matching, variability
+  searches, and proper motion searches as well as presenting hundreds of newly
+  detected stars from our search of Australian SKA Pathfinder observations. The
+  focus of this first version of the catalogue is on objects detected in surveys
+  using SKA precursor and pathfinder instruments; however we will expand this
+  scope in future versions. The 839 objects in the Sydney Radio Star Catalogue
+  are distributed across the whole sky and range from ultracool dwarfs to Wolf-
+  Rayet stars. We demonstrate that the radio luminosities of cool dwarfs are
+  lower than the radio luminosities of more evolved sub-giant and giant stars.
+  We use X-ray detections of 530 radio stars by the eROSITA soft X-ray
+  instrument onboard the SRG (Spectrum Roentgen Gamma) spacecraft to show that
+  almost all of the radio stars in the catalogue are over-luminous in the radio,
+  indicating that the majority of stars at these radio frequencies are coherent
+  radio emitters. The Sydney Radio Star Catalogue can be found in Vizier or at
+  www.radiostars.org.
+
+Description:
+  This is the first release of the Sydney Radio Star Catalogue, containing stars
+  identified as emitting radio light. It contains stars detected below 3GHz by
+  ASKAP, LOFAR, MeerKAT or the VLA. There are two tables, the stars.dat table
+  and the radio.dat table. The stars.dat table contains the identification
+  information and basic properties of each unique star in the catalogue, so
+  there is one row per star. The radio.dat table contains data from each radio
+  measurement of each star in the catalogue; so there may be more than one row
+  per star. Both tables contain a unique identifier for each star of the format
+  SRSC XXXXX to link the information in the tables together.
+
+File Summary:
+--------------------------------------------------------------------------------
+ FileName    Lrecl   Records    Explanations
+--------------------------------------------------------------------------------
+ReadMe          80        .  this file
+stars.dat      312      865  Table of unique radio detected stars
+radio.dat      304     3570  Table of radio measurements of the radio stars in stars.dat
+
+
+--------------------------------------------------------------------------------
+Byte-by-byte Description of file: stars.dat
+--------------------------------------------------------------------------------
+ Bytes Format Units  Label     Explanations
+--------------------------------------------------------------------------------
+  1- 10   A10    -      Identifier             A unique identifier for each star
+                                            in the SRSC.
+ 12- 39   A28    -      Simbad                 The main identifier from the CDS
+                                            Simbad database
+ 41- 68   A28    -      Gaia                   Gaia Data Release 3 (DR3) unique
+                                            source identifier (unique within a
+                                            particular Data Release)
+ 70- 84   A15    -      Tycho                 ? TYC1-3 (TYC number) Tycho
+                                            identifier
+ 86-108   A23    -      2MASS                  2MASS designation from the Two
+                                            Micron All Sky Survey at IPAC
+110-121   A12    -      GCVS                   Designation from the General
+                                            Catalogue of Variable Stars (GCVS)
+123-132   A10    -      HIP                    Hipparcos input catalogue running
+                                            number
+134-149   A16    -      UCAC4                  Recommended identifier from the
+                                            Fourth U.S. Naval Observatory CCD
+                                            Astrograph Catalog
+151-159   A9     -      Survey                 The survey used to provide the
+                                            astrometric information shown here
+                                            (i.e. the position, proper-motion
+                                            and parallax information)
+161-188   A28    -      Survey_id              Designation of the source in the
+                                            survey used to provide the
+                                            astrometric information for the
+                                            source
+190-208   A19    -      Epoch                  The observation epoch of the
+                                            source in the survey. The RA and Dec
+                                            provided here is proper-motion
+                                            correct/observed, all RA and Dec are
+                                            in the J2000 reference frame
+210-225   F16.12 degree RAdeg                 [2.02/359.83] The J2000 RA in
+                                            degrees proper-motion corrected to
+                                            the date in the "Epoch" column
+227-231   E5.1   mas    e_RAdeg               [0.0/2.0]? The uncertainty on the
+                                            Right Ascension
+233-248   F16.12 degree DEdeg                 [-85.08/82.88] The J2000
+                                            Declination in degrees proper-motion
+                                            corrected to the date in the "Epoch"
+                                            column
+250-254   E5.1   mas    e_DEdeg               [0.0/2.0]? The uncertainty on the
+                                            Declination
+256-263   F8.3   mas    plx                   [-0.2/768.07]? The parallax
+                                            provided by the survey
+265-269   F5.2   mas    e_plx                 [0.01/9.0]? The uncertainty on the
+                                            parallax
+271-279   F9.3   mas/yr pmRA                  [-4339.86/3385.3]? The proper-
+                                            motion in Right Ascension
+                                            (*cos(Dec))
+281-287   F7.3   mas/yr e_pmRA                [0.0/50.0]? The uncertainty on the
+                                            proper-motion in Right Ascension
+                                            (*cos(Dec))
+289-297   F9.3   mas/yr pmDE                  [-3409.82/960.7]? The proper-
+                                            motion in Declination
+299-305   F7.3   mas/yr e_pmDE                [0.0/50.0]? The uncertainty on the
+                                            proper-motion in Declination
+307-309   F3.1   -      Radio_multiple         Flag indicating multiple optical
+                                            matches to one radio source. 0
+                                            indicates that there is only one
+                                            optical match to the radio
+                                            component. 1 and 2 indicate that
+                                            there are multiple matches, where 1
+                                            is the "preferred" source and 2 is a
+                                            "duplicate". This is for ease of
+                                            use, such that selecting rows where
+                                            this flag = 0 or 1 results in a set
+                                            of one-to-one radio to optical
+                                            matches. If one radio component has
+                                            multiple optical matches this may
+                                            indicate that the optical matches
+                                            are multiple components of the same
+                                            stellar system, but this is not
+                                            always the case.
+311-312   I2     -      Identification_method [2/26] Indicates the search
+                                            methods used to identify the radio
+                                            emission as stellar emission from
+                                            this star. The possible values are
+                                            the sum of cross-match=2,
+                                            variability=4, proper-motion=8, and
+                                            Stokes V=16. For example, a source
+                                            found in both a cross-match and
+                                            Stokes V search would have a value
+                                            of 2+16=18.
+
+--------------------------------------------------------------------------------
+
+Byte-by-byte Description of file: radio.dat
+--------------------------------------------------------------------------------
+ Bytes Format Units  Label     Explanations
+--------------------------------------------------------------------------------
+  1- 10   A10    -      Identifier        A unique identifier for each star in
+                                       the SRSC.
+ 12- 15   F4.1   arcsec Match_separation ? The separation between the radio and
+                                       optical position, where the optical
+                                       position has been proper-motion corrected
+                                       to the epoch of the radio observation
+ 17- 53   A37    -      Radio_id          The identifier/name of the radio
+                                       source in the radio survey
+ 55- 75   A21    -      Field             The designation/identifier of the
+                                       radio field or observation in the radio
+                                       survey
+ 77- 95   A19    -      Obs_date          ISOT start time of the radio
+                                       observation
+ 97-104   F8.1   s      Exposure         [298.0/46810.0]? Integration time of
+                                       the radio observation
+106-115   F10.5  degree RAdeg            [2.02/359.83]? The Right Ascension
+                                       (J2000) in degrees of the source in the
+                                       radio observation
+117-125   F9.5   degree DEdeg            [-85.08/62.83]? The Declination (J2000)
+                                       in degrees of the source in the radio
+                                       observation
+127-131   F5.2   arcsec e_RAdeg          [0.05/2.0]? The uncertainty on the
+                                       Right Ascension
+133-137   F5.2   arcsec e_DEdeg          [0.05/2.0]? The uncertainty on the
+                                       Declination
+139-144   F6.1   MHz    Freq             [144.0/3000.0] The central frequency of
+                                       the radio observation
+146-153   F8.3   mJy/beam SpeakI           [0.07/188.3]? The peak flux density
+                                       of the Stokes I detection of the source
+155-160   F6.3   mJy/beam e_SpeakI         [0.0/1.0]? The uncertainty on the
+                                       peak flux density of the Stokes I
+                                       detection of the source
+162-169   F8.3   mJy    StotI            ? The integrated flux density of the
+                                       Stokes I detection of the source
+171-176   F6.3   mJy    e_StotI          [0.0/6.0]? The uncertainty on the
+                                       integrated flux density of the Stokes I
+                                       detection of the source
+178-184   F7.2   arcsec bmax             [5.0/107.17]? The major axis of the
+                                       synthesised beam
+186-191   F6.2   arcsec bmin             [4.0/80.16]? The minor axis of the
+                                       synthesised beam
+193-199   F7.2   degree PA               [0.14/180.0]? The position angle of the
+                                       synthesised beam
+201-206   F6.2   arcsec e_bmax           [0.02/15.2]? Uncertainty on the major
+                                       axis of the synthesised beam
+208-213   F6.2   arcsec e_bmin           ? Uncertainty on the major axis of the
+                                       synthesised beam
+215-230   A16    -      Survey           ? Name of the radio survey
+232-237   F6.2   mJy/beam SpeakV           [0.2/42.2]? The peak flux density of
+                                       the Stokes V detection of the source
+239-243   F5.2   mJy/beam e_SpeakV         [0.06/0.3]? The uncertainty on the
+                                       peak flux density of the Stokes V
+                                       detection of the source
+245-250   F6.2   mJy    StotV            [-6.9/42.9]? The integrated flux
+                                       density of the Stokes V detection of the
+                                       source
+252-256   F5.2   mJy    e_StotV          [0.06/0.3]? The uncertainty on the
+                                       integrated flux density of the Stokes V
+                                       detection of the source
+258-264   A7     -      Telescope         The radio telescope used
+266-270   F5.2   mJy/beam localrmsV        [0.06/0.31]? The local Stokes I rms
+272-276   F5.2   mJy/beam localrmsI        [0.01/1.71]? The local Stokes V rms
+278-304   A27    -      Ref               The reference (bibcode) for the radio
+                                       star identification
+
+--------------------------------------------------------------------------------
+
+
+
+See also:
+ 2023A&A...670A.124C : https://ui.adsabs.harvard.edu/abs/2023A%26A...670A.124C/abstract
+ 2022MNRAS.510.1083D : https://ui.adsabs.harvard.edu/abs/2022MNRAS.510.1083D/abstract
+ 2020MNRAS.491..560D : https://ui.adsabs.harvard.edu/abs/2020MNRAS.491..560D/abstract
+ 2023MNRAS.523.5661W : https://ui.adsabs.harvard.edu/abs/2023MNRAS.523.5661W/abstract
+ 2023PASA...40...36D : https://ui.adsabs.harvard.edu/abs/2023PASA...40...36D/abstract
+ 2021MNRAS.502.5438P : https://ui.adsabs.harvard.edu/abs/2021MNRAS.502.5438P/abstract
+
+
+Acknowledgements:
+
+References:
+================================================================================
+     (prepared by author  / pyreadme )

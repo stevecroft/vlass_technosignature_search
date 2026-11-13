@@ -45,12 +45,32 @@ if __name__ == "__main__":
     T = pd.read_csv(os.path.join(RES, "vlass_star_matches_classified.csv")); xr = pd.read_csv(os.path.join(RAW, "xray_counterparts.csv"))
     put("NCand", str(len(xr))); put("NRxs", str(int(xr.rxs_r.notna().sum()))); put("NEra", str(int(xr.era_r.notna().sum())))
     S = T[T.secure].copy(); vc = S["class"].value_counts()
-    grp = {"AB": ["binary/overluminous + X-ray", "RS CVn / active binary", "BY Dra / active binary", "binary/overluminous"],
-           "FL": ["flare star", "X-ray active single star"], "OT": ["young star", "accreting WD binary (CV)", "magnetic CP star"]}
-    for g_, cl in grp.items(): put(f"NClass{g_}", str(int(sum(vc.get(c, 0) for c in cl))))
-    for c, k in [("binary/overluminous + X-ray", "BinX"), ("RS CVn / active binary", "RS"), ("BY Dra / active binary", "BY"), ("binary/overluminous", "Bin"),
-                 ("flare star", "Flare"), ("X-ray active single star", "XA"), ("young star", "Young"), ("accreting WD binary (CV)", "CV"), ("magnetic CP star", "CP")]:
-        put(f"NC{k}", str(int(vc.get(c, 0))))
+    CLS = [("multiple or over-luminous", "Mult", "M"), ("flare star", "Flare", "Fl"), ("RS CVn binary", "RS", "RS"), ("BY Dra variable", "BY", "BY"),
+           ("young star", "Young", "Y"), ("cataclysmic variable", "CV", "CV"), ("X-ray-active star", "XA", "X"), ("magnetic CP star", "CP", "CP")]
+    for c, k, _ in CLS: put(f"NC{k}", str(int(vc.get(c, 0))))
+    gv = S["group"].value_counts()
+    put("NGrpMult", str(int(gv.get("Active, with multiplicity evidence", 0)))); put("NGrpSingle", str(int(gv.get("Active, no multiplicity evidence", 0))))
+    put("NGrpOther", str(int(gv.get("Young, CV or magnetic CP", 0))))
+    put("NMultSimbad", str(int(S.multiplicity_evidence.fillna("").str.contains("SIMBAD").sum())))
+    # radio-star confirmation evidence (scripts 14-16)
+    so = pd.read_csv(os.path.join(RES, "srsc_overlap.csv")); de = pd.read_csv(os.path.join(RES, "de2024_overlap.csv"))
+    va = pd.read_csv(os.path.join(RES, "vlass_detections_variability.csv"))
+    put("NSRSC", str(int(so.in_srsc.sum()))); put("NSRSCV", str(int((so.n_stokesV > 0).sum())))
+    put("NDeOverlap", str(int(de.ours_secure.sum()))); put("NDeTotal", str(len(de))); put("NDeInSample", str(int(de.in_sample.sum())))
+    put("NDeEpTwoOnly", str(int((de.why_not_secure == "no Epoch-1 flux in De et al. (Epoch-2-only source)").sum())))
+    put("NVariable", str(int(va.variable.sum()))); put("NComoving", str(int((va.motion == "co-moving").sum())))
+    put("NInconclusive", str(int((va.motion == "inconclusive").sum()))); put("NSingleDet", str(int((va.motion == "single detection").sum())))
+    put("NStationary", str(int((va.motion == "stationary").sum())))
+    si = pd.read_csv(os.path.join(RES, "srsc_in_sample.csv"))
+    put("NSRSCinSample", str(len(si))); put("NSRSCdet", str(int(si.detected_by_us.sum()))); put("NSRSCundet", str(int((~si.detected_by_us).sum())))
+    me = pd.read_csv(os.path.join(RES, "vlass_detections_multiepoch.csv"))
+    put("NMultiImg", str(len(me))); put("NMultiDetImg", str(int(me.detected.sum())))
+    put("NImgPerStarMin", str(int(va.n_images.min()))); put("NImgPerStarMax", str(int(va.n_images.max())))
+    fs = me.groupby("epoch_label").flux_scale.first()
+    put("FluxScaleMin", f"{fs.min():.2f}"); put("FluxScaleMax", f"{fs.max():.2f}")
+    cm = va[va.motion == "co-moving"]
+    put("LeverMin", f"{cm.lever_arm_arcsec.min():.1f}"); put("LeverMax", f"{cm.lever_arm_arcsec.max():.1f}")
+    put("LeverMed", f"{cm.lever_arm_arcsec.median():.1f}")
     put("NSecureX", str(int(S.LX.notna().sum())))
     gb = S.logGB.dropna(); put("GBmed", f"{gb.median():.2f}"); put("GBmin", f"{gb.min():.2f}"); put("GBmax", f"{gb.max():.2f}")
     put("NUnexplained", str(int((S["class"] == "UNEXPLAINED").sum())))
@@ -83,7 +103,20 @@ if __name__ == "__main__":
     put("PossIO", f"{lim.loc['POSS-I O','mag_limit_3sigma']:.1f}"); put("PossIE", f"{lim.loc['POSS-I E','mag_limit_3sigma']:.1f}")
     put("PossIIB", f"{lim.loc['POSS-II B_J','mag_limit_3sigma']:.1f}"); put("PossIIR", f"{lim.loc['POSS-II R_F','mag_limit_3sigma']:.1f}")
     lspm = T[T.source_id == 2137474969751117312].iloc[0]
-    put("LspmS", f"{lspm.Ftot:.2f}"); put("LspmSep", f"{lspm.sep:.2f}"); put("LspmRel", f"{lspm.rel:.3f}"); put("LspmDist", f"{lspm.dist_pc:.0f}")
+    put("LspmChiTwoD", f"{aj['chi2_at_star_2d']:.0f}"); put("LspmDofTwoD", f"{aj['dof_at_star_2d']}")
+    put("LspmChiRAstat", f"{aj['tgt_E_chi2_stationary']:.0f}"); put("LspmChiRAcomove", f"{aj['tgt_E_chi2_comoving']:.0f}")
+    put("LspmChiDecStat", f"{aj['tgt_N_chi2_stationary']:.1f}")
+    put("LspmMuE", f"{aj['tgt_E_mu_mas_yr']:.0f}"); put("LspmMuEErr", f"{aj['tgt_E_mu_err']:.0f}")
+    q12 = ast[ast.image == "QL 1.2"].iloc[0]; s12 = ast[ast.image == "SE 1.2"].iloc[0]
+    put("LspmQLSEdE", f"{abs(q12.tgt_E - s12.tgt_E):.2f}"); put("LspmQLSEdN", f"{abs(q12.tgt_N - s12.tgt_N):.2f}")
+    put("LspmPA", f"{lspm.DCPA:.0f}")
+    _L = 4 * np.pi * (lspm.dist_pc * 3.0857e16) ** 2 * lspm.Ftot / 0.87 * 1e-29
+    _e = int(np.floor(np.log10(_L))); put("LspmL", f"{_L / 10**_e:.1f}\\times10^{{{_e}}}")
+    _v = pd.read_csv(os.path.join(RES, "vlass_detections_variability.csv")).set_index("source_id").loc[2137474969751117312]
+    put("LspmOffAU", f"{np.hypot(_v.offset_E, _v.offset_N) * lspm.dist_pc:.0f}")
+    put("LspmOffArcsec", f"{np.hypot(_v.offset_E, _v.offset_N):.1f}")
+    put("LspmS", f"{lspm.Ftot / 0.87:.2f}")   # flux-scale corrected, as in Table 1
+    put("LspmSep", f"{lspm.sep:.2f}"); put("LspmRel", f"{lspm.rel:.3f}"); put("LspmDist", f"{lspm.dist_pc:.0f}")
     put("LspmMaj", f"{lspm.DCMaj:.1f}"); put("LspmMin", f"{lspm.DCMin:.1f}")
 
     # --- stacking
@@ -115,27 +148,42 @@ if __name__ == "__main__":
         for k, val in macros.items(): f.write(f"\\newcommand{{\\{k}}}{{{val}}}\n")
 
     # ---------------- tables
-    code = {"binary/overluminous + X-ray": "B+X", "RS CVn / active binary": "RS", "BY Dra / active binary": "BY", "binary/overluminous": "B",
-            "flare star": "Fl", "X-ray active single star": "X", "young star": "Y", "accreting WD binary (CV)": "CV", "magnetic CP star": "CP",
-            "background (multi-epoch astrometry)": "BG"}
+    code = {c: k for c, _, k in CLS}; code["background (multi-epoch astrometry)"] = "BG"
+    so_i, de_i, va_i = so.set_index("source_id"), de.set_index("source_id"), va.set_index("source_id")
+
+    def mflags(e):
+        e = e if isinstance(e, str) else ""
+        return "".join(f for f, k in [("S", "SIMBAD"), ("N", "Gaia NSS"), ("R", "RUWE"), ("O", "over-luminous")] if k in e) or r"\nodata"
+
+    def rflags(sid):
+        f = ""
+        if sid in so_i.index and so_i.loc[sid, "in_srsc"]: f += "P" if so_i.loc[sid, "n_stokesV"] > 0 else "K"
+        if sid in de_i.index and de_i.loc[sid, "ours_secure"]: f += "D"
+        if sid in va_i.index:
+            f += "v" if va_i.loc[sid, "variable"] else ""
+            f += "c" if va_i.loc[sid, "motion"] == "co-moving" else ""
+        return f or r"\nodata"
+
     S = S.sort_values("dist_pc"); rows = []
     for _, r in S.iterrows():
         ND = r"\nodata"
         xflag = (("R" if np.isfinite(r.rxs_r) else "") + ("E" if np.isfinite(r.era_r) else "")) or ND
         gbs = f"{r.logGB:.2f}" if np.isfinite(r.logGB) else ND
         nm1 = clean_name(r.main_id, r.source_id); nm1 = r"\nodata" if nm1.startswith("{Gaia DR3") else nm1
-        rows.append(f"{nm1} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & {r.dMG:+.2f} & {r.ruwe:.2f} & "
-                    f"{r.sep:.2f} & {r.rel:.3f} & {r.Ftot/0.87:.2f} & {np.log10(r.Lnu_R_WHz):.2f} & {xflag} & {gbs} & {code.get(r['class'], r['class'])} " + r"\\")
+        rows.append(f"{nm1} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & {r.sep:.2f} & {r.rel:.3f} & {r.Ftot/0.87:.2f} & "
+                    f"{np.log10(r.Lnu_R_WHz):.2f} & {xflag} & {gbs} & {mflags(r.multiplicity_evidence)} & {rflags(r.source_id)} & "
+                    f"{code.get(r['class'], r['class'])} " + r"\\")
     open(os.path.join(HERE, "tables", "secure_matches.tex"), "w").write(r"""{\setlength{\tabcolsep}{2.5pt}  % group: keep the narrow spacing local to this table
-\begin{deluxetable*}{lrrrrrrrrrcrl}
+\startlongtable
+\begin{deluxetable*}{lrrrrrrrcrccl}
 \tabletypesize{\scriptsize}
 \tablecaption{VLASS Epoch 1 components securely associated (reliability $R>0.5$) with \NSecure\ main-sequence stars within 100\,pc.\label{tab:matches}}
-\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$\Delta M_G$} & \colhead{RUWE} & \colhead{Sep.} & \colhead{$R$} & \colhead{$S_{3\,\rm GHz}$} & \colhead{$\log L_\nu$} & \colhead{X-ray} & \colhead{$\log\frac{L_X}{L_\nu}$} & \colhead{Class} \\
-\colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mag)} & \colhead{} & \colhead{($''$)} & \colhead{} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(Hz)} & \colhead{}}
+\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{Sep.} & \colhead{$R$} & \colhead{$S_{3\,\rm GHz}$} & \colhead{$\log L_\nu$} & \colhead{X-ray} & \colhead{$\log\frac{L_X}{L_\nu}$} & \colhead{Mult.} & \colhead{Radio} & \colhead{Class} \\
+\colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{($''$)} & \colhead{} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(Hz)} & \colhead{} & \colhead{} & \colhead{}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density divided by 0.87 (Quick Look flux-scale correction). X-ray: R = ROSAT 2RXS, E = eRASS1. Class: B+X binary/over-luminous with X-ray detection; RS = RS~CVn; BY = BY~Dra; B = binary/over-luminous; Fl = flare star; X = X-ray-active single star; Y = young star; CV = cataclysmic variable; CP = magnetic chemically peculiar star; BG = background source (Section~\ref{sec:lspm}). A machine-readable version with all columns is provided in the reproducibility package.}
+\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density divided by 0.87 (Quick Look flux-scale correction). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalogue without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): M = multiple or over-luminous; Fl = flare star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}). Machine-readable version in the reproducibility package.}
 \end{deluxetable*}
 }
 """)
@@ -191,7 +239,7 @@ if __name__ == "__main__":
 """)
     # figures
     for f in ["vlass_separation_histogram", "vlass_detections_cmd", "vlass_perstar_limits", "vlass_population_limit",
-              "vlass_technosig_summary", "vlass_ep1_stacking_summary", "transmitter_rate_vs_eirp", "lspm1943_archival_imaging", "lspm1943_vlass_multiepoch_astrometry"]:
+              "vlass_technosig_summary", "vlass_ep1_stacking_summary", "transmitter_rate_vs_eirp", "lspm1943_archival_imaging", "lspm1943_vlass_multiepoch_astrometry", "vlass_detections_multiepoch"]:
         for ext in ("pdf", "png"):
             src = os.path.join(RES, f"{f}.{ext}")
             if os.path.exists(src): shutil.copy(src, os.path.join(HERE, "figures", f"{f}.{ext}"))

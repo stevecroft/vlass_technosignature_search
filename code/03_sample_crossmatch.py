@@ -66,7 +66,7 @@ if __name__ == "__main__":
     s["sub_rms"] = st.MeanIslrms.values[idx]; s["vepoch"] = st.Epoch.values[idx]
     s["obs_jyear"] = Time(list(st.Obs.astype(str).str.strip().values[idx]), format="isot").jyear
     s["in_vlass"] = s.sub_sep_deg < 0.75
-    s["ra_ep"], s["dec_ep"] = C.propagate(s.ra, s.dec, s.pmra, s.pmdec, s.obs_jyear)
+    s["ra_ep"], s["dec_ep"] = C.propagate(s.ra, s.dec, s.pmra, s.pmdec, s.obs_jyear, plx=s.parallax)
     sv = s[s.in_vlass].reset_index(drop=True)
     print("MS, dec>-41:", len(s), " in VLASS footprint:", len(sv))
 
@@ -89,7 +89,8 @@ if __name__ == "__main__":
     A["sep_star_epoch"] = A.sep          # separation at the epoch of the star's own (nearest) subtile
     A["comp_epoch"] = vg.Subtile.map(stdate).values[A.icomp]
     ra2, de2 = C.propagate(sv.ra.values[A.istar], sv.dec.values[A.istar], sv.pmra.values[A.istar],
-                           sv.pmdec.values[A.istar], A.comp_epoch.values)
+                           sv.pmdec.values[A.istar], A.comp_epoch.values,
+                           plx=sv.parallax.values[A.istar])
     A["sep"] = SkyCoord(ra2 * u.deg, de2 * u.deg).separation(
         SkyCoord(vg.RAJ2000.values[A.icomp] * u.deg, vg.DEJ2000.values[A.icomp] * u.deg)).arcsec
     A["e_pos"] = np.hypot(vg.e_RAJ2000.values[A.icomp] * 3600 * np.cos(np.deg2rad(sv.dec_ep.values[A.istar])),

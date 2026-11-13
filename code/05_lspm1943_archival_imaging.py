@@ -73,8 +73,8 @@ def measure(name, vl, star, comp, pcal, rng):
     im, w, ep = load(name); ps = abs(w.proj_plane_pixel_scales()[1].to(u.arcsec).value)
     rap = max((2.0 if name.startswith("dss") else 1.0) / ps, 1.2)
     xv, yv = [float(v) for v in w.world_to_pixel(vl)]
-    xs, ys = [float(v) for v in w.world_to_pixel(SkyCoord(*C.propagate(star.ra, star.dec, star.pmra, star.pmdec, ep), unit="deg"))]
-    xc, yc = [float(v) for v in w.world_to_pixel(SkyCoord(*C.propagate(comp.ra, comp.dec, comp.pmra, comp.pmdec, ep), unit="deg"))]
+    xs, ys = [float(v) for v in w.world_to_pixel(SkyCoord(*C.propagate(star.ra, star.dec, star.pmra, star.pmdec, ep, plx=star.parallax), unit="deg"))]
+    xc, yc = [float(v) for v in w.world_to_pixel(SkyCoord(*C.propagate(comp.ra, comp.dec, comp.pmra, comp.pmdec, ep, plx=comp.parallax), unit="deg"))]
     imb = im - np.nanmedian(im); R = np.hypot(xv - xs, yv - ys)
     thv, thc = np.arctan2(yv - ys, xv - xs), np.arctan2(yc - ys, xc - xs)
     angd = lambda a, b: np.abs((a - b + np.pi) % (2 * np.pi) - np.pi)
@@ -114,7 +114,7 @@ def figure(vl, star, comp, res):
         ax.imshow(np.arcsinh((im - lo) / (0.05 * (hi - lo))), origin="lower", cmap="gray_r", vmin=0, vmax=np.arcsinh(20))
         ax.add_patch(Ellipse((xv, yv), 2 * 3.34 / ps, 2 * 1.32 / ps, angle=90 + 108.95, fill=False, ec="#c0392b", lw=0.9))
         for o, cc, mk in [(star, "#3b6ea8", "+"), (comp, "#2e8b57", "x")]:
-            xs, ys = [float(v) for v in w.world_to_pixel(SkyCoord(*C.propagate(o.ra, o.dec, o.pmra, o.pmdec, ep), unit="deg"))]
+            xs, ys = [float(v) for v in w.world_to_pixel(SkyCoord(*C.propagate(o.ra, o.dec, o.pmra, o.pmdec, ep, plx=o.parallax), unit="deg"))]
             ax.plot(xs, ys, mk, ms=7, mew=1.0, color=cc)
         ax.set_xlim(xv - half, xv + half); ax.set_ylim(yv - half, yv + half); ax.set_xticks([]); ax.set_yticks([])
         rr = res[res.image == LABEL[name]].iloc[0]

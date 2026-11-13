@@ -120,7 +120,7 @@ if __name__ == "__main__":
         bmaj, bmin = h0["BMAJ"] * 3600, h0["BMIN"] * 3600
         snr = tgt["peak"] / rms_t; eb = 0.5 * np.sqrt(bmaj * bmin) / snr
         tE = (tgt["ra"] - RA0) * 3600 * cosd - ora; tN = (tgt["dec"] - DE0) * 3600 - ode
-        sa, sd = C.propagate(star.ra, star.dec, star.pmra, star.pmdec, epoch)
+        sa, sd = C.propagate(star.ra, star.dec, star.pmra, star.pmdec, epoch, plx=star.parallax)
         rows.append(dict(image=f"{kind} {ep}", epoch=round(epoch, 3), frame_off_E=round(ora, 2), frame_off_N=round(ode, 2), n_ref=len(rf),
                          ref_scatter_E=round(sra * np.sqrt(len(rf)), 2), ref_scatter_N=round(sde * np.sqrt(len(rf)), 2),
                          peak_mJy=round(tgt["peak"], 2), rms_mJy=round(rms_t, 3), SNR=round(snr, 1),
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
     # frame tie of the E1 catalogue to Gaia from the secure stellar matches
     sec = A[A.rel > 0.5]; s_ = sv.iloc[sec.istar]
-    ra_s, de_s = C.propagate(s_.ra.values, s_.dec.values, s_.pmra.values, s_.pmdec.values, sec.comp_epoch.values)
+    ra_s, de_s = C.propagate(s_.ra.values, s_.dec.values, s_.pmra.values, s_.pmdec.values, sec.comp_epoch.values, plx=s_.parallax.values)
     dE = (sec.RAJ2000.values - ra_s) * 3600 * np.cos(np.deg2rad(de_s)); dN = (sec.DEJ2000.values - de_s) * 3600
     out = dict(frame_tie_dE=float(np.median(dE)), frame_tie_dN=float(np.median(dN)))
     ind = ast[ast.image.isin(INDEPENDENT)]; t0 = ind.epoch.values - ind.epoch.values.min()
@@ -144,23 +144,30 @@ if __name__ == "__main__":
         out[f"{comp_}_chi2_stationary"] = float(np.sum(Wt * (y - np.average(y, weights=Wt)) ** 2))
         off = np.average(y - mu * t0, weights=Wt); out[f"{comp_}_chi2_comoving"] = float(np.sum(Wt * (y - off - mu * t0) ** 2))
         out[f"{comp_}_chi2_at_star"] = float(np.sum(Wt * (y - ind[starc].values) ** 2))
-    out["verdict"] = "background" if out["tgt_N_chi2_at_star"] > 20 else "inconclusive"
+    out["chi2_at_star_2d"] = out["tgt_N_chi2_at_star"] + out["tgt_E_chi2_at_star"]; out["dof_at_star_2d"] = 2 * len(ind)
+    from scipy.stats import chi2 as _c2
+    out["p_at_star_2d"] = float(_c2.sf(out["chi2_at_star_2d"], out["dof_at_star_2d"]))
+    # the test is whether the emission is located at the star; stationary vs co-moving-with-offset is not decided here
+    out["verdict"] = "not coincident" if out["p_at_star_2d"] < 1e-4 else "inconclusive"
     json.dump(out, open(os.path.join(C.DER, "lspm1943_astrometry.json"), "w"), indent=1); print(json.dumps(out, indent=1))
 
     # figure
     plt = C.set_plot_style(); from matplotlib.patches import Ellipse
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.2, 3.2), gridspec_kw=dict(width_ratios=[1.25, 1]))
+    fig, (a0, a1, a2) = plt.subplots(1, 3, figsize=(7.2, 2.7), gridspec_kw=dict(width_ratios=[1, 1, 1.05]))
     tt = np.linspace(2018.8, 2025, 50)
-    a1.plot(tt, (C.propagate(star.ra, star.dec, star.pmra, star.pmdec, tt)[1] - DE0) * 3600, color="#3b6ea8", lw=1.4, label="LSPM J1943+5337 (Gaia track)")
-    a1.axhline(np.average(ind.tgt_N, weights=1 / ind.err_N ** 2), color="0.4", ls="--", lw=1, label="Stationary source (weighted mean)")
-    for _, rw in ast.iterrows():
-        used = rw.image in INDEPENDENT
-        a1.errorbar(rw.epoch + (0 if used else 0.08), rw.tgt_N, yerr=rw.err_N, fmt="o" if used else "s", mfc="#c0392b" if used else "white",
-                    mec="#c0392b", ecolor="#c0392b", ms=5, capsize=2, lw=0.8)
-    a1.errorbar([], [], fmt="o", mfc="#c0392b", mec="#c0392b", color="#c0392b", label="VLASS radio position (SE 1.2, QL 2.2, SE 3.2)")
-    a1.errorbar([], [], fmt="s", mfc="white", mec="#c0392b", color="#c0392b", label="QL 1.2 / 3.2 (same visibilities as SE)")
-    a1.set_xlabel("Epoch (yr)"); a1.set_ylabel("Dec offset from 2019 radio position (arcsec)")
-    a1.set_title("Radio source stays put while the star moves north", loc="left"); a1.legend(frameon=False, fontsize=6, loc="upper left"); a1.margins(0.05)
+    trk = C.propagate(star.ra, star.dec, star.pmra, star.pmdec, tt, plx=star.parallax)
+    for ax, comp_, errc, ytrk, lab in [(a0, "tgt_E", "err_E", (trk[0] - RA0) * 3600 * cosd, "\u0394RA cos\u03b4"),
+                                       (a1, "tgt_N", "err_N", (trk[1] - DE0) * 3600, "\u0394Dec")]:
+        ax.plot(tt, ytrk, color="#3b6ea8", lw=1.4, label="Star (Gaia DR3, with parallax)")
+        for _, rw in ast.iterrows():
+            used = rw.image in INDEPENDENT
+            ax.errorbar(rw.epoch + (0 if used else 0.08), rw[comp_], yerr=rw[errc], fmt="o" if used else "s", mfc="#c0392b" if used else "white",
+                        mec="#c0392b", ecolor="#c0392b", ms=4.5, capsize=2, lw=0.8)
+        ax.set_xlabel("Epoch (yr)"); ax.set_ylabel(lab + " from 2019 radio position (arcsec)"); ax.margins(0.05)
+    a1.errorbar([], [], fmt="o", mfc="#c0392b", mec="#c0392b", color="#c0392b", label="Radio (SE 1.2, QL 2.2, SE 3.2)")
+    a1.errorbar([], [], fmt="s", mfc="white", mec="#c0392b", color="#c0392b", label="QL 1.2 / 3.2 (same data as SE)")
+    a1.set_ylim(-1.35, 1.25); a1.legend(frameon=False, fontsize=5.5, loc="lower right")
+    a0.set_title("Right ascension", loc="left"); a1.set_title("Declination", loc="left")
     se3 = fits.open(paths[("SE", "3.2", "sci")])[0]; w3 = WCS(se3.header).celestial; d3 = np.squeeze(se3.data)
     ps = abs(w3.proj_plane_pixel_scales()[1].to(u.arcsec).value); xv, yv = [float(q) for q in w3.world_to_pixel(vl)]; hb = int(8 / ps)
     stamp = d3[int(yv)-hb:int(yv)+hb+1, int(xv)-hb:int(xv)+hb+1] * 1e3
@@ -169,10 +176,10 @@ if __name__ == "__main__":
     a2.contour(stamp, levels=[0.375, 0.625, 0.875], colors="w", linewidths=0.5, extent=ext, origin="lower")
     r3 = ast[ast.image == "SE 3.2"].iloc[0]
     for o, cc, mk, lab in [(star, "#5dade2", "+", "Star, 2024.4"), (comp, "#58d68d", "x", "Companion, 2024.4")]:
-        sa, sd = C.propagate(o.ra, o.dec, o.pmra, o.pmdec, r3.epoch)
+        sa, sd = C.propagate(o.ra, o.dec, o.pmra, o.pmdec, r3.epoch, plx=o.parallax)
         a2.plot((sa - RA0) * 3600 * cosd + r3.frame_off_E, (sd - DE0) * 3600 + r3.frame_off_N, mk, color=cc, ms=9, mew=1.4, label=lab)
     a2.set_xlim(8, -8); a2.set_ylim(-8, 8); a2.set_xlabel("\u0394RA (arcsec, E left)"); a2.set_ylabel("\u0394Dec (arcsec)")
     a2.set_title("VLASS 3.2 SE image, 2024.4", loc="left"); a2.legend(frameon=False, fontsize=6, loc="lower left", labelcolor="w")
     cb = fig.colorbar(imh, ax=a2, fraction=0.046, pad=0.02); cb.set_label("mJy beam$^{-1}$")
-    C.panel_letter(a1, "a"); C.panel_letter(a2, "b"); fig.tight_layout()
+    C.panel_letter(a0, "a"); C.panel_letter(a1, "b"); C.panel_letter(a2, "c"); fig.tight_layout()
     fig.savefig(os.path.join(C.RES, "lspm1943_vlass_multiepoch_astrometry.png"), dpi=300); fig.savefig(os.path.join(C.RES, "lspm1943_vlass_multiepoch_astrometry.pdf"), dpi=300)

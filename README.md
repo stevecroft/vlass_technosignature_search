@@ -16,21 +16,26 @@ python 10_stack.py                  # ~35 s; holds the 1.3 GB cutout array + flo
 python 11_figures.py
 python 12_compare_breakthrough_listen.py
 python 13_transmitter_rate.py      # transmitter rate vs EIRP; literature points need external/seti_limits_py3 (see below)
+python 14_multiepoch_detections.py # secure associations in every VLASS QL epoch 1.1-4.1 (~5 min; fetches 61x61 px cutouts from CADC)
+python 15_compare_de2024.py        # overlap with De et al. 2024 (VLASS-Gaia radio stars)
+python 16_compare_srsc.py          # overlap with the Sydney Radio Star Catalogue (Driessen et al. 2024)
 ```
 
 Re-fetching from the archives (only needed to rebuild `data/raw`):
 `01_fetch_gaia.py` (~5 min), `02_fetch_vlass_catalog.py` (~20 min), `04_fetch_counterparts.py` (~2 min),
 `05_lspm1943_archival_imaging.py`, `06_lspm1943_vlass_astrometry.py` (each ~1 min), `08_cadc_wcs_table.py` (~6 min),
-`09_download_cutouts.py --epochs 1.1,1.2 --tag ep1` then `--consolidate` (**~8 h** at 4 threads; please keep concurrency low).
+`08b_fill_image_dates.py` (reads DATE-OBS for the 7,722 QL images whose CAOM record lacks a date),
+`09_download_cutouts.py --epochs 1.1,1.2 --tag ep1` then `--consolidate` (**~8 h** at 4 threads; please keep concurrency low;
+later epochs use `--epochs 2.1,2.2 --tag ep2`, `3.1,3.2 --tag ep3`, `4.1 --tag ep4`).
 
-Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 09 → 10 → 11 → 12.
+Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 08b → 09 → 10 → 14 → 15 → 16 → 11 → 12 → 13.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `code/common.py` | Paths, constants (QL flux bias 0.87, BP−RP split 1.84, shells, service URLs), shared helpers. Also redirects astropy's config directory into the project. |
-| `code/01–12_*.py` | Pipeline scripts. Each docstring lists its inputs, outputs and expected values. |
+| `code/01–16_*.py` | Pipeline scripts. Each docstring lists its inputs, outputs and expected values. |
 | `data/raw/` | Data exactly as fetched (see below). |
 | `data/derived/` | Intermediate tables written by the scripts (sample, star–component pairs, offset pairs, reliability fit, stacked images, LSPM astrometry JSON). |
 | `results/` | Figures (PNG and vector PDF) and tables. |
@@ -40,8 +45,8 @@ Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 0
 
 | File | Purpose |
 |---|---|
-| `ms.tex` | Manuscript for *The Astronomical Journal*. Every number in the text comes from macros in `numbers.tex`; tables are `\input` from `tables/`. Author block, acknowledgments, UAT keyword IDs, facility keywords and the Zenodo DOI are marked `TODO`. |
-| `make_paper_inputs.py` | Regenerates `numbers.tex` (102 macros), `tables/*.tex` and `figures/` from `results/` and `data/derived/`. Run after any pipeline change. |
+| `ms.tex` | Manuscript for *The Astronomical Journal*. Every number in the text comes from macros in `numbers.tex`; tables are `\input` from `tables/`. The Zenodo DOI is marked `TODO`. |
+| `make_paper_inputs.py` | Regenerates `numbers.tex` (142 macros), `tables/*.tex` and `figures/` from `results/` and `data/derived/`. Run after any pipeline change. |
 | `build_bib.py` | Builds `refs.bib` from DOIs via CrossRef (36 entries) plus 3 manual arXiv/ASCL entries. Output is pure ASCII: BibTeX is byte-oriented and splits multi-byte UTF-8 initials such as "Ž". It also restores corporate authors (Gaia/Astropy Collaboration), maps journals to AAS abbreviations and drops month fields. `--fix-only` re-cleans an existing file offline. |
 | `aastex702.cls`, `aasjournalv7.1.bst` | Official AASTeX v7.0.2 files (unmodified; full distribution in `aastex_v702_dist/`). |
 | `aasjournalv7.1_patched.bst` | Copy of the AAS style with a single fix: the original leaves `next.extra = "b"` after the forward pass, which gives the last presorted reference a spurious "a" year suffix (e.g. "Ivezić et al. 2002a"). `ms.tex` uses this copy. |
@@ -78,6 +83,10 @@ component parquet holds exactly the same data.
 | `vlass_strips/` | Per-degree download cache for the component table. Lets 02 resume; deletable once the parquet exists. | 332 MB |
 | `vlass_ql_wcs_cadc.parquet` | CADC CAOM per-image WCS for all 122,698 VLASS QL images (epochs 1.1–4.1) | 5.8 MB |
 | `vlass_ep1_ql_cutouts_41px.npz` | 41×41 px (1″/px) Epoch-1 QL cutouts at 208,573 stars from CADC. Arrays: `star_index`, `source_id`, `cut` (Jy/beam), `off` (sub-pixel offset). Match to stars by `source_id`. | 1.3 GB |
+| `vlass_ql_dates_header.csv` | DATE-OBS from the FITS headers of the 7,722 QL images without a CAOM date (mostly epoch 4.1) | — |
+| `classification_overrides.csv` | Two literature reclassifications (LQ Hya, PW And: young single dwarfs), with references | — |
+| `de2024_vlass_gaia_table1.csv` | VizieR J/AJ/168/288/table1 (De et al. 2024; 605 rows) | — |
+| `srsc/` | Sydney Radio Star Catalogue (Driessen et al. 2024; radiostars.org): ReadMe, stars.dat, radio.dat | 1.3 MB |
 | `xray_counterparts.csv` | ROSAT 2RXS (40″) and eRASS1 (20″) nearest counterparts for the 73 candidate stars (VizieR mirror) | — |
 | `simbad_candidates.csv`, `simbad_nearest.csv` | SIMBAD (CfA mirror) identifications and object types | — |
 | `lspm1943/` | DSS POSS-I/II and PS1 cutouts, PS1 calibration stars, Gaia neighbours, and VLASS QL/SE multi-extension cutouts (target plus 5 references) from CADC | 24 MB |
@@ -85,22 +94,24 @@ component parquet holds exactly the same data.
 ## Key results (as reproduced by these scripts)
 
 - **Sample:** 299,746 Gaia sources with BP−RP → 218,654 main sequence (−1.5 < ΔM_G < +1.0 about the ridge) → 210,191 in the VLASS footprint.
-- **Positional model:** σ_sys = 0.231″ per axis; 48.3 genuine stellar detections; **50 matches with reliability > 0.5** (2.46 expected false).
-- **Classification of the 50:**
-  - 37 active binaries: 22 binary/over-luminous + X-ray, 8 RS CVn, 6 BY Dra, 1 binary without X-ray;
-  - 7 flare or X-ray-active single stars (3 flare stars, 4 X-ray active);
-  - 5 other natural emitters: 2 young stars, 2 CVs, 1 magnetic CP star;
-  - 1 background source (LSPM J1943+5337).
-
-  **No unexplained secure match remains.**
-- **LSPM J1943+5337:** the radio source is stationary across VLASS 1.2/2.2/3.2. The model with the radio source at the star's position gives χ² = 85.7 for 3 dof (frame tied to Gaia within 0.11″). Archival plates show no optical counterpart (POSS-I g ≳ 20.4, r ≳ 19.7–19.9; POSS-II ≳ 20.9).
+- **Positional model** (proper motion and parallax): σ_sys = 0.228″ per axis; 48.2 genuine stellar detections; **50 matches with reliability > 0.5** (2.46 expected false).
+- **Classification of the 50** (SIMBAD types first; multiplicity and activity evidence recorded separately):
+  - 9 flare stars, 7 RS CVn, 5 BY Dra, 4 young stars, 2 CVs, 1 magnetic CP star;
+  - 19 multiple or over-luminous stars without a more specific type, 2 X-ray-active stars;
+  - 1 radio source not coincident with its star (LSPM J1943+5337).
+  - 30 of the 50 are in the Sydney Radio Star Catalogue (11 circularly polarized); 41 are in De et al. (2024).
+- **Multi-epoch (VLASS 1.1–4.1, 178 independent images):** 44/50 variable; 20 co-moving with their star, 18 inconclusive, 12 single-epoch, none stationary.
+- **LSPM J1943+5337:** the radio emission is not at the star: χ² = 86.4 for 3 dof in declination, 105 for 6 dof in RA+Dec
+  (VLASS 1.2/2.2/3.2; frame tied to Gaia within 0.11″). Stationary vs co-moving at a ~0.8″ offset is not yet decided; RA positions
+  scatter beyond their errors (source extended E–W). Archival plates show no optical counterpart (POSS-I g ≳ 20.4, r ≳ 19.7–19.9; POSS-II ≳ 20.9).
 - **Per-star limits (95%):** median 1.11 mJy, giving L_ν < 8.3×10⁸ W Hz⁻¹. The best is Barnard's star, L_ν < 5.4×10⁵ W Hz⁻¹ (EIRP ≈ 1.1×10¹⁵ W if the signal fills 2 GHz).
 - **Population (individual non-detections):** f < 2.1×10⁻² / 6.5×10⁻⁴ / 2.2×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹, and f < 1.4×10⁻⁵ above about 3×10⁹ W Hz⁻¹.
 - **Stacking (Epoch 1):** natural sub-threshold M-dwarf emission is detected (20–40 pc: 11.6 ± 1.9 µJy, 6.2σ; L_ν ≈ 1.2×10⁶ W Hz⁻¹). FGK stacks are ≤ 2.6σ. The stacked limits on fraction × power reach f < 1 at L_T ≈ 2.65×10⁵ (FGK) and 2.43×10⁵ (M) W Hz⁻¹, 4–6× fainter than the individual non-detections.
 - **Versus Breakthrough Listen (Price et al. 2020):**
   - VLASS is about 6,300× deeper in flux density.
   - For narrowband lines it is about 3.2×10⁵× less sensitive in EIRP.
-  - It is more constraining for signals wider than about 300 kHz.
+  - A search of the same GBT data matched to bandwidth B would lose sensitivity only as √B, so the continuum advantage is coverage
+    (signals the turboSETI pipeline does not search for) and sample size, not depth.
 
 ## Reproducibility notes
 
@@ -116,7 +127,7 @@ component parquet holds exactly the same data.
 - **Flux and limits:**
   - QL fluxes are divided by 0.87 to correct their known underestimate.
   - Limits for non-detected stars are (5 + 1.645) × the subtile MeanIslrms.
-  - EIRP = L_ν × 2 GHz, valid only for a flat signal filling the band. A narrowband line is diluted across the band.
+  - EIRP = L_ν × 2 GHz is the total in-band power of a steady signal of any width that survives RFI flagging and imaging.
 - **Duty cycle:** each QL position is observed for only a few seconds, so the fractions are fraction × duty cycle.
 - **Stack interpretation:**
   - Excluding individually detected stars truncates each shell at a luminosity threshold proportional to d². That is why the M-dwarf mean rises with distance.

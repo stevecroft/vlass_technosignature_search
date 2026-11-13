@@ -1,6 +1,7 @@
 """09 - Resumable bulk download of 41x41-pixel (1"/px) VLASS QL cutouts at every sample star, using CADC
 multi-SUB pixel cutouts (one request per image, one FITS extension per star). Stars are propagated to each image's
-epoch (caom2 MJD). Shards are written every 500 images; finished images are skipped on restart.
+epoch (caom2 MJD, or FITS DATE-OBS where missing) using proper motion only, as for Epoch 1; the parallax shift
+(<=0.55") is applied at the photometry stage through the stored sub-pixel offsets. Shards are written every 500 images; finished images are skipped on restart.
 Then --consolidate merges the shards into one array.
 
 Usage:
@@ -53,6 +54,7 @@ if __name__ == "__main__":
         consolidate(); raise SystemExit
     stars = pd.read_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"), columns=["source_id", "ra", "dec", "pmra", "pmdec"])
     wq = pd.read_parquet(os.path.join(C.RAW, "vlass_ql_wcs_cadc.parquet"))
+    wq["mjd"] = C.image_mjd(wq)          # fill CAOM records without time bounds (see 08b_fill_image_dates.py)
     wq["subtile"] = wq.uri.str.extract(r"ql\.(T\d+t\d+\.J\d+[+-]\d+)\.")[0]; wq["ver"] = wq.uri.str.extract(r"\.v(\d+)\.")[0].astype(int)
     img = wq[wq.epoch.isin(a.epochs.split(","))].sort_values("ver").groupby(["epoch", "subtile"]).tail(1).reset_index(drop=True)
     cc = SkyCoord(img.crval1.values * u.deg, img.crval2.values * u.deg)
@@ -69,7 +71,7 @@ if __name__ == "__main__":
     def fetch(k):
         rw = img.iloc[k]; w = mkwcs(rw); st = groups[k]
         ep = Time(rw.mjd, format="mjd").jyear if np.isfinite(rw.mjd) else 2018.5
-        s = stars.iloc[st]; ra, de = C.propagate(s.ra.values, s.dec.values, s.pmra.values, s.pmdec.values, ep)
+        s = stars.iloc[st]; ra, de = C.propagate(s.ra.values, s.dec.values, s.pmra.values, s.pmdec.values, ep)  # proper motion only; 17 applies parallax via `off`
         xs, ys = w.world_to_pixel(SkyCoord(ra * u.deg, de * u.deg)); subs, keep, offs = [], [], []
         for j, (x, y) in enumerate(zip(np.atleast_1d(xs), np.atleast_1d(ys))):
             X, Y = int(round(float(x))) + 1, int(round(float(y))) + 1

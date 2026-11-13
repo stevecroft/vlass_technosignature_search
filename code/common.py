@@ -70,12 +70,51 @@ def viz_get(params, timeout=1800, tries=5, wait=60):
     raise RuntimeError(f"VizieR query failed after {tries} tries: {params}")
 
 
-def propagate(ra, dec, pmra, pmdec, epoch, ref_epoch=2016.0):
-    """Linear proper-motion propagation (deg, deg, mas/yr) from Gaia DR3 J2016.0; parallax ignored (<=0.55")."""
-    dt = np.asarray(epoch) - ref_epoch
+def image_mjd(wq):
+    """MJD for each row of the CADC QL image table. CAOM lacks time bounds for some images (mostly epoch 4.1);
+    fill them from the FITS-header dates recovered by 08b_fill_image_dates.py, then from the median of the same
+    epoch and tile (tiles are observed together; median within-tile range 0.06 d), then the epoch median."""
+    m = wq.mjd.copy()
+    f = os.path.join(RAW, "vlass_ql_dates_header.csv")
+    if os.path.exists(f):
+        h = pd.read_csv(f).dropna(subset=["mjd"]).drop_duplicates("uri").set_index("uri").mjd
+        m = m.fillna(wq.uri.map(h))
+    tile = wq.uri.str.extract(r"ql\.(T\d+t\d+)\.")[0]
+    m = m.fillna(m.groupby([wq.epoch, tile]).transform("median"))
+    m = m.fillna(m.groupby(wq.epoch).transform("median"))
+    n = int(wq.mjd.isna().sum() - m.isna().sum())
+    if n: print(f"image_mjd: filled {n} missing MJDs ({int(m.isna().sum())} still missing)", flush=True)
+    return m
+
+
+def earth_bary_xyz(jyear):
+    """Earth's heliocentric position (au, ICRS equatorial) from the low-precision solar ephemeris of the
+    Astronomical Almanac. Neglecting the Sun's ~0.01 au barycentric offset errs by ~1% of the parallax
+    (<=6 mas for Barnard's star; checked against astropy GCRS), far below the 0.1" astrometric floor."""
+    n = (np.asarray(jyear, float) - 2000.0) * 365.25 - 0.0       # days from J2000.0 (TT ~ UTC here)
+    L = np.deg2rad((280.460 + 0.9856474 * n) % 360)
+    g = np.deg2rad((357.528 + 0.9856003 * n) % 360)
+    lam = L + np.deg2rad(1.915) * np.sin(g) + np.deg2rad(0.020) * np.sin(2 * g)
+    R = 1.00014 - 0.01671 * np.cos(g) - 0.00014 * np.cos(2 * g)
+    eps = np.deg2rad(23.439 - 4.0e-7 * n)
+    xs, ys, zs = R * np.cos(lam), R * np.cos(eps) * np.sin(lam), R * np.sin(eps) * np.sin(lam)   # geocentric Sun
+    return -xs, -ys, -zs
+
+
+def propagate(ra, dec, pmra, pmdec, epoch, ref_epoch=2016.0, plx=None):
+    """Propagate Gaia DR3 J2016.0 positions (deg, deg, mas/yr) to `epoch` (Julian year): linear proper motion
+    plus, if `plx` (mas) is given, the geocentric parallax displacement at that date (up to 0.55" here)."""
+    dt = np.asarray(epoch, float) - ref_epoch
     pmra = np.nan_to_num(np.asarray(pmra, float)); pmdec = np.nan_to_num(np.asarray(pmdec, float))
-    return (np.asarray(ra) + pmra * dt / 3.6e6 / np.cos(np.deg2rad(dec)),
-            np.asarray(dec) + pmdec * dt / 3.6e6)
+    ra = np.asarray(ra, float); dec = np.asarray(dec, float)
+    da, dd = pmra * dt, pmdec * dt                                   # mas
+    if plx is not None:
+        X, Y, Z = earth_bary_xyz(epoch)
+        a, d = np.deg2rad(ra), np.deg2rad(dec)
+        p = np.nan_to_num(np.asarray(plx, float))
+        da = da + p * (X * np.sin(a) - Y * np.cos(a))
+        dd = dd + p * (X * np.cos(a) * np.sin(d) + Y * np.sin(a) * np.sin(d) - Z * np.cos(d))
+    return ra + da / 3.6e6 / np.cos(np.deg2rad(dec)), dec + dd / 3.6e6
 
 
 def lum(flux_mjy, dist_pc):

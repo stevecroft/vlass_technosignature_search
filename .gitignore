@@ -4,6 +4,16 @@ data/raw/vlass_ep1_ql_cutouts_41px.npz
 data/raw/vlass_e1ql_components.parquet
 # Per-strip download cache for 02_fetch_vlass_catalog.py; fully redundant with vlass_e1ql_components.parquet
 data/raw/vlass_strips/
+# Per-shard download caches for 09_download_cutouts.py (consolidated into vlass_<tag>_ql_cutouts_41px.npz)
+data/raw/cutouts_*/
+# Per-image FITS cache for 14_multiepoch_detections.py (re-downloaded on demand, ~36 MB)
+data/raw/multiepoch_detections/
+# Consolidated all-epoch cutout arrays (>100 MB; attached to the GitHub release)
+data/raw/vlass_ep2_ql_cutouts_41px.npz
+data/raw/vlass_ep3_ql_cutouts_41px.npz
+data/raw/vlass_ep4_ql_cutouts_41px.npz
+# run logs
+data/raw/*.log
 # caches and build products
 __pycache__/
 *.pyc
