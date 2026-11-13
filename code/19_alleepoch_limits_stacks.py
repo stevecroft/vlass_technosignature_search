@@ -26,7 +26,7 @@ Stack limits:
   median   : Monte Carlo: give a random fraction f of the shell's stars an extra S_L / sigma_i and find the f at which the
              median shift exceeds the observed shift + 1.645 sigma_med. Bounds f regardless of L_T once S_L >> sigma.
 
-Inputs : data/derived/alleepoch_forced.parquet, alleepoch_candidates.json, forced_calibration.json,
+Inputs : data/derived/alleepoch_forced.parquet (+ alleepoch_forced_controls.parquet), alleepoch_candidates.json, forced_calibration.json,
          data/derived/ms_sample_vlass.parquet, results/vlass_perstar_limits_100pc_MS.parquet, results/alleepoch_candidates.csv
 Outputs: results/alleepoch_perstar_limits.parquet, results/alleepoch_population_limits.csv,
          results/alleepoch_stacks.csv, results/alleepoch_stack_limits.csv, data/derived/alleepoch_summary.json
@@ -75,6 +75,7 @@ def median_f_limit(z, s_over_sig, allowed, nmc=40):
 
 if __name__ == "__main__":
     LT = pd.read_parquet(os.path.join(C.DER, "alleepoch_forced.parquet"))
+    LT = LT.merge(pd.read_parquet(os.path.join(C.DER, "alleepoch_forced_controls.parquet")), on=["source_id", "tag"], how="left", validate="one_to_one")
     cj = json.load(open(os.path.join(C.DER, "alleepoch_candidates.json")))
     CA = pd.read_csv(os.path.join(C.RES, "alleepoch_candidates.csv"))
     sv = pd.read_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"), columns=["source_id", "dist_pc", "bp_rp"])

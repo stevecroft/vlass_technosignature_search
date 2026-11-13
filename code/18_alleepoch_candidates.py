@@ -89,7 +89,10 @@ if __name__ == "__main__":
         longs.append(F[["source_id", "tag", "half_epoch", "ep", "S_mJy", "sigma_mJy", "snr", "pred_contam", "contam_snr", "veto"] +
                        [f"c{j}" for j in range(N_CTRL)] + [f"cv{j}" for j in range(N_CTRL)]])
     LT = pd.concat(longs, ignore_index=True).merge(L, on="source_id", how="left"); LT["detected"] = LT.detected.fillna(False).astype(bool)
-    LT.to_parquet(os.path.join(C.DER, "alleepoch_forced.parquet"), index=False)   # c<j>/cv<j>: control S/N and veto flag
+    # two files, each well under the 50 MB per-file limit of Overleaf's GitHub sync; join on (source_id, tag)
+    cc = [f"c{j}" for j in range(N_CTRL)] + [f"cv{j}" for j in range(N_CTRL)]       # control S/N and veto flag
+    LT.drop(columns=cc).to_parquet(os.path.join(C.DER, "alleepoch_forced.parquet"), index=False, compression="zstd")
+    LT[["source_id", "tag"] + cc].to_parquet(os.path.join(C.DER, "alleepoch_forced_controls.parquet"), index=False, compression="zstd")
     # ---- per-star coadd (unvetoed epochs) for stars and for each control angle
     U = LT[~LT.detected & ~LT.veto].copy(); U["w"] = 1 / U.sigma_mJy ** 2
     g = U.groupby("source_id")
