@@ -70,6 +70,22 @@ def viz_get(params, timeout=1800, tries=5, wait=60):
     raise RuntimeError(f"VizieR query failed after {tries} tries: {params}")
 
 
+# The Gaia download is stored as two row-halves so that every tracked file stays far below the ~40 MiB GitHub
+# blob-API limit used by Overleaf's GitHub sync (the single file was 44 MB).
+GAIA_PARTS = [os.path.join(RAW, f"gaia_dr3_plx10_part{i}.parquet") for i in (1, 2)]
+
+
+def read_gaia(columns=None):
+    """The Gaia DR3 sample of 01_fetch_gaia.py (parts concatenated in their original row order)."""
+    return pd.concat([pd.read_parquet(p, columns=columns) for p in GAIA_PARTS], ignore_index=True)
+
+
+def write_gaia(df):
+    h = (len(df) + 1) // 2
+    for p, part in zip(GAIA_PARTS, (df.iloc[:h], df.iloc[h:])):
+        part.to_parquet(p, index=False, compression="zstd")
+
+
 def image_mjd(wq):
     """MJD for each row of the CADC QL image table. CAOM lacks time bounds for some images (mostly epoch 4.1);
     fill them from the FITS-header dates recovered by 08b_fill_image_dates.py, then from the median of the same

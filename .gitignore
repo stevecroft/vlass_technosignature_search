@@ -12,6 +12,9 @@ data/raw/multiepoch_detections/
 data/raw/vlass_ep2_ql_cutouts_41px.npz
 data/raw/vlass_ep3_ql_cutouts_41px.npz
 data/raw/vlass_ep4_ql_cutouts_41px.npz
+# Derived sample table (40 MB): regenerated bit-for-bit by code/03_sample_crossmatch.py in ~1 min. Not tracked because
+# Overleaf's GitHub sync cannot transfer files above ~40 MiB (GitHub blob-API limit).
+data/derived/ms_sample_vlass.parquet
 # run logs
 data/raw/*.log
 # caches and build products

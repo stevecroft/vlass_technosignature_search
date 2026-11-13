@@ -43,7 +43,7 @@ Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 0
 | `code/common.py` | Paths, constants (QL flux bias 0.87, BP−RP split 1.84, shells, service URLs), shared helpers. Also redirects astropy's config directory into the project. |
 | `code/01–16_*.py` | Pipeline scripts. Each docstring lists its inputs, outputs and expected values. |
 | `data/raw/` | Data exactly as fetched (see below). |
-| `data/derived/` | Intermediate tables written by the scripts (sample, star–component pairs, offset pairs, reliability fit, stacked images, LSPM astrometry JSON). |
+| `data/derived/` | Intermediate tables written by the scripts (sample, star–component pairs, offset pairs, reliability fit, stacked images, LSPM astrometry JSON, all-epoch forced photometry). `ms_sample_vlass.parquet` (40 MB) is not tracked: script 03 regenerates it bit-for-bit in about a minute. |
 | `results/` | Figures (PNG and vector PDF) and tables. |
 | `paper/` | AAS Journals manuscript (AASTeX v7.0.2), see below. |
 
@@ -67,6 +67,8 @@ Run order for a full rebuild: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 0
 
 ### Large files
 
+Every tracked file is kept below ~30 MB. Overleaf's GitHub sync rejects files over 50 MB and, through GitHub's blob API, fails above ~40 MiB.
+
 GitHub limits files to 100 MB, so two inputs are attached to the repository's GitHub release (tag `v1.0-data`)
 instead of being committed. After cloning, download them into `data/raw/` and check them with
 `shasum -a 256 -c MANIFEST.sha256`:
@@ -86,7 +88,7 @@ component parquet holds exactly the same data.
 
 | File | Source | Size |
 |---|---|---|
-| `gaia_dr3_plx10.parquet` | Gaia DR3 archive; ϖ > 10 mas, ϖ/σ > 10, δ > −45° (321,417 rows) | 42 MB |
+| `gaia_dr3_plx10_part1.parquet`, `_part2.parquet` | Gaia DR3 archive; ϖ > 10 mas, ϖ/σ > 10, δ > −45° (321,417 rows, stored as two row-halves; read with `common.read_gaia()`) | 22 + 22 MB |
 | `vlass_e1ql_components.parquet` | VizieR J/ApJS/255/30/comp (Gordon et al. 2021), via the CfA mirror (3,381,277 rows) | 242 MB |
 | `vlass_e1ql_subtiles.parquet` | VizieR J/ApJS/255/30/subtile (35,285 Quick Look images; observation dates, MeanIslrms) | 1.6 MB |
 | `vlass_strips/` | Per-degree download cache for the component table. Lets 02 resume; deletable once the parquet exists. | 332 MB |

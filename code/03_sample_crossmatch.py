@@ -1,7 +1,7 @@
 """03 - Main-sequence sample, VLASS subtile assignment, epoch propagation, cross-match, offset controls,
 and positional reliability (Rayleigh + uniform background, background density fixed from offsets).
 
-Inputs : data/raw/gaia_dr3_plx10.parquet, data/raw/vlass_e1ql_components.parquet, data/raw/vlass_e1ql_subtiles.parquet
+Inputs : data/raw/gaia_dr3_plx10_part{1,2}.parquet, data/raw/vlass_e1ql_components.parquet, data/raw/vlass_e1ql_subtiles.parquet
 Outputs: data/derived/ms_sample_vlass.parquet   (MS stars in the VLASS footprint; expected 210,191)
          data/derived/matches_10arcsec.parquet  (all star-component pairs < 10", with reliability)
          data/derived/offset_pairs.parquet      (pairs from the 10 offset realisations)
@@ -50,7 +50,7 @@ def pairs(ra, dec, vc, R):
 
 if __name__ == "__main__":
     # sort: the Gaia archive does not guarantee row order, and the offset realisations below are seeded per row
-    g = pd.read_parquet(os.path.join(C.RAW, "gaia_dr3_plx10.parquet")).sort_values("source_id").reset_index(drop=True)
+    g = C.read_gaia().sort_values("source_id").reset_index(drop=True)
     v = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_components.parquet"))
     st = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_subtiles.parquet"))
     print("Gaia rows:", len(g), " VLASS components:", len(v), " subtiles:", len(st))
@@ -117,11 +117,11 @@ if __name__ == "__main__":
              "DCMin", "DCPA", "SCode", "QualFlag", "DupFlag", "MainSample", "NNdist", "PeakToRing", "NVSSdist", "FIRSTdist", "Subtile"]
     A = pd.concat([A.reset_index(drop=True), vg.iloc[A.icomp][keepc].reset_index(drop=True),
                    sv.iloc[A.istar][["source_id"]].reset_index(drop=True)], axis=1)
-    sv.to_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"))
+    sv.to_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"), compression="zstd")   # not tracked in git: regenerate with this script
     A.to_parquet(os.path.join(C.DER, "matches_10arcsec.parquet"))
     offs.to_parquet(os.path.join(C.DER, "offset_pairs.parquet"))
     json.dump(fit, open(os.path.join(C.DER, "reliability_fit.json"), "w"), indent=1)
-    counts = dict(n_gaia=int(len(pd.read_parquet(os.path.join(C.RAW, "gaia_dr3_plx10.parquet"), columns=["source_id"]))),
+    counts = dict(n_gaia=int(len(C.read_gaia(columns=["source_id"]))),
                   n_finite_bprp=int(len(g)), n_ms=int(g.is_MS.sum()), n_ms_dec41=int(len(s)), n_in_vlass=int(len(sv)),
                   n_components=int(len(v)), n_mainsample=int((v.MainSample == 1).sum()), n_used_components=int(len(vg)),
                   n_subtiles=int(len(st)), obs_epoch_min=float(s.obs_jyear.min()), obs_epoch_max=float(s.obs_jyear.max()),
