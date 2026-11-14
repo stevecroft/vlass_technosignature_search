@@ -500,6 +500,14 @@ Ivezi{\'c}, {\v Z}., Menou, K., Knapp, G.~R., {et~al.} 2002,
   Observed by the FIRST Survey and the Sloan Digital Sky Survey},} \aj, 124,
   2364, \dodoi{10.1086/344069}
 
+% type= inproceedings
+\bibitem[{A.~E. Kimball {et~al.}(2026)Kimball, Lacy, Ott, Tobin, Candelaria,
+  Garza, Medlin, \& Myers}]{Kimball2026}
+Kimball, A.~E., Lacy, M., Ott, J., {et~al.} 2026, \bibinfo{title}{{The Karl G.
+  Jansky Very Large Array Sky Survey (VLASS). Data Products},} in Proc. SPIE,
+  Vol. 14153, Radio Telescopes, Technologies, and Methods, ed. J.~Lazio, M.-T.
+  Chen, \& S.~J. Wijnholds (SPIE), 1415309, \dodoi{10.1117/12.3105474}
+
 % type= techreport
 \bibitem[{M. {Lacy} {et~al.}(2025){Lacy}, {Dong}, \& {VLASS Team}}]{Lacy2025}
 {Lacy}, M., {Dong}, D., \& {VLASS Team}. 2025, {VLASS Epoch 3 Quick Look and

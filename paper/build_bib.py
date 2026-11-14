@@ -58,6 +58,10 @@ def finalize(text):
     # CrossRef 'issued' is the online date; use the volume year where they differ
     for key, yr in {"Garrett2022": 2023, "Choza2024": 2024}.items():
         text = re.sub(r"(" + key + r",[^@]*?year=\{)\d{4}(\})", r"\g<1>" + str(yr) + r"\2", text, count=1)
+    # SPIE record: CrossRef gives a lower-case title and the page count instead of the paper number
+    text = text.replace("title={{The Karl G. Jansky very large array sky survey (VLASS): data products}}",
+                        "title={{The Karl G. Jansky Very Large Array Sky Survey (VLASS). Data Products}}")
+    text = re.sub(r"(Kimball2026,[^@]*?)pages=\{7\}", r"\1series={Proc. SPIE}, volume={14153}, pages={1415309}", text, count=1)
     # article numbers CrossRef leaves out of the pages field
     text = text.replace("author={Ayanabha, D. and", "author={De, Ayanabha and")   # CrossRef swaps given and family names
     for key, eid in {"TremblayTingay2020": "e035", "Driessen2023": "e036", "Driessen2024": "e084", "McConnell2020": "e048"}.items():
@@ -89,6 +93,7 @@ DOIS = {
     "Harris2020": "10.1038/s41586-020-2649-2", "Virtanen2020": "10.1038/s41592-019-0686-2",
     "Hunter2007": "10.1109/MCSE.2007.55", "McKinney2010": "10.25080/Majora-92bf1922-00a",
     "McConnell2020": "10.1017/pasa.2020.41", "Shimwell2022": "10.1051/0004-6361/202142484",
+    "Kimball2026": "10.1117/12.3105474",
 }
 MANUAL = r"""
 @ARTICLE{Chambers2016,
