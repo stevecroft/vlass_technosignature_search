@@ -18,7 +18,24 @@ for f in ["ReadMe", "stars.dat", "radio.dat"]:
         open(os.path.join(D, f), "wb").write(requests.get(f"https://radiostars.org/data/download/{f}/", timeout=120).content)
 S = ascii.read(os.path.join(D, "stars.dat"), readme=os.path.join(D, "ReadMe"), format="cds").to_pandas()
 R = ascii.read(os.path.join(D, "radio.dat"), readme=os.path.join(D, "ReadMe"), format="cds").to_pandas()
-S["source_id"] = pd.to_numeric(S.Gaia.astype(str).str.extract(r"(\d{6,})")[0], errors="coerce")
+# Gaia DR3 IDs exceed 2**53: parse them as exact int64 (a float64 key silently merges stars with nearby IDs, e.g. binary
+# components). SRSC entries without a DR3 ID (DR2 ID or none) are matched by position (2", star propagated to the SRSC epoch).
+S["source_id"] = pd.array([int(x) if isinstance(x, str) else pd.NA for x in S.Gaia.astype(str).str.extract(r"Gaia DR3 (\d+)")[0]],
+                          dtype="Int64")
+_sv = pd.read_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"), columns=["source_id", "ra", "dec", "pmra", "pmdec"])
+_m = S.source_id.isna() & S.RAdeg.notna()
+if _m.any():
+    from astropy.coordinates import SkyCoord; import astropy.units as u
+    ep = pd.to_numeric(S.loc[_m, "Epoch"].astype(str).str.lstrip("J"), errors="coerce").fillna(2016.0).values
+    cs = SkyCoord(S.loc[_m, "RAdeg"].values * u.deg, S.loc[_m, "DEdeg"].values * u.deg)
+    cg = SkyCoord(_sv.ra.values * u.deg, _sv.dec.values * u.deg)
+    j, d, _ = cs.match_to_catalog_sky(cg)
+    dt = ep - 2016.0; jj = j
+    ra2 = _sv.ra.values[jj] + _sv.pmra.values[jj] * dt / 3.6e6 / np.cos(np.deg2rad(_sv.dec.values[jj])); de2 = _sv.dec.values[jj] + _sv.pmdec.values[jj] * dt / 3.6e6
+    d2 = cs.separation(SkyCoord(ra2 * u.deg, de2 * u.deg)).arcsec
+    ok = d2 < 2.0
+    S.loc[S.index[_m][ok], "source_id"] = _sv.source_id.values[jj][ok]
+    print(f"SRSC entries without a DR3 ID: {int(_m.sum())}; positionally matched to the sample: {int(ok.sum())}")
 agg = R.groupby("Identifier").agg(n_radio=("Freq", "size"), freqs=("Freq", lambda x: ",".join(f"{v:g}" for v in sorted(set(x)))),
                                   surveys=("Survey", lambda x: ",".join(sorted(set(map(str, x.dropna()))))),
                                   n_stokesV=("SpeakV", lambda x: int(np.isfinite(pd.to_numeric(x, errors="coerce")).sum())),

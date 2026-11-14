@@ -77,6 +77,11 @@ if __name__ == "__main__":
     put("NStationary", str(int((va.motion == "stationary").sum())))
     si = pd.read_csv(os.path.join(RES, "srsc_in_sample.csv"))
     put("NSRSCinSample", str(len(si))); put("NSRSCdet", str(int(si.detected_by_us.sum()))); put("NSRSCundet", str(int((~si.detected_by_us).sum())))
+    _u = si[~si.detected_by_us]; _f = _u.freqs.fillna("").apply(lambda q: [float(x) for x in str(q).split(",") if x])   # MHz
+    _PA = pd.read_parquet(os.path.join(RES, "alleepoch_perstar_limits.parquet")).set_index("source_id")
+    _cand = _u.source_id.map(_PA.candidate).fillna(False).astype(bool); _vl = _f.apply(lambda L: any(2000 <= x <= 4000 for x in L))
+    put("NSRSClow", str(int(_f.apply(lambda L: len(L) > 0 and max(L) < 2000).sum()))); put("NSRSCvlass", str(int(_vl.sum())))
+    put("NSRSCvlassCand", str(int((_vl & _cand).sum()))); put("NSRSCcand", str(int(_cand.sum())))
     me = pd.read_csv(os.path.join(RES, "vlass_detections_multiepoch.csv"))
     put("NMultiImg", str(len(me))); put("NMultiDetImg", str(int(me.detected.sum())))
     put("NImgPerStarMin", str(int(va.n_images.min()))); put("NImgPerStarMax", str(int(va.n_images.max())))
@@ -184,6 +189,15 @@ if __name__ == "__main__":
         put("InjFour", f"{tb.frac_det[4]:.2f}"); put("InjFive", f"{tb.frac_det[5]:.2f}"); put("InjSix", f"{tb.frac_det[6]:.2f}")
         put("NInject", com(int(tb.n.sum()))); put("NEpochTags", str(len(tg)))
         put("NStarEpochs", com(sum(cal[t]["n_good"] for t in tg)))
+        # sample accounting: cutouts per epoch, discarded cutouts, stars with no usable or no unvetoed epoch
+        put("NCutoutsAll", com(sum(cal[t]["n_stars"] for t in tg))); put("NBadCut", com(sum(cal[t]["n_stars"] - cal[t]["n_good"] for t in tg)))
+        put("NCutEpList", ", ".join(com(cal[t]["n_stars"]) for t in tg[:-1]) + ", and " + com(cal[tg[-1]]["n_stars"]))
+        _P = pd.read_parquet(os.path.join(RES, "alleepoch_perstar_limits.parquet"), columns=["source_id", "n", "n_ep_all"])
+        _dec = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "dec"]).set_index("source_id").dec
+        _none = _P.n_ep_all == 0
+        put("NNoEpoch", com(_none.sum())); put("NNoEpochPct", f"{100 * _none.mean():.1f}")
+        put("NNoEpochSouth", com((_dec.reindex(_P.source_id[_none]) < -38).sum()))
+        put("NAllVeto", str(int((_P.n.isna() & (_P.n_ep_all > 0)).sum()))); put("NWithForced", com((~_none).sum()))
         put("NCandStars", str(cj["n_candidate_stars"])); put("NCandExpl", str(cj["n_explained"])); put("NCandMult", str(cj["n_multiplicity_only"]))
         put("KUnexpl", str(cj["k_unexplained"])); put("BExp", f"{cj['b_expected']:.1f}"); put("MuHidden", f"{cj['mu95_hidden']:.1f}")
         put("KSteady", str(cj["k_steady"])); put("BSteady", f"{cj['b_steady']:.1f}"); put("MuSteady", f"{cj['mu95_steady']:.1f}")
@@ -241,6 +255,8 @@ if __name__ == "__main__":
             put(f"FMedSix{t}", f"{md.get(1e6, np.nan):.2f}"); put(f"FMedSeven{t}", f"{md.get(1e7, np.nan):.3f}"); put(f"FMedNine{t}", f"{md.get(1e9, np.nan):.3f}")
         reach = [SLm[SLm.cls == t].reset_index(drop=True).pipe(lambda s: s.L_WHz[np.nanargmax(s.f95_mean.values < 1)]) for t in ["AFGK", "M"]]
         put("ReachEIRPAll", sci(min(reach) * 2e9))
+        for t, L0 in zip(["AFGK", "M"], reach):   # EIRP from the *displayed* (rounded) L so the abstract is self-consistent
+            put(f"ReachEIRPAll{t}", sci(float(f"{L0:.1e}") * 2e9))
         ALL = dict(SA=SA)
 
     # ---------------- tables
@@ -302,7 +318,7 @@ if __name__ == "__main__":
         rows = [f"{clean_name(r.main_id, r.source_id)} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.dist_pc:.1f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & "
                 f"{int(r.n) if np.isfinite(r.n) else 0} & {r.S_lim_steady:.2f} & ${sci(r.L_lim_steady)}$ & ${sci(r.L_lim_steady * 2e9)}$ \\\\" for _, r in nearA.iterrows()]
         open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable*}{lrrrrrrrrr}
-\tablecaption{95\% upper limits on steady 2--4\,GHz emission at the positions of the twelve nearest stars in the sample.\label{tab:nearest}}
+\tablecaption{95\% limits on steady 2--4\,GHz emission at the positions of the twelve nearest stars in the sample (completeness thresholds, or upper confidence bounds for stars with emission; Section~\ref{sec:limits_method}).\label{tab:nearest}}
 \tablehead{\colhead{Star} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{1\arcsec} & \colhead{$S_{\rm lim}^{\rm E1}$} & \colhead{$L_{\nu,\rm lim}^{\rm E1}$} & \colhead{$N_{\rm ep}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
 \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(au)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
 \startdata
@@ -314,7 +330,7 @@ if __name__ == "__main__":
     else:
         rows = [f"{clean_name(r.main_id, r.source_id)} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & ${sci(r.EIRP_lim_W_2GHz)}$ \\\\" for _, r in near.iterrows()]
         open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable}{lrrrrr}
-\tablecaption{95\% upper limits on steady 2--4\,GHz emission from the twelve nearest stars in the sample.\label{tab:nearest}}
+\tablecaption{95\% limits on steady 2--4\,GHz emission from the twelve nearest stars in the sample (completeness thresholds, or upper confidence bounds for stars with emission; Section~\ref{sec:limits_method}).\label{tab:nearest}}
 \tablehead{\colhead{Star} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
 \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
 \startdata
