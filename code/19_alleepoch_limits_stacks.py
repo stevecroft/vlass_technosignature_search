@@ -4,7 +4,10 @@ Per-star limits (95%), from the forced photometry of 17 and the vetoes of 18:
   steady    : inverse-variance coadd over unvetoed epochs. S_lim = (5 + 1.645) sigma_coadd for stars without emission;
               S_coadd + 1.645 sigma_coadd (if larger) for stars with natural or unexplained emission; for stars whose
               every epoch is confusion-vetoed, the largest single-epoch S + 1.645 sigma.
-  any-epoch : (5 + 1.645) sigma_e in the best (lowest-noise) unvetoed epoch, for a transmitter on in one snapshot.
+  any-epoch : a transmitter on in only one snapshot, at an unknown epoch, is excluded only if it would have been detected
+              in whichever unvetoed epoch it was on: the largest (worst-epoch) single-epoch limit, (5 + 1.645) sigma_e,
+              or S_e + 1.645 sigma_e where larger for stars with emission. The best-epoch value is kept as
+              S_lim_bestepoch (the limit if the transmitter happened to be on in the lowest-noise epoch).
 Population (steady transmitter of spectral luminosity L, flux S_L = L / 4 pi d^2):
   p_i(L) = Phi((S_L - t_i) / sigma_coadd)   (steady test: coadd only, one trial per star),
   with t_i = 5 sigma_coadd, or S_coadd + 5 sigma_coadd for stars with natural emission (a transmitter must exceed it).
@@ -96,7 +99,10 @@ if __name__ == "__main__":
     allv = P.n.isna() & (P.n_ep_all > 0)                     # every epoch vetoed: confusion-limited
     vmax = LT[LT.veto].assign(x=lambda d: d.S_mJy + Z * d.sigma_mJy).groupby("source_id").x.max()
     P.loc[allv, "S_lim_steady"] = vmax.reindex(P.index[allv]).values
-    P["S_lim_anyepoch"] = (THR + Z) * P.sig_best
+    lim_e = (THR + Z) * U.sigma_mJy
+    lim_e = pd.Series(np.where(U.source_id.isin(natural | cand), np.maximum(lim_e, U.S_mJy + Z * U.sigma_mJy), lim_e), index=U.index)
+    P["S_lim_anyepoch"] = lim_e.groupby(U.source_id).max().reindex(P.index)          # worst unvetoed epoch
+    P["S_lim_bestepoch"] = lim_e.groupby(U.source_id).min().reindex(P.index)
     P["L_lim_steady"] = lum(P.S_lim_steady, P.dist_pc); P["L_lim_anyepoch"] = lum(P.S_lim_anyepoch, P.dist_pc)
     P["class"] = np.where(P.bp_rp < C.BPRP_SPLIT, "AFGK", "M")
     P.reset_index().to_parquet(os.path.join(C.RES, "alleepoch_perstar_limits.parquet"), index=False)
@@ -196,7 +202,7 @@ if __name__ == "__main__":
     g = lambda L0: float(np.interp(np.log10(L0), np.log10(POP.L_WHz), POP.f95))
     summ = dict(tags=tags, n_stars=int(len(P)), n_with_coadd=int(ok.sum()), median_epochs=float(P.n.median()),
                 S_lim_steady_med=float(P.S_lim_steady.median()), L_lim_steady_med=float(P.L_lim_steady.median()),
-                S_lim_any_med=float(P.S_lim_anyepoch.median()),
+                S_lim_any_med=float(P.S_lim_anyepoch.median()), S_lim_best_med=float(P.S_lim_bestepoch.median()),
                 f95_1e7=g(1e7), f95_1e8=g(1e8), f95_1e9=g(1e9), f95_floor=float(POP.f95.min()), Neff_max=float(POP.N_eff.max()),
                 mu95=mu95, k=kk, b=bb, mu95_snap=mu95e, k_snap=cj["k_snap"], b_snap=cj["b_snap"], fdelta95_floor=float(POP.fdelta95.min()),
                 n_unexplained_candidates=int(P.unexplained_candidate.sum()))

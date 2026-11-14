@@ -147,6 +147,12 @@ Driessen, L.~N., Pritchard, J., Murphy, T., {et~al.} 2024, \bibinfo{title}{{The
   Sydney Radio Star Catalogue: Properties of radio stars at megahertz to
   gigahertz frequencies},} PASA, 41, e084, \dodoi{10.1017/pasa.2024.72}
 
+% type= misc
+\bibitem[{E. {Enriquez} {\&} D. {Price}(2019){Enriquez} \&
+  {Price}}]{Enriquez2019}
+{Enriquez}, E., \& {Price}, D. 2019, {turboSETI: Python-based SETI search
+  algorithm},, Astrophysics Source Code Library, record ascl:1906.006
+
 % type= article
 \bibitem[{J.~E. Enriquez {et~al.}(2017)Enriquez, Siemion, Foster, Gajjar,
   Hellbourg, Hickish, Isaacson, Price, Croft, DeBoer, Lebofsky, MacMahon, \&
@@ -531,6 +537,18 @@ L{\'o}pez-Santiago, J., Montes, D., Fern{\'a}ndez-Figueroa, M.~J., \& Ramsey,
   chromospheric activity in the young, single K2-dwarf PW And},} \aap, 411,
   489, \dodoi{10.1051/0004-6361:20031377}
 
+% type= article
+\bibitem[{D. McConnell {et~al.}(2020)McConnell, Hale, Lenc, Banfield, Heald,
+  Hotan, Leung, Moss, Murphy, O'Brien, Pritchard, Raja, Sadler, Stewart,
+  Thomson, Whiting, Allison, Amy, Anderson, Ball, Bannister, Bell, Bock,
+  Bolton, Bunton, Chippendale, Collier, Cooray, Cornwell, Diamond, Edwards,
+  Gupta, Hayman, Heywood, Jackson, Koribalski, Lee-Waddell, McClure-Griffiths,
+  Ng, Norris, Phillips, Reynolds, Roxby, Schinckel, Shields, Tremblay,
+  Tzioumis, Voronkov, \& Westmeier}]{McConnell2020}
+McConnell, D., Hale, C.~L., Lenc, E., {et~al.} 2020, \bibinfo{title}{{The Rapid
+  ASKAP Continuum Survey I: Design and first results},} PASA, 37, e048,
+  \dodoi{10.1017/pasa.2020.41}
+
 % type= inproceedings
 \bibitem[{W. McKinney(2010)McKinney}]{McKinney2010}
 McKinney, W. 2010, \bibinfo{title}{{Data Structures for Statistical Computing
@@ -604,6 +622,26 @@ Saide, R.~C., Garrett, M.~A., \& Heeralall-Issur, N. 2023,
   \bibinfo{title}{{Simulation of the Earth's radio-leakage from mobile towers
   as seen from selected nearby stellar systems},} \mnras, 522, 2393,
   \dodoi{10.1093/mnras/stad378}
+
+% type= article
+\bibitem[{T.~W. Shimwell {et~al.}(2022)Shimwell, Hardcastle, Tasse, Best,
+  R{\"o}ttgering, Williams, Botteon, Drabent, Mechev, Shulevski, van Weeren,
+  Bester, Br{\"u}ggen, Brunetti, Callingham, Chy{\.z}y, Conway, Dijkema,
+  Duncan, de~Gasperin, Hale, Haverkorn, Hugo, Jackson, Mevius, Miley, Morabito,
+  Morganti, Offringa, Oonk, Rafferty, Sabater, Smith, Schwarz, Smirnov,
+  O'Sullivan, Vedantham, White, Albert, Alegre, Asabere, Bacon, Bonafede,
+  Bonnassieux, Brienza, Bilicki, Bonato, Calistro~Rivera, Cassano, Cochrane,
+  Croston, Cuciti, Dallacasa, Danezi, Dettmar, Di~Gennaro, Edler, En{\ss}lin,
+  Emig, Franzen, Garc{\'\i}a-Vergara, Grange, G{\"u}rkan, Hajduk, Heald,
+  Heesen, Hoang, Hoeft, Horellou, Iacobelli, Jamrozy, Jeli{\'c}, Kondapally,
+  Kukreti, Kunert-Bajraszewska, Magliocchetti, Mahatma, Ma{\l}ek, Mandal,
+  Massaro, Meyer-Zhao, Mingo, Mostert, Nair, Nakoneczny, Nikiel-Wroczy{\'n}ski,
+  Orr{\'u}, Pajdosz-{\'S}mierciak, Pasini, Prandoni, van Piggelen, Rajpurohit,
+  Retana-Montenegro, Riseley, Rowlinson, Saxena, Schrijvers, Sweijen, Siewert,
+  Timmerman, Vaccari, Vink, West, Wo{\l}owska, Zhang, \& Zheng}]{Shimwell2022}
+Shimwell, T.~W., Hardcastle, M.~J., Tasse, C., {et~al.} 2022,
+  \bibinfo{title}{{The LOFAR Two-metre Sky Survey: V. Second data release},}
+  \aap, 659, A1, \dodoi{10.1051/0004-6361/202142484}
 
 % type= article
 \bibitem[{A.~P.~V. Siemion {et~al.}(2013)Siemion, Demorest, Korpela, Maddalena,

@@ -60,7 +60,7 @@ def finalize(text):
         text = re.sub(r"(" + key + r",[^@]*?year=\{)\d{4}(\})", r"\g<1>" + str(yr) + r"\2", text, count=1)
     # article numbers CrossRef leaves out of the pages field
     text = text.replace("author={Ayanabha, D. and", "author={De, Ayanabha and")   # CrossRef swaps given and family names
-    for key, eid in {"TremblayTingay2020": "e035", "Driessen2023": "e036", "Driessen2024": "e084"}.items():
+    for key, eid in {"TremblayTingay2020": "e035", "Driessen2023": "e036", "Driessen2024": "e084", "McConnell2020": "e048"}.items():
         text = re.sub(r"(" + key + r",[^@]*?year=\{\d{4}\})(?![^@]*pages=)", r"\1, pages={" + eid + "}", text, count=1)
     return texify(text)
 
@@ -88,6 +88,7 @@ DOIS = {
     "Astropy2018": "10.3847/1538-3881/aabc4f", "Astropy2022": "10.3847/1538-4357/ac7c74",
     "Harris2020": "10.1038/s41586-020-2649-2", "Virtanen2020": "10.1038/s41592-019-0686-2",
     "Hunter2007": "10.1109/MCSE.2007.55", "McKinney2010": "10.25080/Majora-92bf1922-00a",
+    "McConnell2020": "10.1017/pasa.2020.41", "Shimwell2022": "10.1051/0004-6361/202142484",
 }
 MANUAL = r"""
 @ARTICLE{Chambers2016,
@@ -108,6 +109,10 @@ MANUAL = r"""
   author = {{Graham}, Matthew and {Plante}, Ray and {Tody}, Doug and {Fitzpatrick}, Mike},
   title = "{PyVO: Python access to the Virtual Observatory}",
   journal = {Astrophysics Source Code Library, record ascl:1402.004}, year = 2014}
+@MISC{Enriquez2019,
+  author = {{Enriquez}, Emilio and {Price}, Danny},
+  title = "{turboSETI: Python-based SETI search algorithm}",
+  howpublished = {Astrophysics Source Code Library, record ascl:1906.006}, year = 2019}
 @TECHREPORT{Lacy2025,
   author = {{Lacy}, M. and {Dong}, D. and {VLASS Team}},
   title = "{VLASS Epoch 3 Quick Look and Quick Look Median Stack Interim Component Lists}",
@@ -134,4 +139,4 @@ if __name__ == "__main__":
         bib = re.sub(r"title=\{([^}]*)\}", lambda m: "title={{" + m.group(1).strip() + "}}", bib, count=1)  # protect capitalisation
         out.append(bib); time.sleep(0.5)
     open("refs.bib", "w").write(finalize("\n\n".join(out) + "\n" + MANUAL))
-    print(f"wrote refs.bib with {len(out)} CrossRef + 5 manual entries")
+    print(f"wrote refs.bib with {len(out)} CrossRef + 6 manual entries")

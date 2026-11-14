@@ -18,6 +18,11 @@ def sci(x, d=1):
     return (f"{m:.{d}f}\\times10^{{{e}}}") if e != 0 else f"{m:.{d}f}"
 
 
+def fas(x, d=1):
+    """AAS fractional arcseconds: 0.25 -> 0\\farcs25"""
+    return f"{x:.{d}f}".replace(".", "\\farcs")
+
+
 def com(n): return f"{int(n):,}".replace(",", "{,}")
 def put(name, val): macros[name] = val
 
@@ -174,6 +179,7 @@ if __name__ == "__main__":
         q5, q50, q95 = np.percentile(PA.S_lim_steady, [5, 50, 95]); put("SlimAllMed", f"{q50:.2f}"); put("SlimAllLo", f"{q5:.2f}"); put("SlimAllHi", f"{q95:.2f}")
         put("LlimAllMed", sci(PA.L_lim_steady.median())); put("EIRPlimAllMed", sci(PA.L_lim_steady.median() * 2e9))
         put("SlimAnyMed", f"{PA.S_lim_anyepoch.median():.2f}")
+        put("SlimBestMed", f"{PA.S_lim_bestepoch.median():.2f}")
         bn = PA.nsmallest(1, "dist_pc").iloc[0]; put("BarnardLAll", sci(bn.L_lim_steady)); put("BarnardEIRPAll", sci(bn.L_lim_steady * 2e9))
         put("BarnardSAll", f"{bn.S_lim_steady:.2f}"); put("BarnardNep", str(int(bn.n)))
         put("EarthLeakAUAll", com(round(np.sqrt(400.0 / (4 * np.pi * PA.S_lim_steady.median() * 1e-29)) / 1.496e11, -2)))
@@ -251,7 +257,7 @@ if __name__ == "__main__":
 \tabletypesize{\scriptsize}
 \tablecaption{VLASS Epoch 1 components securely associated (reliability $R>0.5$) with \NSecure\ main-sequence stars within 100\,pc.\label{tab:matches}}
 \tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{Sep.} & \colhead{$R$} & \colhead{$S_{3\,\rm GHz}$} & \colhead{$\log L_\nu$} & \colhead{X-ray} & \colhead{$\log\frac{L_X}{L_\nu}$} & \colhead{Mult.} & \colhead{Radio} & \colhead{Class} \\
-\colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{($''$)} & \colhead{} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(Hz)} & \colhead{} & \colhead{} & \colhead{}}
+\colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(arcsec)} & \colhead{} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(Hz)} & \colhead{} & \colhead{} & \colhead{}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
@@ -270,7 +276,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Means are measured against the empirical null (stacked image at 10--18$''$ from the centre); uncertainties are the larger of the formal and null-ring scatter. $\langle L_\nu\rangle_{95}$ is the one-sided 95\% upper limit on the mean spectral luminosity; EIRP$_{95}$ assumes a flat signal filling 2\,GHz. FGK/M split at $G_{BP}-G_{RP}=1.84$.}
+\tablecomments{Means are measured against the empirical null (stacked image at 10\arcsec--18\arcsec from the centre); uncertainties are the larger of the formal and null-ring scatter. $\langle L_\nu\rangle_{95}$ is the one-sided 95\% upper limit on the mean spectral luminosity; EIRP$_{95}$ assumes a flat signal filling 2\,GHz. FGK/M split at $G_{BP}-G_{RP}=1.84$.}
 \end{deluxetable*}
 """)
     if ALL is not None:      # all-epoch steady limits for the same stars
@@ -279,12 +285,12 @@ if __name__ == "__main__":
                 f"{int(r.n) if np.isfinite(r.n) else 0} & {r.S_lim_steady:.2f} & ${sci(r.L_lim_steady)}$ & ${sci(r.L_lim_steady * 2e9)}$ \\\\" for _, r in nearA.iterrows()]
         open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable*}{lrrrrrrrrr}
 \tablecaption{95\% upper limits on steady 2--4\,GHz emission at the positions of the twelve nearest stars in the sample.\label{tab:nearest}}
-\tablehead{\colhead{Star} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$1''$} & \colhead{$S_{\rm lim}^{\rm E1}$} & \colhead{$L_{\nu,\rm lim}^{\rm E1}$} & \colhead{$N_{\rm ep}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
+\tablehead{\colhead{Star} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{1\arcsec} & \colhead{$S_{\rm lim}^{\rm E1}$} & \colhead{$L_{\nu,\rm lim}^{\rm E1}$} & \colhead{$N_{\rm ep}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
 \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(au)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{E1: Epoch-1 catalogue analysis. $N_{\rm ep}$, $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star, i.e.\ to projected separations below roughly the value in the ``$1''$'' column; a transmitter on a planet at a wider separation would lie outside the measured position.}
+\tablecomments{E1: Epoch-1 catalogue analysis. $N_{\rm ep}$, $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star, i.e.\ to projected separations below roughly the value in the ``1\arcsec'' column; a transmitter on a planet at a wider separation would lie outside the measured position.}
 \end{deluxetable*}
 """)
     else:
@@ -317,7 +323,7 @@ if __name__ == "__main__":
     open(os.path.join(HERE, "tables", "lspm_astrometry.tex"), "w").write(r"""\begin{deluxetable}{lrrrrrrr}
 \tablecaption{Multi-epoch VLASS astrometry of the radio source near LSPM~J1943+5337.\label{tab:lspm}}
 \tablehead{\colhead{Image} & \colhead{Epoch} & \colhead{$S_{\rm peak}$} & \colhead{SNR} & \colhead{$\Delta\alpha^*$} & \colhead{$\Delta\delta$} & \colhead{$\Delta\alpha^*_\star$} & \colhead{$\Delta\delta_\star$} \\
-\colhead{} & \colhead{(yr)} & \colhead{(mJy\,b$^{-1}$)} & \colhead{} & \colhead{($''$)} & \colhead{($''$)} & \colhead{($''$)} & \colhead{($''$)}}
+\colhead{} & \colhead{(yr)} & \colhead{(mJy\,b$^{-1}$)} & \colhead{} & \colhead{(arcsec)} & \colhead{(arcsec)} & \colhead{(arcsec)} & \colhead{(arcsec)}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
@@ -352,8 +358,8 @@ if __name__ == "__main__":
                 cd = EC.cats_det.get(sid, np.nan) if sid in EC.index else np.nan
                 if isinstance(cd, str):
                     for e in cd.split(";"):
-                        c_, rest = e.split(":", 1); ent.append(f"{c_} ({float(rest.split(chr(34))[0]):.1f}$''$)")
-                if sid in MS.index: ent.append(f"Med ({MS.med_sep[sid]:.1f}$''$)")
+                        c_, rest = e.split(":", 1); ent.append(f"{c_} ({fas(float(rest.split(chr(34))[0]))})")
+                if sid in MS.index: ent.append(f"Med ({fas(MS.med_sep[sid])})")
                 catd[sid] = ", ".join(ent) if ent else "---"
         rows = []
         for _, r in U.iterrows():
@@ -372,7 +378,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) \KSteady\ unexplained candidates compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}). Multiplicity: SIMBAD binary type, RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge. Catalogs: independent per-epoch component catalogs with a $\ge5\sigma$ component within $4''$ of the star's position at that epoch, and the separation (E1: Epoch-1 QL; QL: NRAO QL lists; SE: Single Epoch lists; Med: QL median stack; Section~\ref{sec:catcheck}).}
+\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) \KSteady\ unexplained candidates compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}). Multiplicity: SIMBAD binary type, RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge. Catalogs: independent per-epoch component catalogs with a $\ge5\sigma$ component within 4\arcsec\ of the star's position at that epoch, and the separation (E1: Epoch-1 QL; QL: NRAO QL lists; SE: Single Epoch lists; Med: QL median stack; Section~\ref{sec:catcheck}).}
 \end{deluxetable*}
 }
 """)
@@ -393,8 +399,8 @@ if __name__ == "__main__":
         sq = X["SE3_vs_QL3"]; put("XcSEoverQL", f"{sq['peak_ratio_SE_over_QL']:.3f}"); put("XcSEoverQLErr", f"{sq['peak_ratio_err']:.3f}")
         put("XcSEoverQLN", str(sq["n"])); put("XcSEQLpos", f"{max(sq['pos_diff_rstd_E'], sq['pos_diff_rstd_N']):.2f}")
         asys = X["candidates"]["astrometric_sys_arcsec"]
-        put("XcAstSE", f"{min(asys[c] for c in se):.2f}--{max(asys[c] for c in se):.2f}")
-        put("XcAstQL", f"{min(asys[c] for c in ql):.2f}--{max(asys[c] for c in ql):.2f}")
+        put("XcAstSE", fas(min(asys[c] for c in se), 2) + "--" + fas(max(asys[c] for c in se), 2))
+        put("XcAstQL", fas(min(asys[c] for c in ql), 2) + "--" + fas(max(asys[c] for c in ql), 2))
         conc = lambda cs: (sum(pc[c]["n_forced_ge5_unvetoed_with_cat"] for c in cs), sum(pc[c]["n_forced_ge5_unvetoed"] for c in cs))
         a_, b_ = conc(ql); put("XcConcQL", f"{a_}"); put("XcConcQLN", f"{b_}"); put("XcConcQLpct", f"{100 * a_ / b_:.0f}")
         a_, b_ = conc(se); put("XcConcSE", f"{a_}"); put("XcConcSEN", f"{b_}"); put("XcConcSEpct", f"{100 * a_ / b_:.0f}")
