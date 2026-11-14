@@ -51,7 +51,7 @@ def pairs(ra, dec, vc, R):
 if __name__ == "__main__":
     # sort: the Gaia archive does not guarantee row order, and the offset realisations below are seeded per row
     g = C.read_gaia().sort_values("source_id").reset_index(drop=True)
-    v = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_components.parquet"))
+    v = C.e1_components()       # positions corrected for the Epoch-1 w-term offsets (02b)
     st = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_subtiles.parquet"))
     print("Gaia rows:", len(g), " VLASS components:", len(v), " subtiles:", len(st))
 
@@ -95,26 +95,30 @@ if __name__ == "__main__":
         SkyCoord(vg.RAJ2000.values[A.icomp] * u.deg, vg.DEJ2000.values[A.icomp] * u.deg)).arcsec
     A["e_pos"] = np.hypot(vg.e_RAJ2000.values[A.icomp] * 3600 * np.cos(np.deg2rad(sv.dec_ep.values[A.istar])),
                           vg.e_DEJ2000.values[A.icomp] * 3600) / np.sqrt(2)          # per-axis catalogue error
+    A["e_corr"] = vg.e_corr.values[A.icomp] if "e_corr" in vg else 0.0                  # per-axis astrometric-correction error
 
     # ---- reliability: extended ML fit of Rayleigh (true) + uniform (background) separations
     Rmax = C.MATCH_R_ARCSEC; N = len(sv)
     lam = (len(offs) / C.N_OFFSETS) / (N * np.pi * Rmax ** 2)                    # background pairs / arcsec^2 / star
+    # per-axis offset variance: catalogue error scaled by a fitted factor k (PyBDSF errors are optimistic), plus a
+    # systematic floor sigma_sys, plus the uncertainty of the Epoch-1 astrometric correction (02b)
     def nll(par):
-        ss, logf = par; f = 1 / (1 + np.exp(-logf)); sig2 = A.e_pos ** 2 + ss ** 2
+        ss, logf, logk = par; f = 1 / (1 + np.exp(-logf)); sig2 = (np.exp(logk) * A.e_pos) ** 2 + ss ** 2 + A.e_corr ** 2
         pt = f * (A.sep / sig2) * np.exp(-A.sep ** 2 / (2 * sig2)); pb = lam * 2 * np.pi * A.sep
         return -(np.log(pt + pb).sum() - f * N - lam * np.pi * Rmax ** 2 * N)
-    res = minimize(nll, [0.3, np.log(60 / N)], method="Nelder-Mead")
-    ss, logf = res.x; f = 1 / (1 + np.exp(-logf)); sig2 = A.e_pos ** 2 + ss ** 2
+    res = minimize(nll, [0.1, np.log(60 / N), np.log(1.5)], method="Nelder-Mead", options=dict(maxiter=20000, xatol=1e-6, fatol=1e-6))
+    ss, logf, logk = res.x; ss = abs(ss); kk = float(np.exp(logk)); f = 1 / (1 + np.exp(-logf))
+    sig2 = (kk * A.e_pos) ** 2 + ss ** 2 + A.e_corr ** 2
     pt = f * (A.sep / sig2) * np.exp(-A.sep ** 2 / (2 * sig2)); pb = lam * 2 * np.pi * A.sep
     A["rel"] = pt / (pt + pb)
-    fit = dict(sigma_sys_arcsec=float(ss), N_true=float(f * N), N_bg_pairs=float(lam * np.pi * Rmax ** 2 * N),
+    fit = dict(sigma_sys_arcsec=float(ss), err_scale_k=kk, e_corr_median=float(np.median(A.e_corr)), N_true=float(f * N), N_bg_pairs=float(lam * np.pi * Rmax ** 2 * N),
                n_rel_gt_0p5=int((A.rel > 0.5).sum()), n_rel_gt_0p9=int((A.rel > 0.9).sum()),
                expected_false_rel_gt_0p5=float((1 - A.rel[A.rel > 0.5]).sum()))
     print(json.dumps(fit, indent=1))
 
     # attach component columns to the pair table and save
     keepc = ["RAJ2000", "DEJ2000", "e_RAJ2000", "e_DEJ2000", "Ftot", "e_Ftot", "Fpeak", "e_Fpeak", "Islrms", "DCMaj",
-             "DCMin", "DCPA", "SCode", "QualFlag", "DupFlag", "MainSample", "NNdist", "PeakToRing", "NVSSdist", "FIRSTdist", "Subtile"]
+             "DCMin", "DCPA", "SCode", "QualFlag", "DupFlag", "MainSample", "NNdist", "PeakToRing", "NVSSdist", "FIRSTdist", "Subtile", "half", "RAJ2000_cat", "DEJ2000_cat"]
     A = pd.concat([A.reset_index(drop=True), vg.iloc[A.icomp][keepc].reset_index(drop=True),
                    sv.iloc[A.istar][["source_id"]].reset_index(drop=True)], axis=1)
     sv.to_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"), compression="zstd")   # not tracked in git: regenerate with this script

@@ -7,8 +7,9 @@ the target, boxes 1.. are bright, compact, isolated Epoch-1 catalog components w
 
 Per image
   * frame tie: median (fit - catalog) offset of the references; its scatter / sqrt(n) is the tie uncertainty
-  * flux scale: median (fit peak / catalog Fpeak) of the references, for an empirical per-epoch scale relative to
-    the Epoch-1 catalog; all fluxes are then divided by QL_FLUX_BIAS (0.87) as for Epoch 1
+  * flux scale: median (fit peak / catalog Fpeak) of the references, an empirical per-epoch scale relative to the
+    Epoch-1 catalog, kept as a check; fluxes are divided by the QL peak bias of their half-epoch (0.85 in 1.1,
+    0.92 later; Kimball et al. 2026). Reference positions are the w-term-corrected Epoch-1 positions (02b).
   * target: 2-D Gaussian fit if the peak within 3" of the star is >= 5 sigma (robust sigma from r > 10"); otherwise
     a forced peak measurement at the star's position
 Per star
@@ -95,8 +96,7 @@ def main():
     sv = pd.read_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"), columns=["source_id", "ra", "dec", "pmra", "pmdec", "parallax", "dist_pc"])
     T = T[["source_id", "main_id", "class", "rel", "RAJ2000", "DEJ2000"]].merge(sv, on="source_id", how="left")
     if a.limit: T = T.head(a.limit)
-    v = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_components.parquet"),
-                        columns=["RAJ2000", "DEJ2000", "Fpeak", "DCMaj", "NNdist", "SCode", "DupFlag"])
+    v = C.e1_components(columns=["RAJ2000", "DEJ2000", "Fpeak", "DCMaj", "NNdist", "SCode", "DupFlag"])
     v = v[(v.DupFlag < 2) & (v.SCode == "S") & (v.Fpeak > 4) & (v.DCMaj < 1.5) & (v.NNdist > 30)].reset_index(drop=True)
     vc = SkyCoord(v.RAJ2000.values * u.deg, v.DEJ2000.values * u.deg)
     wq = pd.read_parquet(os.path.join(C.RAW, "vlass_ql_wcs_cadc.parquet"))
@@ -194,7 +194,7 @@ def main():
     # per-epoch flux scale from all reference measurements, relative to the Epoch-1 catalog
     scale = M.groupby("epoch_label").flux_scale_ref.median().fillna(1.0); M["flux_scale"] = M.epoch_label.map(scale)
     for c in ["peak_mJy", "forced_peak_mJy", "sigma_mJy"]:
-        M[c.replace("_mJy", "_corr_mJy")] = M[c] / M.flux_scale / C.QL_FLUX_BIAS
+        M[c.replace("_mJy", "_corr_mJy")] = M[c] / C.peak_bias(M.epoch_label)
     # global Gaia tie: median radio - star offset over all detections (most detected stars are genuine)
     det = M[M.detected & M.dE_star.notna()]
     gE, gN = det.dE_star.median(), det.dN_star.median()

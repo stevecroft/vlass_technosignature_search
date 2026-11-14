@@ -31,6 +31,8 @@ def simbad_by_gaia(ids):
                 time.sleep(10)
     sb = pd.concat(out, ignore_index=True)
     sb["source_id"] = sb.gid.str.replace("Gaia DR3 ", "").astype("int64")
+    if not len(sb):                                   # none of these stars is in SIMBAD
+        return sb.assign(otypes=pd.Series(dtype=str))
     oids = ",".join(str(int(x)) for x in sb.oid)
     ot = sim.search(f"SELECT oidref, otype FROM otypes WHERE oidref IN ({oids})").to_table().to_pandas()
     ot = ot.groupby("oidref").otype.apply(lambda x: "|".join(sorted(set(map(str, x))))).rename("otypes")
@@ -43,17 +45,26 @@ if __name__ == "__main__":
     cand = A[A.sep < 2.5].copy()
     stars = sv.iloc[cand.istar.unique()]
     print("candidate stars:", len(stars))
+    # reuse the as-fetched tables (SIMBAD is live; re-querying unchanged stars would let classifications drift);
+    # query only stars not yet cached. Delete the two csv files to force a full refresh.
+    fx, fsb = os.path.join(C.RAW, "xray_counterparts.csv"), os.path.join(C.RAW, "simbad_candidates.csv")
+    xr0 = pd.read_csv(fx) if os.path.exists(fx) else pd.DataFrame(columns=["source_id"])
+    sb0 = pd.read_csv(fsb) if os.path.exists(fsb) else pd.DataFrame(columns=["source_id"])
+    new_x = stars[~stars.source_id.isin(xr0.source_id)]; new_s = stars[~stars.source_id.isin(sb0.source_id)]
+    print("not yet cached: X-ray", len(new_x), " SIMBAD", len(new_s))
     rows = []
-    for _, r in stars.iterrows():
+    for _, r in new_x.iterrows():
         a = viz_cone("J/A+A/588/A103/cat2rxs", r.ra, r.dec, 40, "2RXS,CRate,e_CRate,ExiML")
         b = viz_cone("J/A+A/682/A34/erass1-m", r.ra, r.dec, 20, "IAUName,MLFlux1,DETLIKE1")
         gv = lambda x, k: (x[k] if x is not None and k in x.index else np.nan)
         rows.append(dict(source_id=r.source_id, rxs_r=gv(a, "_r"), rxs_crate=gv(a, "CRate"), rxs_name=gv(a, "2RXS"),
                          era_r=gv(b, "_r"), era_F=gv(b, "MLFlux1"), era_name=gv(b, "IAUName")))
         time.sleep(0.3)
-    xr = pd.DataFrame(rows); xr.to_csv(os.path.join(C.RAW, "xray_counterparts.csv"), index=False)
+    xr = pd.concat([xr0, pd.DataFrame(rows)], ignore_index=True) if rows else xr0
+    xr.to_csv(fx, index=False)
     print("2RXS:", int(xr.rxs_r.notna().sum()), " eRASS1:", int(xr.era_r.notna().sum()))
-    sb = simbad_by_gaia(stars.source_id.values); sb.to_csv(os.path.join(C.RAW, "simbad_candidates.csv"), index=False)
+    sb = pd.concat([sb0, simbad_by_gaia(new_s.source_id.values)], ignore_index=True) if len(new_s) else sb0
+    sb.to_csv(fsb, index=False)
     print("SIMBAD identifications:", len(sb))
     near = sv.nsmallest(12, "dist_pc")
     sim = pyvo.dal.TAPService(C.SIMBAD_TAP)

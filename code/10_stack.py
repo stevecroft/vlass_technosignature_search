@@ -2,7 +2,7 @@
 
 Method: exclude detected, confused and near-component stars; per-cutout robust sigma from pixels r >= 8";
 drop sigma > 5x median and non-finite centres; inverse-variance mean in L_nu (W/Hz) and in flux (uJy/beam);
-QL flux bias /0.87; centring-loss correction mean(exp(-r^2/2 sigma_b^2)), sigma_b = 1.06 px; empirical null =
+QL peak bias per half-epoch (0.85 in 1.1, 0.92 in 1.2; Kimball et al. 2026); centring-loss correction mean(exp(-r^2/2 sigma_b^2)), sigma_b = 1.06 px; empirical null =
 stacked image at r = 10-18" (subtract its mean; error = max(formal, null std)). Robustness: top-1% trimming
 (bias measured at 12 null pixels), RA-half jackknife, median stack.
 Fraction-vs-power: stack gives f <= UL95(mean L)/L_T using only shells whose 5th-percentile per-star limit > L_T;
@@ -33,7 +33,7 @@ def wmean(maps, w):
 
 
 def stack(cut, off, dist, beam_sigma_pix=1.06):
-    S = cut / C.QL_FLUX_BIAS * 1e3                                        # mJy/beam
+    S = cut * 1e3                                    # mJy/beam (cut already divided by the per-star QL peak bias)
     sig = robust_sigma(S[:, ANN].reshape(len(S), -1))
     good = np.isfinite(sig) & (sig > 0) & (sig < 5 * np.nanmedian(sig)) & np.isfinite(S[:, HB, HB])
     S, sig, d, o = S[good], sig[good], dist[good], off[good]
@@ -60,6 +60,7 @@ if __name__ == "__main__":
     idx = row.reindex(z["source_id"]).values; okc = np.isfinite(idx)
     print("cutouts:", len(idx), " matched to sample:", int(okc.sum()))
     idx = idx[okc].astype(int); cut = z["cut"][okc]; off = z["off"][okc]
+    cut = cut / C.peak_bias(L.vepoch.values[idx]).astype(np.float32)[:, None, None]   # QL peak bias per half-epoch
     excl = (L.detected | L.confused | L.has_nearby_component).values
     print("excluded stars (detected | confused | non-stellar component < 10\"):", int(excl.sum()))
     keep = ~excl[idx]; idx, cut, off = idx[keep], cut[keep], off[keep]

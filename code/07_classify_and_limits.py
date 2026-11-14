@@ -7,8 +7,9 @@ Background tests for UNEXPLAINED matches:
   * NVSS/FIRST proper-motion test: a radio source that is still at the VLASS position in NVSS (~1994.5) or FIRST (~2000)
     although the star moved more than twice the radio offset since then is stationary -> background.
   * Multi-epoch VLASS astrometry (script 06) for LSPM J1943+5337.
-Limits: non-detections S_lim = (5 + 1.645) * subtile MeanIslrms / 0.87 (95% completeness, flux-bias corrected);
-confused stars (unrelated component < 3") use max(S_lim, that component's flux); detected stars use F/0.87 + 1.645 sigma.
+Limits: non-detections S_lim = (5 + 1.645) * subtile MeanIslrms / peak_bias (95% completeness; QL peak bias 0.85 in
+half-epoch 1.1, 0.92 in 1.2, Kimball et al. 2026); confused stars (unrelated component < 3") use max(S_lim, that
+component's flux); detected stars use (F + 1.645 sigma) / int_bias (integrated bias 0.90 in 1.1, 1.00 in 1.2).
 Population: f < 3.0 / N_eff(L*) (95%, zero unexplained detections), N_eff = stars whose limit is below L*.
 
 Inputs : data/derived/{ms_sample_vlass, matches_10arcsec}.parquet, data/raw/{xray_counterparts, simbad_candidates,
@@ -84,7 +85,7 @@ if __name__ == "__main__":
     T = T.merge(sv[["source_id", "ra", "dec", "pmra", "pmdec", "dist_pc", "bp_rp", "MG", "dMG", "ruwe", "non_single_star",
                     "phot_variable_flag"]], on="source_id", how="left")
     T = T.merge(xr, on="source_id", how="left").merge(sb[["source_id", "main_id", "otype", "sp_type", "otypes"]], on="source_id", how="left")
-    T["Lnu_R_WHz"] = C.lum(T.Ftot / C.QL_FLUX_BIAS, T.dist_pc)
+    T["S_corr_mJy"] = T.Ftot / C.int_bias(T.half); T["Lnu_R_WHz"] = C.lum(T.S_corr_mJy, T.dist_pc)
     T["FX_cgs"] = np.where(T.era_F.notna(), T.era_F, T.rxs_crate * ECF_2RXS)
     T["LX_erg_s"] = T.FX_cgs * 4 * np.pi * (T.dist_pc * PC_CM) ** 2
     T["logGB"] = np.log10(T.LX_erg_s / (T.Lnu_R_WHz * 1e7))
@@ -111,15 +112,15 @@ if __name__ == "__main__":
 
     # ---------------- per-star limits
     L = sv[["source_id", "ra", "dec", "parallax", "dist_pc", "bp_rp", "MG", "dMG", "phot_g_mean_mag", "ruwe", "non_single_star",
-            "sub_rms", "subtile", "obs_jyear"]].copy()
-    L["S_lim_mJy"] = (C.DET_SIGMA + C.Z95) * L.sub_rms / C.QL_FLUX_BIAS
-    near = A[(A.sep_star_epoch < 3.0) & (A.rel < 0.5)].copy(); near["F"] = near.Ftot / C.QL_FLUX_BIAS
+            "sub_rms", "subtile", "vepoch", "obs_jyear"]].copy()
+    L["S_lim_mJy"] = (C.DET_SIGMA + C.Z95) * L.sub_rms / C.peak_bias(L.vepoch)
+    near = A[(A.sep_star_epoch < 3.0) & (A.rel < 0.5)].copy(); near["F"] = near.Ftot / C.int_bias(near.half)
     conf = near.groupby("istar").F.max()
     L["confused"] = False; L.loc[conf.index, "confused"] = True
     L.loc[conf.index, "S_lim_mJy"] = np.maximum(L.loc[conf.index, "S_lim_mJy"], conf.values)
     det = A[A.rel > 0.5]
     L["detected"] = False; L.loc[det.istar.values, "detected"] = True
-    L.loc[det.istar.values, "S_lim_mJy"] = (det.Ftot.values + C.Z95 * det.e_Ftot.values) / C.QL_FLUX_BIAS
+    L.loc[det.istar.values, "S_lim_mJy"] = (det.Ftot.values + C.Z95 * det.e_Ftot.values) / C.int_bias(det.half.values)
     L["Lnu_lim_WHz"] = C.lum(L.S_lim_mJy, L.dist_pc); L["EIRP_lim_W_2GHz"] = L.Lnu_lim_WHz * C.BAND_HZ
     # stars with any non-secure catalogued component within 10" (excluded from stacking in script 10)
     L["has_nearby_component"] = False; L.loc[A[A.rel <= 0.5].istar.unique(), "has_nearby_component"] = True

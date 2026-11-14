@@ -23,6 +23,10 @@ def fas(x, d=1):
     return f"{x:.{d}f}".replace(".", "\\farcs")
 
 
+def C_PEAK(label):
+    return 0.85 if label == "1.1" else 0.92          # QL peak bias (Kimball et al. 2026), as code/common.peak_bias
+
+
 def com(n): return f"{int(n):,}".replace(",", "{,}")
 def put(name, val): macros[name] = val
 
@@ -43,6 +47,11 @@ if __name__ == "__main__":
         put(k, com(cnt[n]))
     put("NOffOne", f"{cnt['offset_pairs_lt1_per_realisation']:.1f}")
     put("EpochMin", f"{cnt['obs_epoch_min']:.1f}"); put("EpochMax", f"{cnt['obs_epoch_max']:.1f}")
+    put("ErrScaleK", f"{fit.get('err_scale_k', 1.0):.2f}"); put("EcorrMed", f"{fit.get('e_corr_median', 0.0):.2f}")
+    ea = json.load(open(os.path.join(DER, "e1_astrometry_summary.json")))
+    put("EOnePairs", com(ea["n_pairs"])); put("EOneDNsouth", f"{ea['bands']['-41_-20']['dN']:.2f}")
+    put("EOneDNnorth", f"{abs(ea['bands']['60_90']['dN']):.2f}")
+    for k_, v_ in [("EOneNsub", "subtile"), ("EOneNtile", "tile"), ("EOneNdec", "declination")]: put(k_, com(ea["source_counts"].get(v_, 0)))
     put("SigSys", f"{fit['sigma_sys_arcsec']:.2f}"); put("NTrue", f"{fit['N_true']:.0f}"); put("NSecure", str(fit["n_rel_gt_0p5"]))
     put("NRelNine", str(fit["n_rel_gt_0p9"])); put("NFalseSecure", f"{fit['expected_false_rel_gt_0p5']:.1f}")
 
@@ -73,6 +82,15 @@ if __name__ == "__main__":
     put("NImgPerStarMin", str(int(va.n_images.min()))); put("NImgPerStarMax", str(int(va.n_images.max())))
     fs = me.groupby("epoch_label").flux_scale.first()
     put("FluxScaleMin", f"{fs.min():.2f}"); put("FluxScaleMax", f"{fs.max():.2f}")
+    # the reference-source scale (later epoch / Epoch-1 catalogue) predicted by the Kimball et al. biases: the x.1
+    # half-epochs re-observe the 1.1 sky (peak bias 0.85), the x.2 half-epochs the 1.2 sky (0.92)
+    lab = fs.index.map(lambda v: f"{v:.1f}")
+    pred = np.array([C_PEAK(l) / (C_PEAK("1.1") if l.endswith(".1") else C_PEAK("1.2")) for l in lab])
+    dev = np.abs(fs.values / pred - 1)[np.array([not l.startswith("1.") for l in lab])]
+    put("FsAgree", f"{100 * dev.max():.0f}")
+    _o = va.set_index("source_id"); _off = lambda sid: float(np.hypot(_o.offset_E[sid], _o.offset_N[sid]))
+    put("GNineOff", f"{_off(_o.index[_o.main_id.astype(str).str.replace(' ', '') == 'G9-38B'][0]):.1f}")
+    put("CDOff", f"{_off(5970189504209690496):.1f}")
     cm = va[va.motion == "co-moving"]
     put("LeverMin", f"{cm.lever_arm_arcsec.min():.1f}"); put("LeverMax", f"{cm.lever_arm_arcsec.max():.1f}")
     put("LeverMed", f"{cm.lever_arm_arcsec.median():.1f}")
@@ -115,12 +133,12 @@ if __name__ == "__main__":
     q12 = ast[ast.image == "QL 1.2"].iloc[0]; s12 = ast[ast.image == "SE 1.2"].iloc[0]
     put("LspmQLSEdE", f"{abs(q12.tgt_E - s12.tgt_E):.2f}"); put("LspmQLSEdN", f"{abs(q12.tgt_N - s12.tgt_N):.2f}")
     put("LspmPA", f"{lspm.DCPA:.0f}")
-    _L = 4 * np.pi * (lspm.dist_pc * 3.0857e16) ** 2 * lspm.Ftot / 0.87 * 1e-29
+    _L = 4 * np.pi * (lspm.dist_pc * 3.0857e16) ** 2 * lspm.S_corr_mJy * 1e-29
     _e = int(np.floor(np.log10(_L))); put("LspmL", f"{_L / 10**_e:.1f}\\times10^{{{_e}}}")
     _v = pd.read_csv(os.path.join(RES, "vlass_detections_variability.csv")).set_index("source_id").loc[2137474969751117312]
     put("LspmOffAU", f"{np.hypot(_v.offset_E, _v.offset_N) * lspm.dist_pc:.0f}")
     put("LspmOffArcsec", f"{np.hypot(_v.offset_E, _v.offset_N):.1f}")
-    put("LspmS", f"{lspm.Ftot / 0.87:.2f}")   # flux-scale corrected, as in Table 1
+    put("LspmS", f"{lspm.S_corr_mJy:.2f}")   # flux-scale corrected, as in Table 1
     put("LspmSep", f"{lspm.sep:.2f}"); put("LspmRel", f"{lspm.rel:.3f}"); put("LspmDist", f"{lspm.dist_pc:.0f}")
     put("LspmMaj", f"{lspm.DCMaj:.1f}"); put("LspmMin", f"{lspm.DCMin:.1f}")
 
@@ -248,7 +266,7 @@ if __name__ == "__main__":
         xflag = (("R" if np.isfinite(r.rxs_r) else "") + ("E" if np.isfinite(r.era_r) else "")) or ND
         gbs = f"{r.logGB:.2f}" if np.isfinite(r.logGB) else ND
         nm1 = clean_name(r.main_id, r.source_id); nm1 = r"\nodata" if nm1.startswith("{Gaia DR3") else nm1
-        rows.append(f"{nm1} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & {r.sep:.2f} & {r.rel:.3f} & {r.Ftot/0.87:.2f} & "
+        rows.append(f"{nm1} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & {r.sep:.2f} & {r.rel:.3f} & {r.S_corr_mJy:.2f} & "
                     f"{np.log10(r.Lnu_R_WHz):.2f} & {xflag} & {gbs} & {mflags(r.multiplicity_evidence)} & {rflags(r.source_id)} & "
                     f"{code.get(r['class'], r['class'])} " + r"\\")
     open(os.path.join(HERE, "tables", "secure_matches.tex"), "w").write(r"""{\setlength{\tabcolsep}{2.5pt}  % group: keep the narrow spacing local to this table
@@ -261,7 +279,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density divided by 0.87 (Quick Look flux-scale correction). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalogue without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): M = multiple or over-luminous; Fl = flare star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}). Machine-readable version in the reproducibility package.}
+\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density corrected for the Quick Look integrated-flux bias (divided by 0.90 in half-epoch 1.1; \citealt{Kimball2026}). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalogue without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): M = multiple or over-luminous; Fl = flare star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}). Machine-readable version in the reproducibility package.}
 \end{deluxetable*}
 }
 """)
@@ -395,7 +413,7 @@ if __name__ == "__main__":
         put("XcSEratio", f"{np.sum(w * v) / w.sum():.2f}"); put("XcSEratioErr", f"{w.sum() ** -0.5:.2f}")
         put("XcSEratioN", str(sum(pc[c]["flux_n"] for c in se)))
         put("XcSEratioRange", f"{v.min():.2f}--{v.max():.2f}")
-        put("XcBiasImplied", f"{0.87 * np.sum(w * v) / w.sum():.2f}")
+        put("XcBiasImplied", f"{0.92 * np.sum(w * v) / w.sum():.2f}")
         sq = X["SE3_vs_QL3"]; put("XcSEoverQL", f"{sq['peak_ratio_SE_over_QL']:.3f}"); put("XcSEoverQLErr", f"{sq['peak_ratio_err']:.3f}")
         put("XcSEoverQLN", str(sq["n"])); put("XcSEQLpos", f"{max(sq['pos_diff_rstd_E'], sq['pos_diff_rstd_N']):.2f}")
         asys = X["candidates"]["astrometric_sys_arcsec"]
@@ -422,6 +440,11 @@ if __name__ == "__main__":
             put(f"XcMed{s.capitalize()}", str(M["by_status"][s])); put(f"XcMed{s.capitalize()}Tested", str(M["tested_by_status"][s]))
         put("XcMedChance", f"{M['chance_expected']:.0f}"); put("XcMedRms", f"{1000 * M['Isl_rms_median_near_stars']:.0f}")
         put("XcNCat", str(len(ql) + len(se) + 1))
+        put("XcSEcons", f"{100 * (np.sum(w * v) / w.sum() - 1):.0f}")
+        # V376 Cep: known RS CVn radio star below R = 0.5 after the Epoch-1 astrometric correction
+        _A = pd.read_parquet(os.path.join(DER, "matches_10arcsec.parquet")); _v = _A[_A.source_id == 2299477768899190400].sort_values("sep").iloc[0]
+        _M = pd.read_parquet(os.path.join(DER, "epoch_catalog_matches.parquet")); _m = _M[(_M.source_id == 2299477768899190400) & _M.cat.str.startswith("QL3")]
+        put("VCepSep", f"{_v.sep:.2f}"); put("VCepRel", f"{_v.rel:.2f}"); put("VCepLaterSep", f"{_m.m_sep.min():.2f}")
         EC = pd.read_csv(os.path.join(RES, "epoch_catalog_candidates.csv"))
         mv = EC[(EC.dof_2 >= 2) & (EC.motion_span_arcsec > 5)].sort_values("motion_span_arcsec", ascending=False)
         mv = mv.drop_duplicates(subset=["chi2_stationary"])      # a binary's two stars can share one radio source

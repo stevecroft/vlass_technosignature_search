@@ -1,8 +1,10 @@
 {
- "sigma_sys_arcsec": 0.22765733046631792,
- "N_true": 48.188523617420174,
- "N_bg_pairs": 330.3,
- "n_rel_gt_0p5": 50,
- "n_rel_gt_0p9": 44,
- "expected_false_rel_gt_0p5": 2.4751110942980024
+ "sigma_sys_arcsec": 0.0390465187819392,
+ "err_scale_k": 1.5018927813933818,
+ "e_corr_median": 0.056435804238089846,
+ "N_true": 50.01746166416171,
+ "N_bg_pairs": 330.00000000000006,
+ "n_rel_gt_0p5": 51,
+ "n_rel_gt_0p9": 48,
+ "expected_false_rel_gt_0p5": 1.5156848131871394
 }

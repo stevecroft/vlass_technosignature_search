@@ -23,7 +23,7 @@ Steps
   B. Each star-epoch is matched to the catalogue(s) of its own half-epoch: star propagated (proper motion + parallax)
      to the component's MJD; nearest component within R_POS = 4" recorded, a match is <= R_MATCH = 2.5" and S/N >= 5.
      Chance: the same at the 8 control positions 14" away used by 18. SE: only star-epochs inside an SE image.
-  C. Flux scale: forced S_mJy x QL_FLUX_BIAS x fs vs QL Peak_flux (both QL image scale) -> per-epoch kappa;
+  C. Flux scale: forced S_mJy x peak_bias vs QL Peak_flux (both QL image scale) -> per-epoch kappa;
      forced S_mJy (corrected to the true scale) vs SE Peak_flux -> check of the QL bias correction.
   D. Own-epoch confusion veto: predicted contamination at the measurement position from that epoch's catalogue
      (components within 15", elliptical Gaussians, Maj/Min floored at the beam), excluding components within
@@ -145,8 +145,7 @@ def reduce_catalogues(sv):
 
 
 def e1_catalogue():
-    v = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_components.parquet"),
-                        columns=["RAJ2000", "DEJ2000", "e_RAJ2000", "e_DEJ2000", "Ftot", "Fpeak", "e_Fpeak", "Maj", "Min", "PA",
+    v = C.e1_components(columns=["RAJ2000", "DEJ2000", "e_RAJ2000", "e_DEJ2000", "Ftot", "Fpeak", "e_Fpeak", "Maj", "Min", "PA",
                                  "Islrms", "SCode", "DupFlag", "QualFlag", "BMaj", "BMin"])
     v = v[v.DupFlag < 2]
     return pd.DataFrame(dict(cat="E1", RA=v.RAJ2000.values, DEC=v.DEJ2000.values,
@@ -251,7 +250,8 @@ if __name__ == "__main__":
     me = pd.read_csv(os.path.join(C.RES, "vlass_detections_multiepoch.csv"))
     fscale = me.groupby("epoch_label").flux_scale.first(); fscale.index = fscale.index.map(lambda v: f"{v:.1f}")
     LT["fs"] = LT.half_epoch.map(fscale).astype(float).values
-    LT["sig_cat"] = LT.sigma_mJy * LT.fs * C.QL_FLUX_BIAS * kappa      # = eta * sigma_raw (QL image scale)
+    LT["bp"] = C.peak_bias(LT.half_epoch.values)
+    LT["sig_cat"] = LT.sigma_mJy * LT.bp * kappa      # = eta * sigma_raw (QL image scale)
     chk = LT[LT.pred_contam > 0]; res["contam_snr_check_max_dev"] = float(np.abs(kappa * chk.pred_contam / chk.sig_cat - chk.contam_snr).max())
     LT["ra_e"], LT["de_e"] = C.propagate(LT.ra.values, LT.dec.values, LT.pmra.values, LT.pmdec.values, LT.ep.values, plx=LT.parallax.values)
     LT["veto_own"] = LT.veto.values; CVown = CV18.copy(); LT["veto_cat"] = "E1(adopted)"; LT["own_contam_snr"] = LT.contam_snr
@@ -265,7 +265,7 @@ if __name__ == "__main__":
             cov = covered(X.ra_e.values, X.de_e.values, IM[IM.cat == cat] if cat in PARTIAL else None)
             Xc = X[cov]
             P = match(Xc, K, t)
-            Lc = Xc[["source_id", "tag", "half_epoch", "ep", "S_mJy", "sigma_mJy", "snr", "fs", "veto", "detected"]].copy()
+            Lc = Xc[["source_id", "tag", "half_epoch", "ep", "S_mJy", "sigma_mJy", "snr", "fs", "bp", "veto", "detected"]].copy()
             Lc["cat"] = cat; Lc = Lc.join(P.drop(columns=["comp"]).add_prefix("m_"))
             nch = np.zeros(len(Xc), int)
             for j in range(N_CTRL):
@@ -304,11 +304,11 @@ if __name__ == "__main__":
                  n_cat_forced_lt5_unvetoed_nonsecure=int(((cm.snr < THR) & ~cm.veto & ~cm.detected).sum()))
         q = cm[(cm.m_SNR >= 10) & (cm.m_Flag == 0) & (cm.m_sep <= 1.0)]
         if len(q) >= 3:
-            rq = q.S_mJy * q.fs * C.QL_FLUX_BIAS / q.m_Peak_flux        # QL-image-scale ratio (-> kappa for QL catalogues)
+            rq = q.S_mJy * q.bp / q.m_Peak_flux        # QL-image-scale ratio (-> kappa for QL catalogues)
             rt = q.S_mJy / q.m_Peak_flux                                # true-scale ratio (-> QL bias check for SE)
             d.update(flux_n=int(len(q)), ratio_qlscale=float(np.median(rq)), ratio_qlscale_err=float(1.2533 * rstd(rq) / np.sqrt(len(q))),
                      ratio_true=float(np.median(rt)), ratio_true_err=float(1.2533 * rstd(rt) / np.sqrt(len(q))),
-                     kappa_implied=float(kappa * np.median(rq)), ql_bias_implied=float(C.QL_FLUX_BIAS * np.median(rt)))
+                     kappa_implied=float(kappa * np.median(rq)), ql_bias_implied=float(np.median(q.bp) * np.median(rt)))
         q2 = cm[cm.m_SNR >= 10]
         if len(q2) >= 5:
             for ax, e in (("dE", "m_E_RA"), ("dN", "m_E_DEC")):

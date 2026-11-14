@@ -10,6 +10,6 @@
  "n_subtiles": 35285,
  "obs_epoch_min": 2017.6852223553121,
  "obs_epoch_max": 2019.5385280249448,
- "real_pairs_lt1": 53,
- "offset_pairs_lt1_per_realisation": 2.8
+ "real_pairs_lt1": 54,
+ "offset_pairs_lt1_per_realisation": 3.4
 }

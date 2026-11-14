@@ -2,13 +2,13 @@
  "per_tag": {
   "ep1": {
    "n_star_epochs": 207899,
-   "n_veto": 22,
-   "n_ge5": 41
+   "n_veto": 23,
+   "n_ge5": 40
   },
   "ep2": {
    "n_star_epochs": 208016,
-   "n_veto": 22,
-   "n_ge5": 62
+   "n_veto": 24,
+   "n_ge5": 63
   },
   "ep3": {
    "n_star_epochs": 207153,
@@ -17,28 +17,28 @@
   },
   "ep4": {
    "n_star_epochs": 97040,
-   "n_veto": 7,
+   "n_veto": 9,
    "n_ge5": 24
   }
  },
- "n_stars_coadd": 208165,
- "n_star_epochs_trials": 719863,
- "ctrl_rate_coadd_per_star": 5.7051643147377e-05,
- "ctrl_rate_per_epoch": 1.7366520058504334e-05,
+ "n_stars_coadd": 208163,
+ "n_star_epochs_trials": 719855,
+ "ctrl_rate_coadd_per_star": 5.464992817438011e-05,
+ "ctrl_rate_per_epoch": 1.632473014265904e-05,
  "n_candidate_stars": 160,
  "n_explained": 143,
  "n_multiplicity_only": 11,
  "n_cand_coadd": 113,
  "n_cand_epoch": 138,
  "k_steady": 7,
- "b_steady": 11.876155295773733,
- "mu95_steady": 5.338722466521461,
+ "b_steady": 11.376092998563488,
+ "mu95_steady": 5.456460962158217,
  "k_snap": 16,
- "b_snap": 12.501515228875105,
- "mu95_snap": 12.151261898429027,
+ "b_snap": 11.751438616843823,
+ "mu95_snap": 12.782502271219036,
  "k_unexplained": 17,
- "b_expected": 11.876155295773733,
- "mu95_hidden": 5.338722466521461,
- "n_vetoed_star_epochs": 71,
- "n_stars_any_veto": 25
+ "b_expected": 11.376092998563488,
+ "mu95_hidden": 5.456460962158217,
+ "n_vetoed_star_epochs": 76,
+ "n_stars_any_veto": 26
 }

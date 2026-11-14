@@ -30,7 +30,12 @@ VLASS_CAT = "J/ApJS/255/30"                                       # Gordon et al
 
 # ---------------------------------------------------------------- constants / conventions
 PC_M = 3.0857e16          # parsec in metres
-QL_FLUX_BIAS = 0.87       # QL fluxes ~13% low: divide catalogue/image fluxes by this
+# QL flux-density biases (Kimball et al. 2026, from calibrators observed in OTF mode vs pointed observations):
+# peak intensities are low by ~15% in half-epoch 1.1 (antenna pointing errors) and by ~8% in later half-epochs
+# (residual phase errors); integrated flux densities are low by ~10% in 1.1 and accurate to ~3% otherwise.
+# Divide QL peak (image pixel, PyBDSF Peak_flux / Fpeak, rms) values by peak_bias(), total fluxes by int_bias().
+QL_PEAK_BIAS_11, QL_PEAK_BIAS = 0.85, 0.92
+QL_INT_BIAS_11, QL_INT_BIAS = 0.90, 1.00
 Z95 = 1.645               # one-sided 95%
 DET_SIGMA = 5.0           # PyBDSF detection threshold (sigma)
 BAND_HZ = 2e9             # VLASS 2-4 GHz: EIRP = L_nu * 2 GHz for a flat band-filling signal
@@ -84,6 +89,43 @@ def write_gaia(df):
     h = (len(df) + 1) // 2
     for p, part in zip(GAIA_PARTS, (df.iloc[:h], df.iloc[h:])):
         part.to_parquet(p, index=False, compression="zstd")
+
+
+def _half_str(half):
+    h = np.asarray(half)
+    return np.char.strip(h.astype(str)) if h.dtype.kind in "US" else np.char.mod("%.1f", h.astype(float))
+
+
+def peak_bias(half):
+    """QL peak-intensity bias for each half-epoch label (e.g. '1.1', 3.2)."""
+    return np.where(_half_str(half) == "1.1", QL_PEAK_BIAS_11, QL_PEAK_BIAS)
+
+
+def int_bias(half):
+    """QL integrated-flux bias for each half-epoch label."""
+    return np.where(_half_str(half) == "1.1", QL_INT_BIAS_11, QL_INT_BIAS)
+
+
+E1_OFFSETS = os.path.join(RAW, "vlass_e1ql_position_offsets.csv")
+
+
+def e1_components(columns=None, corrected=True):
+    """The CIRADA Epoch-1 QL component table with (by default) positions corrected for the w-term offsets of the
+    uncorrected Epoch-1 images (per-subtile offsets from 02b_e1_astrometry.py; originals kept as RAJ2000_cat,
+    DEJ2000_cat), plus 'half' (1.1 or 1.2) from the subtile table."""
+    need = None if columns is None else sorted(set(columns) | {"RAJ2000", "DEJ2000", "Subtile"})
+    v = pd.read_parquet(os.path.join(RAW, "vlass_e1ql_components.parquet"), columns=need)
+    sub = v.Subtile.astype(str).str.strip()
+    st = pd.read_parquet(os.path.join(RAW, "vlass_e1ql_subtiles.parquet"), columns=["Subtile", "Epoch"])
+    v["half"] = sub.map(pd.Series(st.Epoch.astype(str).str.strip().values, index=st.Subtile.str.strip())).values
+    if corrected:
+        o = pd.read_csv(E1_OFFSETS).set_index("Subtile")
+        dE = sub.map(o.dE).fillna(0.0).values; dN = sub.map(o.dN).fillna(0.0).values
+        if "eE" in o: v["e_corr"] = np.hypot(sub.map(o.eE).fillna(0.1).values, sub.map(o.eN).fillna(0.1).values) / np.sqrt(2)
+        v["RAJ2000_cat"], v["DEJ2000_cat"] = v.RAJ2000.values, v.DEJ2000.values
+        v["DEJ2000"] = v.DEJ2000_cat.values - dN / 3600.0
+        v["RAJ2000"] = v.RAJ2000_cat.values - dE / 3600.0 / np.cos(np.deg2rad(v.DEJ2000.values))
+    return v
 
 
 def image_mjd(wq):

@@ -9,7 +9,7 @@ cutout from 09_download_cutouts.py, centred on its proper-motion-propagated posi
   * repeat the same estimator at 8 control positions 14" from the star (same sub-pixel phase), which gives the
     empirical noise normalisation eta (std of S/sigma at blank positions) and the empirical >=5 sigma false-positive
     rate per trial, including sidelobes and unrelated sources,
-  * correct for the per-half-epoch flux scale measured from compact reference sources in 14 and the 0.87 QL bias.
+  * correct for the QL peak bias of each half-epoch (0.85 in 1.1, 0.92 later; Kimball et al. 2026).
 
 Calibration (written to data/derived/forced_calibration.json):
   kappa = peak-loss factor of the bilinear estimator, S_true = S_bilinear / kappa. Adopted from injection-recovery:
@@ -156,7 +156,7 @@ if __name__ == "__main__":
         cal[tag] = dict(eta=eta)
         if comp_tree is None:
             from scipy.spatial import cKDTree
-            comp = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_components.parquet"), columns=["RAJ2000", "DEJ2000", "BMaj", "BMin", "BPA"])
+            comp = C.e1_components(columns=["RAJ2000", "DEJ2000", "BMaj", "BMin", "BPA"])
             cx = np.c_[np.cos(np.deg2rad(comp.DEJ2000)) * np.cos(np.deg2rad(comp.RAJ2000)), np.cos(np.deg2rad(comp.DEJ2000)) * np.sin(np.deg2rad(comp.RAJ2000)), np.sin(np.deg2rad(comp.DEJ2000))]
             comp_tree = cKDTree(cx)
         if tag == "ep1":    # adopted peak-loss factor: injection of the restoring beam through this exact estimator
@@ -169,9 +169,9 @@ if __name__ == "__main__":
         from scipy.stats import norm
         rec = IJ.groupby("level").apply(lambda q: pd.Series(dict(frac_det=np.mean(q.snr_after >= 5), model=norm.cdf(q.name - 5),
                                                                  kappa_inj=np.median(q.kappa_inj), n=len(q))), include_groups=False)
-        fs = F.half_epoch.map(fscale).astype(float).values
-        F["S_mJy"] = F.S_raw / kappa / fs / C.QL_FLUX_BIAS
-        F["sigma_mJy"] = eta * F.sig_raw / kappa / fs / C.QL_FLUX_BIAS
+        bp = C.peak_bias(F.half_epoch.astype(str).values)                    # QL peak bias (Kimball et al. 2026)
+        F["S_mJy"] = F.S_raw / kappa / bp
+        F["sigma_mJy"] = eta * F.sig_raw / kappa / bp
         F["snr"] = F.S_raw / (eta * F.sig_raw)
         F["snr_maxcore"] = F.maxcore_raw / (eta * F.sig_raw)
         zc = z / eta

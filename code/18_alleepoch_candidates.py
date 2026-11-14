@@ -63,7 +63,7 @@ if __name__ == "__main__":
     sv = pd.read_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"),
                          columns=["source_id", "ra", "dec", "pmra", "pmdec", "parallax", "dist_pc", "bp_rp", "MG", "dMG", "ruwe", "non_single_star"])
     L = pd.read_parquet(os.path.join(C.RES, "vlass_perstar_limits_100pc_MS.parquet"), columns=["source_id", "detected"])
-    v = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_components.parquet"), columns=["RAJ2000", "DEJ2000", "Ftot", "Fpeak", "Maj", "Min", "PA", "BMaj", "BMin", "DupFlag"])
+    v = C.e1_components(columns=["RAJ2000", "DEJ2000", "Ftot", "Fpeak", "Maj", "Min", "PA", "BMaj", "BMin", "DupFlag"])
     v = v[v.DupFlag < 2].reset_index(drop=True)
     v["Maj"] = np.maximum(v.Maj, v.BMaj); v["Min"] = np.maximum(v.Min, v.BMin)   # ~25% of fits report zero axes
     tree = cKDTree(xyz(v.RAJ2000.values, v.DEJ2000.values))

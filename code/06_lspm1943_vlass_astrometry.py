@@ -86,7 +86,7 @@ def fetch_cutouts(files, coords, half_arcsec=14):
 if __name__ == "__main__":
     A = pd.read_parquet(os.path.join(C.DER, "matches_10arcsec.parquet"))
     sv = pd.read_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"))
-    v = pd.read_parquet(os.path.join(C.RAW, "vlass_e1ql_components.parquet"))
+    v = C.e1_components()
     star = sv[sv.source_id == STAR].iloc[0]
     comp = pd.read_csv(os.path.join(IMG, "gaia_neighbours.csv")).query("source_id == @COMPANION").iloc[0]
     m = A[A.source_id == STAR].sort_values("sep").iloc[0]; RA0, DE0 = m.RAJ2000, m.DEJ2000
