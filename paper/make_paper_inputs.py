@@ -255,6 +255,7 @@ if __name__ == "__main__":
         from scipy.stats import chi2 as _chi2
         _PC = 3.0857e16; _Sz = 1e10 * 3.0 / 2e9; _Lz = _Sz * 1e-26 * 4 * np.pi * (200 * _PC) ** 2
         _floor1 = lambda x: (lambda e, m: (f"{m}\\times" if m > 1 else "") + f"10^{{{e}}}")(int(np.floor(np.log10(x))), int(x / 10 ** int(np.floor(np.log10(x)))))   # round DOWN, 1 sig. fig.
+        _nc = PA["class"].value_counts(); put("NRatioMA", f"{_nc['M'] / _nc['AFGK']:.1f}"); put("SqrtRatioMA", f"{np.sqrt(_nc['M'] / _nc['AFGK']):.1f}")
         put("ZuckSband", f"{_Sz:.0f}"); put("ZuckL", sci(_Lz)); put("ZuckEIRP", sci(_Lz * 2e9))
         put("ZuckMarginMed", _floor1(_Lz / PA.L_lim_steady.median())); put("ZuckMarginWorst", _floor1(_Lz / PA.L_lim_steady.max()))
         put("LlimAllMax", sci(PA.L_lim_steady.max()))
