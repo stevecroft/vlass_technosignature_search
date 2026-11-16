@@ -59,7 +59,7 @@ if __name__ == "__main__":
     T = pd.read_csv(os.path.join(RES, "vlass_star_matches_classified.csv")); xr = pd.read_csv(os.path.join(RAW, "xray_counterparts.csv"))
     put("NCand", str(len(xr))); put("NRxs", str(int(xr.rxs_r.notna().sum()))); put("NEra", str(int(xr.era_r.notna().sum())))
     S = T[T.secure].copy(); vc = S["class"].value_counts()
-    CLS = [("multiple or over-luminous", "Mult", "M"), ("flare star", "Flare", "Fl"), ("RS CVn binary", "RS", "RS"), ("BY Dra variable", "BY", "BY"),
+    CLS = [("UNEXPLAINED", "Unexpl", "U"), ("flare star", "Flare", "Fl"), ("RS CVn binary", "RS", "RS"), ("BY Dra variable", "BY", "BY"),
            ("young star", "Young", "Y"), ("cataclysmic variable", "CV", "CV"), ("X-ray-active star", "XA", "X"), ("magnetic CP star", "CP", "CP")]
     for c, k, _ in CLS: put(f"NC{k}", str(int(vc.get(c, 0))))
     gv = S["group"].value_counts()
@@ -102,6 +102,22 @@ if __name__ == "__main__":
     put("NSecureX", str(int(S.LX.notna().sum())))
     gb = S.logGB.dropna(); put("GBmed", f"{gb.median():.2f}"); put("GBmin", f"{gb.min():.2f}"); put("GBmax", f"{gb.max():.2f}")
     put("NUnexplained", str(int((S["class"] == "UNEXPLAINED").sum())))
+    put("NExplSecure", str(int((S["class"] != "UNEXPLAINED").sum())))
+    put("NXAMult", str(int(((S["class"] == "X-ray-active star") & (S.multiplicity_evidence.fillna("") != "")).sum())))
+    _pc = pd.read_csv(os.path.join(RES, "vlass_population_limit_curve.csv"))
+    _k1 = int(_pc.k_unexplained.iloc[0]); put("KEOne", str(_k1))
+    from scipy.stats import chi2 as _c2
+    put("MuEOne", f"{0.5 * _c2.ppf(0.95, 2 * (_k1 + 1)):.2f}")
+    # the unexplained secure association (multiplicity evidence only; no X-ray or SIMBAD activity type)
+    _U = S[S["class"] == "UNEXPLAINED"]
+    if len(_U) == 1:
+        _u = _U.iloc[0]
+        put("UnSecName", str(_u.main_id).replace("2MASS ", "2MASS~"))
+        put("UnSecDist", f"{_u.dist_pc:.1f}"); put("UnSecS", f"{_u.S_corr_mJy:.2f}"); put("UnSecRel", f"{_u.rel:.2f}")
+        put("UnSecRUWE", f"{_u.ruwe:.1f}"); put("UnSecdMG", f"{-_u.dMG:.2f}")
+        _F = pd.read_parquet(os.path.join(DER, "alleepoch_forced.parquet"), columns=["source_id", "tag", "snr"])
+        _F = _F[_F.source_id == _u.source_id].set_index("tag").snr
+        put("UnSecSNRone", f"{_F.get('ep1', np.nan):.1f}"); put("UnSecSNRlater", f"{_F.drop('ep1', errors='ignore').max():.1f}")
     put("NNatural", str(int((~S["class"].str.startswith("background") & (S["class"] != "UNEXPLAINED")).sum())))
     put("NBackground", str(int(S["class"].str.startswith("background").sum())))
 
@@ -315,7 +331,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density corrected for the Quick Look integrated-flux bias (divided by 0.90 in half-epoch 1.1; \citealt{Kimball2026}). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalogue without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): M = multiple or over-luminous; Fl = flare star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}). Machine-readable version in the reproducibility package.}
+\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density corrected for the Quick Look integrated-flux bias (divided by 0.90 in half-epoch 1.1; \citealt{Kimball2026}). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalogue without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): Fl = flare star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}); U = unexplained, multiplicity evidence but no activity evidence (Section~\ref{sec:matches}). Machine-readable version in the reproducibility package.}
 \end{deluxetable*}
 }
 """)

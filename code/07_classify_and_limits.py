@@ -1,8 +1,9 @@
 """07 - Classify the VLASS-matched stars, apply background tests, and compute per-star and population limits.
 
-Classification (in priority order): literature overrides (data/raw/classification_overrides.csv), CV*, a2* (magnetic CP),
-RS*/RS?, TT*/Y*O, BY*, Er*/Fl* (flare), multiple or over-luminous (SIMBAD binary types, Gaia NSS > 0, RUWE > 1.4,
-dMG < -0.5), X-ray-active star, else UNEXPLAINED. Multiplicity and activity evidence are recorded in separate columns.
+Classification of the secure associations (R > 0.5), in priority order: literature overrides
+(data/raw/classification_overrides.csv), CV*, a2* (magnetic CP), RS*/RS?, TT*/Y*O, BY*, Er*/Fl* (flare), X-ray-active star,
+else UNEXPLAINED. Multiplicity evidence (SIMBAD binary types, Gaia NSS > 0, RUWE > 1.4, dMG < -0.5) is recorded in its own
+column but does not explain an association, the same rule as for the all-epoch candidates (18).
 Background tests for UNEXPLAINED matches:
   * NVSS/FIRST proper-motion test: a radio source that is still at the VLASS position in NVSS (~1994.5) or FIRST (~2000)
     although the star moved more than twice the radio offset since then is stationary -> background.
@@ -60,7 +61,8 @@ def classify(r):
     if "TT*" in ol or "Y*O" in ol: return "young star"
     if "BY*" in ol: return "BY Dra variable"
     if "Er*" in ol or "Fl*" in ol: return "flare star"
-    if ol & BINARY_OTYPES or r.non_single_star > 0 or r.ruwe > 1.4 or r.dMG < -0.5: return "multiple or over-luminous"
+    # Multiplicity is recorded as evidence (column multiplicity_evidence, figure groups) but is not a radio-emission
+    # mechanism, so it does not explain an association; the same rule as for the all-epoch candidates (18).
     if np.isfinite(r.LX): return "X-ray-active star"
     return "UNEXPLAINED"
 
@@ -80,8 +82,8 @@ if __name__ == "__main__":
     xr = pd.read_csv(os.path.join(C.RAW, "xray_counterparts.csv"))
     sb = pd.read_csv(os.path.join(C.RAW, "simbad_candidates.csv"))
 
-    # ---------------- classification of matches with rel > 0.05
-    T = A[A.rel > 0.05].copy()
+    # ---------------- classification of the secure associations (rel > 0.5), the same set used by every result
+    T = A[A.rel > 0.5].copy()
     T = T.merge(sv[["source_id", "ra", "dec", "pmra", "pmdec", "dist_pc", "bp_rp", "MG", "dMG", "ruwe", "non_single_star",
                     "phot_variable_flag"]], on="source_id", how="left")
     T = T.merge(xr, on="source_id", how="left").merge(sb[["source_id", "main_id", "otype", "sp_type", "otypes"]], on="source_id", how="left")
@@ -120,6 +122,9 @@ if __name__ == "__main__":
     L.loc[conf.index, "S_lim_mJy"] = np.maximum(L.loc[conf.index, "S_lim_mJy"], conf.values)
     det = A[A.rel > 0.5]
     L["detected"] = False; L.loc[det.istar.values, "detected"] = True
+    # secure associations whose emission is explained (natural emitter, or a background source not at the star);
+    # unexplained secure associations are treated like any other star in the all-epoch candidate test (18, 19)
+    L["explained_detection"] = L.source_id.isin(T.source_id[T.secure & (T["class"] != "UNEXPLAINED")])
     L.loc[det.istar.values, "S_lim_mJy"] = (det.Ftot.values + C.Z95 * det.e_Ftot.values) / C.int_bias(det.half.values)
     L["Lnu_lim_WHz"] = C.lum(L.S_lim_mJy, L.dist_pc); L["EIRP_lim_W_2GHz"] = L.Lnu_lim_WHz * C.BAND_HZ
     # stars with any non-secure catalogued component within 10" (excluded from stacking in script 10)

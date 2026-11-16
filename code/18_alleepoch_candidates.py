@@ -1,6 +1,7 @@
 """18 - All-epoch detection candidates from forced photometry, their classification, and the chance background.
 
-A star-epoch is a candidate if its forced S/N (17) is >= 5 and the star is not one of the secure Epoch-1 associations.
+A star-epoch is a candidate if its forced S/N (17) is >= 5 and the star is not an explained secure Epoch-1 association
+(a natural emitter, or a background source not at the star); unexplained secure associations are tested like any star.
   * Confusion veto: the summed contribution at the measurement position of all Epoch-1 catalogue components within
     15" (other than the star's own secure component), each modelled as an elliptical Gaussian with its fitted
     (beam-convolved) Maj, Min, PA and peak, is at least half the detection threshold (kappa * pred >= 2.5 sigma_eff).
@@ -62,7 +63,8 @@ def zech_ul(k, b, cl=0.95):
 if __name__ == "__main__":
     sv = pd.read_parquet(os.path.join(C.DER, "ms_sample_vlass.parquet"),
                          columns=["source_id", "ra", "dec", "pmra", "pmdec", "parallax", "dist_pc", "bp_rp", "MG", "dMG", "ruwe", "non_single_star"])
-    L = pd.read_parquet(os.path.join(C.RES, "vlass_perstar_limits_100pc_MS.parquet"), columns=["source_id", "detected"])
+    L = pd.read_parquet(os.path.join(C.RES, "vlass_perstar_limits_100pc_MS.parquet"), columns=["source_id", "explained_detection"])
+    L = L.rename(columns={"explained_detection": "detected"})      # 'detected' below = excluded as an explained secure association
     v = C.e1_components(columns=["RAJ2000", "DEJ2000", "Ftot", "Fpeak", "Maj", "Min", "PA", "BMaj", "BMin", "DupFlag"])
     v = v[v.DupFlag < 2].reset_index(drop=True)
     v["Maj"] = np.maximum(v.Maj, v.BMaj); v["Min"] = np.maximum(v.Min, v.BMin)   # ~25% of fits report zero axes

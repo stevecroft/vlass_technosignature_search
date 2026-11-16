@@ -118,9 +118,13 @@ component parquet holds exactly the same data.
 - **Positional model** (proper motion and parallax): σ_i² = (k·σ_cat)² + σ_corr² + σ_sys² with k = 1.50, σ_sys = 0.04″ per axis;
   50 genuine stellar detections; **51 matches with reliability > 0.5** (48 with R > 0.9; 1.5 expected false). V376 Cep drops to R = 0.01
   (corrected Epoch-1 offset 0.65″ vs 0.14″ in QL3.1) and is treated as confusion-limited.
-- **Classification of the 51** (SIMBAD types first; multiplicity and activity evidence recorded separately):
+- **Classification of the 51** (secure associations only, R > 0.5; SIMBAD types first; an association is explained only by
+  activity evidence, X-ray or a SIMBAD activity type, the same rule as for the all-epoch candidates; multiplicity is recorded
+  separately and explains nothing):
   - 9 flare stars, 6 RS CVn, 6 BY Dra, 4 young stars, 2 CVs, 1 magnetic CP star;
-  - 20 multiple or over-luminous stars without a more specific type, 2 X-ray-active stars;
+  - 21 X-ray-active stars without a more specific type (19 with multiplicity evidence);
+  - 1 unexplained: 2MASS J17022950+1341015 (M dwarf, 30.5 pc; RUWE 5.3, over-luminous; SIMBAD Em*; Epoch 1 only,
+    forced S/N 4.9 then <2, so not an all-epoch candidate);
   - 1 radio source not coincident with its star (LSPM J1943+5337).
   - 30 of the 51 are in the Sydney Radio Star Catalogue (11 circularly polarized); 41 are in De et al. (2024).
 - **Multi-epoch (VLASS 1.1–4.1, 177 independent images):** 44/51 variable; 21 co-moving with their star, 17 inconclusive, 12 single-epoch, none stationary.
@@ -142,7 +146,7 @@ component parquet holds exactly the same data.
 - **Per-star limits (95%, all epochs, steady):** median 0.54 mJy, L_ν < 4.0×10⁸ W Hz⁻¹; Barnard's star L_ν < 2.3×10⁵ W Hz⁻¹
   (Epoch-1 catalogue analysis: median 1.09 mJy; Barnard 5.1×10⁵).
 - **Population (steady):** f < 8.0×10⁻³ / 2.4×10⁻⁴ / 2.6×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹; per snapshot f·δ < 1.8×10⁻⁵.
-  (Epoch-1 catalogue, with no unexplained associations by construction: 2.1×10⁻² / 6.4×10⁻⁴ / 2.2×10⁻⁵, floor 1.4×10⁻⁵.)
+  (Epoch-1 catalogue, Poisson limit with k = 1 unexplained secure association: 3.3×10⁻² / 1.0×10⁻³ / 3.5×10⁻⁵, floor 2.3×10⁻⁵.)
 - **Stacks (all epochs):** M-dwarf mean > 4σ in 4 of 6 shells, 20–40 pc: (7.9 ± 1.1)×10⁵ W Hz⁻¹ (7.5σ); median S/σ shift including
   detected stars 0.084 ± 0.013 (6.2σ). AFGK ≤ 3.8σ. Mean stacks reach f < 1 at L_T ≈ 1.3×10⁵ (AFGK) and 1.6×10⁵ (M) W Hz⁻¹ (nearest
   shells); median stacks give f < 0.09–0.10 at 10⁷ and 0.015–0.028 at 10⁹ W Hz⁻¹.
