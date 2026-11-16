@@ -9,7 +9,8 @@ A star-epoch is a candidate if its forced S/N (17) is >= 5 and the star is not a
     declination where the QL beam is elongated. Vetoed stars are confusion-limited and reported separately.
   * Classification of the remaining candidate stars with the same evidence as for the secure associations (07):
     SIMBAD object types (CfA TAP mirror) and ROSAT 2RXS / eRASS1 X-ray counterparts (CfA VizieR mirror). A candidate
-    is "explained" if it has activity evidence (X-ray, flare/BY Dra/RS CVn/young/CV/magnetic CP type). Stars with
+    is "explained" if it has activity evidence (X-ray counterpart or SIMBAD X-ray type; flare/BY Dra/RS CVn/young/CV/
+    magnetic CP/emission-line type). The *_strict values repeat the tests without the emission-line and SIMBAD X-ray types. Stars with
     only multiplicity evidence are listed separately and counted as unexplained (conservative).
   * Chance background: the same estimator and the same 3" catalogue veto at 8 control positions 14" from each star.
     b = (control rate) x (number of unvetoed, non-secure star-epochs). Control positions carry no stellar emission,
@@ -140,6 +141,8 @@ if __name__ == "__main__":
     S["LX"] = np.where(S.era_F.notna() | S.rxs_crate.notna(), 1.0, np.nan)
     ev = S.apply(P07.evidence, axis=1); S["multiplicity_evidence"] = [e[0] for e in ev]; S["activity_evidence"] = [e[1] for e in ev]
     S["explained"] = S.activity_evidence.str.len() > 0
+    _weak = {"emission-line", "X-ray (SIMBAD)"}                  # robustness: criteria without these two types
+    S["explained_strict"] = S.activity_evidence.apply(lambda e: len([x for x in e.split("; ") if x and x not in _weak]) > 0)
     S = S.merge(CO[["n_ep", "S", "sig", "snr", "cand_coadd", "cand_epoch"]].rename(columns={"S": "S_coadd_mJy", "sig": "sigma_coadd_mJy", "snr": "snr_coadd"}),
                 left_on="source_id", right_index=True)
     n_ep_det = (U[U.source_id.isin(cand_ids)].snr >= THR).groupby(U.source_id[U.source_id.isin(cand_ids)]).sum().rename("n_ep_det")
@@ -152,6 +155,7 @@ if __name__ == "__main__":
         ["explained", "snr_coadd"], ascending=[True, False]).to_csv(os.path.join(C.RES, "alleepoch_candidates.csv"), index=False)
     k = int((~S.explained).sum())
     k_s = int(((~S.explained) & S.cand_coadd).sum()); k_e = int(S.loc[~S.explained, "n_ep_det"].fillna(0).sum())
+    k_s0 = int(((~S.explained_strict) & S.cand_coadd).sum()); k_e0 = int(S.loc[~S.explained_strict, "n_ep_det"].fillna(0).sum())
     res = dict(per_tag=per_tag, n_stars_coadd=int(len(CO)), n_star_epochs_trials=int(len(U)),
                ctrl_rate_coadd_per_star=rate_co, ctrl_rate_per_epoch=rate_ep,
                n_candidate_stars=int(len(S)), n_explained=int(S.explained.sum()),
@@ -160,6 +164,8 @@ if __name__ == "__main__":
                k_steady=k_s, b_steady=b_s, mu95_steady=zech_ul(k_s, b_s),
                k_snap=k_e, b_snap=b_e, mu95_snap=zech_ul(k_e, b_e),
                k_unexplained=k, b_expected=b_s, mu95_hidden=zech_ul(k_s, b_s),
+               k_steady_strict=k_s0, mu95_steady_strict=zech_ul(k_s0, b_s), k_snap_strict=k_e0, mu95_snap_strict=zech_ul(k_e0, b_e),
+               n_explained_strict=int(S.explained_strict.sum()),
                n_vetoed_star_epochs=int(LT.veto.sum()), n_stars_any_veto=int(LT.groupby("source_id").veto.any().sum()))
     json.dump(res, open(os.path.join(C.DER, "alleepoch_candidates.json"), "w"), indent=1)
     print(json.dumps(res, indent=1))

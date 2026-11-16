@@ -59,7 +59,7 @@ if __name__ == "__main__":
     T = pd.read_csv(os.path.join(RES, "vlass_star_matches_classified.csv")); xr = pd.read_csv(os.path.join(RAW, "xray_counterparts.csv"))
     put("NCand", str(len(xr))); put("NRxs", str(int(xr.rxs_r.notna().sum()))); put("NEra", str(int(xr.era_r.notna().sum())))
     S = T[T.secure].copy(); vc = S["class"].value_counts()
-    CLS = [("UNEXPLAINED", "Unexpl", "U"), ("flare star", "Flare", "Fl"), ("RS CVn binary", "RS", "RS"), ("BY Dra variable", "BY", "BY"),
+    CLS = [("UNEXPLAINED", "Unexpl", "U"), ("emission-line star", "Em", "Em"), ("flare star", "Flare", "Fl"), ("RS CVn binary", "RS", "RS"), ("BY Dra variable", "BY", "BY"),
            ("young star", "Young", "Y"), ("cataclysmic variable", "CV", "CV"), ("X-ray-active star", "XA", "X"), ("magnetic CP star", "CP", "CP")]
     for c, k, _ in CLS: put(f"NC{k}", str(int(vc.get(c, 0))))
     gv = S["group"].value_counts()
@@ -108,16 +108,16 @@ if __name__ == "__main__":
     _k1 = int(_pc.k_unexplained.iloc[0]); put("KEOne", str(_k1))
     from scipy.stats import chi2 as _c2
     put("MuEOne", f"{0.5 * _c2.ppf(0.95, 2 * (_k1 + 1)):.2f}")
-    # the unexplained secure association (multiplicity evidence only; no X-ray or SIMBAD activity type)
-    _U = S[S["class"] == "UNEXPLAINED"]
+    # the secure association explained only by its SIMBAD emission-line type (if exactly one)
+    _U = S[S["class"] == "emission-line star"]
     if len(_U) == 1:
         _u = _U.iloc[0]
-        put("UnSecName", str(_u.main_id).replace("2MASS ", "2MASS~"))
-        put("UnSecDist", f"{_u.dist_pc:.1f}"); put("UnSecS", f"{_u.S_corr_mJy:.2f}"); put("UnSecRel", f"{_u.rel:.2f}")
-        put("UnSecRUWE", f"{_u.ruwe:.1f}"); put("UnSecdMG", f"{-_u.dMG:.2f}")
+        put("EmSecName", str(_u.main_id).replace("2MASS ", "2MASS~"))
+        put("EmSecDist", f"{_u.dist_pc:.1f}"); put("EmSecS", f"{_u.S_corr_mJy:.2f}"); put("EmSecRel", f"{_u.rel:.2f}")
+        put("EmSecRUWE", f"{_u.ruwe:.1f}"); put("EmSecdMG", f"{-_u.dMG:.2f}")
         _F = pd.read_parquet(os.path.join(DER, "alleepoch_forced.parquet"), columns=["source_id", "tag", "snr"])
         _F = _F[_F.source_id == _u.source_id].set_index("tag").snr
-        put("UnSecSNRone", f"{_F.get('ep1', np.nan):.1f}"); put("UnSecSNRlater", f"{_F.drop('ep1', errors='ignore').max():.1f}")
+        put("EmSecSNRone", f"{_F.get('ep1', np.nan):.1f}"); put("EmSecSNRlater", f"{_F.drop('ep1', errors='ignore').max():.1f}")
     put("NNatural", str(int((~S["class"].str.startswith("background") & (S["class"] != "UNEXPLAINED")).sum())))
     put("NBackground", str(int(S["class"].str.startswith("background").sum())))
 
@@ -214,6 +214,13 @@ if __name__ == "__main__":
         put("NNoEpoch", com(_none.sum())); put("NNoEpochPct", f"{100 * _none.mean():.1f}")
         put("NNoEpochSouth", com((_dec.reindex(_P.source_id[_none]) < -38).sum()))
         put("NAllVeto", str(int((_P.n.isna() & (_P.n_ep_all > 0)).sum()))); put("NWithForced", com((~_none).sum()))
+        from scipy.stats import poisson as _po
+        put("PSteadyLow", f"{_po.cdf(cj['k_steady'], cj['b_steady']):.3f}"); put("PSnapLow", f"{_po.cdf(cj['k_snap'], cj['b_snap']):.2f}")
+        put("KSteadyStrict", str(cj["k_steady_strict"])); put("MuSteadyStrict", f"{cj['mu95_steady_strict']:.1f}")
+        put("KSnapStrict", str(cj["k_snap_strict"])); put("MuSnapStrict", f"{cj['mu95_snap_strict']:.1f}")
+        put("NCandExplStrict", str(cj["n_explained_strict"])); put("NCandExplWeak", str(cj["n_explained"] - cj["n_explained_strict"]))
+        put("StrictPct", f"{100 * (cj['mu95_steady_strict'] / cj['mu95_steady'] - 1):.0f}")
+        put("StrictSnapPct", f"{100 * (cj['mu95_snap_strict'] / cj['mu95_snap'] - 1):.0f}")
         put("NCandStars", str(cj["n_candidate_stars"])); put("NCandExpl", str(cj["n_explained"])); put("NCandMult", str(cj["n_multiplicity_only"]))
         put("KUnexpl", str(cj["k_unexplained"])); put("BExp", f"{cj['b_expected']:.1f}"); put("MuHidden", f"{cj['mu95_hidden']:.1f}")
         put("KSteady", str(cj["k_steady"])); put("BSteady", f"{cj['b_steady']:.1f}"); put("MuSteady", f"{cj['mu95_steady']:.1f}")
@@ -331,7 +338,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density corrected for the Quick Look integrated-flux bias (divided by 0.90 in half-epoch 1.1; \citealt{Kimball2026}). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalogue without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): Fl = flare star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}); U = unexplained, multiplicity evidence but no activity evidence (Section~\ref{sec:matches}). Machine-readable version in the reproducibility package.}
+\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density corrected for the Quick Look integrated-flux bias (divided by 0.90 in half-epoch 1.1; \citealt{Kimball2026}). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalogue without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): Fl = flare star; Em = emission-line star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}). Machine-readable version in the reproducibility package.}
 \end{deluxetable*}
 }
 """)

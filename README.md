@@ -119,12 +119,12 @@ component parquet holds exactly the same data.
   50 genuine stellar detections; **51 matches with reliability > 0.5** (48 with R > 0.9; 1.5 expected false). V376 Cep drops to R = 0.01
   (corrected Epoch-1 offset 0.65″ vs 0.14″ in QL3.1) and is treated as confusion-limited.
 - **Classification of the 51** (secure associations only, R > 0.5; SIMBAD types first; an association is explained only by
-  activity evidence, X-ray or a SIMBAD activity type, the same rule as for the all-epoch candidates; multiplicity is recorded
+  activity evidence -- a 2RXS/eRASS1 counterpart, a SIMBAD X-ray-source type (X), or a SIMBAD flare/BY Dra/RS CVn/
+  emission-line (Em*)/young/CV/magnetic CP type -- the same rule as for the all-epoch candidates; multiplicity is recorded
   separately and explains nothing):
   - 9 flare stars, 6 RS CVn, 6 BY Dra, 4 young stars, 2 CVs, 1 magnetic CP star;
   - 21 X-ray-active stars without a more specific type (19 with multiplicity evidence);
-  - 1 unexplained: 2MASS J17022950+1341015 (M dwarf, 30.5 pc; RUWE 5.3, over-luminous; SIMBAD Em*; Epoch 1 only,
-    forced S/N 4.9 then <2, so not an all-epoch candidate);
+  - 1 emission-line star: 2MASS J17022950+1341015 (M dwarf, 30.5 pc; Epoch 1 only, forced S/N 4.9 then <2: a flare);
   - 1 radio source not coincident with its star (LSPM J1943+5337).
   - 30 of the 51 are in the Sydney Radio Star Catalogue (11 circularly polarized); 41 are in De et al. (2024).
 - **Multi-epoch (VLASS 1.1–4.1, 177 independent images):** 44/51 variable; 21 co-moving with their star, 17 inconclusive, 12 single-epoch, none stationary.
@@ -133,20 +133,21 @@ component parquet holds exactly the same data.
   scatter beyond their errors (source extended E–W). Archival plates show no optical counterpart (POSS-I g ≳ 20.4, r ≳ 19.7–19.9; POSS-II ≳ 20.9).
 - **Forced photometry, all epochs (720,108 star-epochs; median 3 per star):** peak-loss factor κ = 0.861 from injection–recovery
   (catalogue cross-check 0.899 ± 0.010, a 4% systematic); injected sources are recovered at 5σ in 51% of cases, as Φ(S/σ − 5) predicts.
-- **Candidates:** 160 stars at ≥ 5σ (coadd or any epoch), 143 with X-ray/SIMBAD activity evidence. Steady test (coadd): 7 unexplained
-  vs 11.4 expected at control positions → μ95 = 5.5. Single-epoch test: 16 vs 11.8 → μ95 = 12.8. The one candidate bright enough for
+- **Candidates:** 160 stars at ≥ 5σ (coadd or any epoch), 149 with activity evidence (11 unexplained). Steady test (coadd): 4
+  unexplained vs 11.4 expected at control positions → μ95 = 4.1. Single-epoch test: 10 vs 11.8 → μ95 = 7.2. Without the SIMBAD
+  Em* and X types (which explain 6 candidates): 7 vs 11.4 → 5.5 and 16 vs 11.8 → 12.8. The one candidate bright enough for
   per-epoch astrometry (TYC 3573-1391-1) lies 1.8″ from its star.
 - **Cross-check with per-epoch catalogues (21):** κ from the QL3.1–4.1 lists 0.83–0.87 (adopted 0.861). Our bias-corrected fluxes are
   1.13 ± 0.01 × the Single Epoch peaks (1.07–1.16 by epoch), and SE/QL = 0.975 ± 0.006 for the same Epoch-3 sources: faint compact QL
-  peaks are less biased than the calibrator-based 0.92, so later-epoch fluxes and limits may be ≈13% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. Of the 17
-  unexplained candidates, G 133-48, MCC 401 and HD 317101A are detected at the star in independent catalogues (MCC 401 and
-  LP 198-661 also in the median stack); TYC 3573-1391-1 sits 1.7–1.8″ off in four catalogues. An own-epoch confusion veto gives
-  7→10 vs b 11.4→23.4 (steady); the union of both vetoes changes μ95 by −4% (steady) and +11% (single-epoch). The median stack
+  peaks are less biased than the calibrator-based 0.92, so later-epoch fluxes and limits may be ≈13% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. Of the 11
+  unexplained candidates, G 133-48 is detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in
+  four catalogues. An own-epoch confusion veto gives 4→7 vs b 11.4→23.4 (steady); the union of both vetoes changes μ95 by −6%
+  (steady) and +11% (single-epoch). The median stack
   (152,511 low-motion stars) finds no steady emitters missed by the coadd (9 unclassified matches, all 1.9–2.3″ off; 22 chance).
 - **Per-star limits (95%, all epochs, steady):** median 0.54 mJy, L_ν < 4.0×10⁸ W Hz⁻¹; Barnard's star L_ν < 2.3×10⁵ W Hz⁻¹
   (Epoch-1 catalogue analysis: median 1.09 mJy; Barnard 5.1×10⁵).
-- **Population (steady):** f < 8.0×10⁻³ / 2.4×10⁻⁴ / 2.6×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹; per snapshot f·δ < 1.8×10⁻⁵.
-  (Epoch-1 catalogue, Poisson limit with k = 1 unexplained secure association: 3.3×10⁻² / 1.0×10⁻³ / 3.5×10⁻⁵, floor 2.3×10⁻⁵.)
+- **Population (steady):** f < 6.0×10⁻³ / 1.8×10⁻⁴ / 2.0×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹; per snapshot f·δ < 1.0×10⁻⁵.
+  (Epoch-1 catalogue, Poisson limit with no unexplained secure association: 2.1×10⁻² / 6.4×10⁻⁴ / 2.2×10⁻⁵, floor 1.4×10⁻⁵.)
 - **Stacks (all epochs):** M-dwarf mean > 4σ in 4 of 6 shells, 20–40 pc: (7.9 ± 1.1)×10⁵ W Hz⁻¹ (7.5σ); median S/σ shift including
   detected stars 0.084 ± 0.013 (6.2σ). AFGK ≤ 3.8σ. Mean stacks reach f < 1 at L_T ≈ 1.3×10⁵ (AFGK) and 1.6×10⁵ (M) W Hz⁻¹ (nearest
   shells); median stacks give f < 0.09–0.10 at 10⁷ and 0.015–0.028 at 10⁹ W Hz⁻¹.

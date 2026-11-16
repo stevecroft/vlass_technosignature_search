@@ -1,7 +1,8 @@
 """07 - Classify the VLASS-matched stars, apply background tests, and compute per-star and population limits.
 
 Classification of the secure associations (R > 0.5), in priority order: literature overrides
-(data/raw/classification_overrides.csv), CV*, a2* (magnetic CP), RS*/RS?, TT*/Y*O, BY*, Er*/Fl* (flare), X-ray-active star,
+(data/raw/classification_overrides.csv), CV*, a2* (magnetic CP), RS*/RS?, TT*/Y*O, BY*, Er*/Fl* (flare), Em* (emission-line star), X-ray-active star (2RXS/eRASS1 counterpart or SIMBAD
+type X),
 else UNEXPLAINED. Multiplicity evidence (SIMBAD binary types, Gaia NSS > 0, RUWE > 1.4, dMG < -0.5) is recorded in its own
 column but does not explain an association, the same rule as for the all-epoch candidates (18).
 Background tests for UNEXPLAINED matches:
@@ -46,8 +47,9 @@ def evidence(r):
         if r.dMG < -0.5: mult.append(f"over-luminous ({r.dMG:+.2f} mag)")
     act = []
     if np.isfinite(r.LX): act.append("X-ray")
+    if "X" in ol: act.append("X-ray (SIMBAD)")             # catalogued X-ray source (e.g. XMM, Chandra; eRASS1 covers half the sky)
     for t, lab in [("Er*", "flare"), ("Fl*", "flare"), ("BY*", "BY Dra"), ("RS*", "RS CVn"), ("TT*", "young"), ("Y*O", "young"),
-                   ("CV*", "CV"), ("a2*", "magnetic CP")]:
+                   ("CV*", "CV"), ("a2*", "magnetic CP"), ("Em*", "emission-line")]:
         if t in ol and lab not in act: act.append(lab)
     return "; ".join(mult), "; ".join(act)
 
@@ -61,6 +63,8 @@ def classify(r):
     if "TT*" in ol or "Y*O" in ol: return "young star"
     if "BY*" in ol: return "BY Dra variable"
     if "Er*" in ol or "Fl*" in ol: return "flare star"
+    if "Em*" in ol: return "emission-line star"           # H-alpha emission: chromospheric activity (dMe) on the main sequence
+    if "X" in ol: return "X-ray-active star"
     # Multiplicity is recorded as evidence (column multiplicity_evidence, figure groups) but is not a radio-emission
     # mechanism, so it does not explain an association; the same rule as for the all-epoch candidates (18).
     if np.isfinite(r.LX): return "X-ray-active star"

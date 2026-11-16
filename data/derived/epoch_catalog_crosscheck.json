@@ -55,7 +55,7 @@
    "n_cat_match": 82,
    "chance_per_position": 0.00014550334537443663,
    "chance_expected": 30.25,
-   "n_cat_match_secure": 50,
+   "n_cat_match_secure": 51,
    "n_forced_ge5": 90,
    "n_forced_ge5_unvetoed": 75,
    "n_forced_ge5_with_cat": 62,
@@ -64,7 +64,7 @@
    "n_cat_forced_lt3": 10,
    "n_cat_forced_lt5_flagged": 9,
    "n_cat_forced_lt5_sep_gt1p5": 16,
-   "n_cat_forced_lt5_unvetoed_nonsecure": 13,
+   "n_cat_forced_lt5_unvetoed_nonsecure": 12,
    "flux_n": 21,
    "ratio_qlscale": 1.044249330083873,
    "ratio_qlscale_err": 0.01492336104030505,
@@ -314,7 +314,7 @@
    "dist_pc": 15.025498321811419,
    "otypes": "*|**|Em*|PM*|SB*",
    "multiplicity_evidence": "SIMBAD **/SB*; RUWE 5.2; over-luminous (-0.66 mag)",
-   "activity_evidence": "X-ray",
+   "activity_evidence": "X-ray; emission-line",
    "explained": true
   },
   {
@@ -323,7 +323,7 @@
    "dist_pc": 39.927003009326796,
    "otypes": "*|**|IR|NIR|PM*|RS*|SB*|UV|V*|X",
    "multiplicity_evidence": "SIMBAD **/RS*/SB*; over-luminous (-0.80 mag)",
-   "activity_evidence": "X-ray; RS CVn",
+   "activity_evidence": "X-ray; X-ray (SIMBAD); RS CVn",
    "explained": true
   },
   {
@@ -341,7 +341,7 @@
    "dist_pc": 50.062742408513515,
    "otypes": "*|NIR|Ro*|UV|V*|X",
    "multiplicity_evidence": "RUWE 13.8; over-luminous (-0.56 mag)",
-   "activity_evidence": "X-ray",
+   "activity_evidence": "X-ray; X-ray (SIMBAD)",
    "explained": true
   },
   {
@@ -382,7 +382,7 @@
   }
  ],
  "catalogue_only": {
-  "n_stars_any": 13,
+  "n_stars_any": 12,
   "n_stars_ge2_epochs": 4,
   "ge2_epochs": [
    1873073175244118784,
@@ -393,42 +393,42 @@
  },
  "veto_variants": {
   "adopted_E1": {
-   "n_trials_steady": 208164,
-   "n_trials_snap": 719858,
-   "b_steady": 11.376092993312323,
-   "b_snap": 11.751438610847668,
+   "n_trials_steady": 208163,
+   "n_trials_snap": 719855,
+   "b_steady": 11.376092998563488,
+   "b_snap": 11.751438616843823,
    "n_vetoed": 76,
    "n_cand_stars": 160,
    "n_cand_coadd": 113,
    "n_cand_epoch": 138,
-   "n_unexplained": 17,
+   "n_unexplained": 11,
    "n_new_unclassified": 0,
    "new_unclassified": [],
-   "k_steady": 7,
-   "k_snap": 16,
-   "mu95_steady": 5.456460963448073,
-   "mu95_snap": 12.782502276395988,
+   "k_steady": 4,
+   "k_snap": 10,
+   "mu95_steady": 4.127869303784333,
+   "mu95_snap": 7.20994027921254,
    "lost_vs_adopted": [],
    "lost_unexplained": [],
    "added_vs_adopted": [],
    "added_unexplained": []
   },
   "own_epoch": {
-   "n_trials_steady": 208179,
-   "n_trials_snap": 719880,
-   "b_steady": 23.37530878282225,
-   "b_snap": 30.25225353822302,
+   "n_trials_steady": 208178,
+   "n_trials_snap": 719877,
+   "b_steady": 23.37530878430553,
+   "b_snap": 30.25225354761507,
    "n_vetoed": 54,
    "n_cand_stars": 167,
    "n_cand_coadd": 120,
    "n_cand_epoch": 146,
-   "n_unexplained": 20,
+   "n_unexplained": 14,
    "n_new_unclassified": 0,
    "new_unclassified": [],
-   "k_steady": 10,
-   "k_snap": 21,
-   "mu95_steady": 4.743034018468376,
-   "mu95_snap": 7.2193804508953665,
+   "k_steady": 7,
+   "k_snap": 15,
+   "mu95_steady": 4.063864242788635,
+   "mu95_snap": 5.302600555198204,
    "lost_vs_adopted": [
     2563195186142791552
    ],
@@ -453,21 +453,21 @@
    ]
   },
   "union": {
-   "n_trials_steady": 208164,
-   "n_trials_snap": 719848,
-   "b_steady": 10.000966879280018,
-   "b_snap": 10.126327602726558,
+   "n_trials_steady": 208163,
+   "n_trials_snap": 719845,
+   "b_steady": 10.000966883925283,
+   "b_snap": 10.126327608260153,
    "n_vetoed": 86,
    "n_cand_stars": 159,
    "n_cand_coadd": 112,
    "n_cand_epoch": 138,
-   "n_unexplained": 16,
+   "n_unexplained": 10,
    "n_new_unclassified": 0,
    "new_unclassified": [],
-   "k_steady": 6,
-   "k_snap": 16,
-   "mu95_steady": 5.250156756814396,
-   "mu95_snap": 14.251522451941465,
+   "k_steady": 3,
+   "k_snap": 10,
+   "mu95_steady": 3.89266290468309,
+   "mu95_snap": 8.011578938951155,
    "lost_vs_adopted": [
     2563195186142791552
    ],
@@ -495,9 +495,9 @@
  "candidates": {
   "n": 160,
   "n_with_cat_det": 69,
-  "n_unexplained": 17,
-  "n_unexplained_with_cat_det": 4,
-  "n_unexplained_multi_cat": 2,
+  "n_unexplained": 11,
+  "n_unexplained_with_cat_det": 2,
+  "n_unexplained_multi_cat": 1,
   "n_p_at_star_lt_0p01": 10,
   "n_unexplained_p_at_star_lt_0p01": 1,
   "forced_ge5_epochs": 164,
@@ -520,26 +520,23 @@
   "chance_expected": 21.875,
   "by_status": {
    "secure": 20,
-   "explained": 9,
-   "unexplained": 2,
+   "explained": 11,
+   "unexplained": 0,
    "catonly": 6,
    "none": 9
   },
   "tested_by_status": {
-   "secure": 27,
-   "explained": 82,
-   "unexplained": 11,
+   "secure": 28,
+   "explained": 87,
+   "unexplained": 6,
    "catonly": 7,
-   "none": 152384
+   "none": 152383
   },
   "none_snr_coadd_median": 2.4221026764811286,
   "none_snr_coadd_ge3": 2,
   "none_peak_median_mJy": 0.96097093354,
   "Isl_rms_median_near_stars": 0.09361492994,
-  "unexplained_detected": [
-   22338644598132096,
-   237854021839986944
-  ],
+  "unexplained_detected": [],
   "secure_not_detected": [
    818854107897169024,
    2913314288686472576,
@@ -547,6 +544,7 @@
    3821318547411001728,
    3955187043030098176,
    4108078979665915648,
+   4544627976777952640,
    4808527947311614208
   ]
  }
