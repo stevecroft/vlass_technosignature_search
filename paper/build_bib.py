@@ -74,6 +74,8 @@ DOIS = {
     "Painter2025": "10.3847/1538-3881/adbc5e", "Wlodarczyk2020": "10.1093/mnras/staa2672",
     "Garrett2022": "10.1093/mnras/stac2607",
     "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378",
+    "Zuckerman2026": "10.3847/1538-4357/ae4c38", "Matthews2025": "10.1088/1538-3873/ae1661",
+    "Davis2026": "10.3847/1538-4357/ae4a22", "Pritchard2024": "10.1093/mnras/stae127",
     "Choza2024": "10.3847/1538-3881/acf576", "Harp2016": "10.3847/0004-6256/152/6/181", "Siemion2013": "10.1088/0004-637X/767/1/94",
     "HorowitzSagan1993": "10.1086/173157", "GrayMooley2017": "10.3847/1538-3881/153/3/110",
     "TremblayTingay2020": "10.1017/pasa.2020.27", "Uno2023": "10.1093/mnras/stad993",

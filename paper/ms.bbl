@@ -119,6 +119,14 @@ Condon, J.~J., Cotton, W.~D., Greisen, E.~W., {et~al.} 1998,
   \dodoi{10.1086/300337}
 
 % type= article
+\bibitem[{I. Davis {et~al.}(2026)Davis, Hallinan, Ayala, Dong, \&
+  Myers}]{Davis2026}
+Davis, I., Hallinan, G., Ayala, C., Dong, D., \& Myers, S. 2026,
+  \bibinfo{title}{{Detection of Radio Emission from Superflaring Solar-type
+  Stars in the VLA Sky Survey},} \apj, 1001, 143,
+  \dodoi{10.3847/1538-4357/ae4a22}
+
+% type= article
 \bibitem[{A. De {et~al.}(2024)De, Narang, Puravankara, Shridharan, Tyagi,
   Banerjee, Nayak, \& Surya}]{De2024}
 De, A., Narang, M., Puravankara, M., {et~al.} 2024, \bibinfo{title}{{Demography
@@ -546,6 +554,11 @@ L{\'o}pez-Santiago, J., Montes, D., Fern{\'a}ndez-Figueroa, M.~J., \& Ramsey,
   489, \dodoi{10.1051/0004-6361:20031377}
 
 % type= article
+\bibitem[{L.~D. Matthews(2025)Matthews}]{Matthews2025}
+Matthews, L.~D. 2025, \bibinfo{title}{{Radio Stars in the Era of New
+  Observatories},} \pasp, 137, 116001, \dodoi{10.1088/1538-3873/ae1661}
+
+% type= article
 \bibitem[{D. McConnell {et~al.}(2020)McConnell, Hale, Lenc, Banfield, Heald,
   Hotan, Leung, Moss, Murphy, O'Brien, Pritchard, Raja, Sadler, Stewart,
   Thomson, Whiting, Allison, Amy, Anderson, Ball, Bannister, Bell, Bock,
@@ -622,6 +635,13 @@ Pecaut, M.~J., \& Mamajek, E.~E. 2013, \bibinfo{title}{{INTRINSIC COLORS,
 Price, D.~C., Enriquez, J.~E., Brzycki, B., {et~al.} 2020, \bibinfo{title}{{The
   Breakthrough Listen Search for Intelligent Life: Observations of 1327 Nearby
   Stars Over 1.10--3.45 GHz},} \aj, 159, 86, \dodoi{10.3847/1538-3881/ab65f1}
+
+% type= article
+\bibitem[{J. Pritchard {et~al.}(2024)Pritchard, Murphy, Heald, Wheatland,
+  Kaplan, Lenc, O'Brien, \& Wang}]{Pritchard2024}
+Pritchard, J., Murphy, T., Heald, G., {et~al.} 2024,
+  \bibinfo{title}{{Multi-epoch sampling of the radio star population with the
+  Australian SKA Pathfinder},} \mnras, 529, 1258, \dodoi{10.1093/mnras/stae127}
 
 % type= article
 \bibitem[{R.~C. Saide {et~al.}(2023)Saide, Garrett, \&
@@ -746,5 +766,11 @@ Yiu, T. W.~H., Vedantham, H.~K., Callingham, J.~R., \& G{\"u}nther, M.~N. 2024,
 \bibitem[{G. Zech(1989)Zech}]{Zech1989}
 Zech, G. 1989, \bibinfo{title}{{Upper limits in experiments with background or
   measurement errors},} NIMPA, 277, 608, \dodoi{10.1016/0168-9002(89)90795-x}
+
+% type= article
+\bibitem[{B. Zuckerman(2026)Zuckerman}]{Zuckerman2026}
+Zuckerman, B. 2026, \bibinfo{title}{{Broadband Searches for Extraterrestrial
+  Technological Intelligence: A New Strategy to Find Nearby Alien
+  Civilizations},} \apj, 1001, 167, \dodoi{10.3847/1538-4357/ae4c38}
 
 \end{thebibliography}

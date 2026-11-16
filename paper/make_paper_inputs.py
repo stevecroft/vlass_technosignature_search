@@ -227,6 +227,22 @@ if __name__ == "__main__":
         for x, k in [(1e7, "Seven"), (1e8, "Eight"), (1e9, "Nine")]:
             put(f"FAll{k}", sci(fi(x))); put(f"NAll{k}", com(fi(x, "N_eff")))
         put("FAllFloor", sci(PP.f95.min())); put("NAllFloor", com(PP.N_eff.max())); put("FDeltaFloor", sci(PP.fdelta95.min()))
+        # Zuckerman (2026) benchmark: 60 MW beamed at Earth from 200 pc -> ~1e10 Jy in a few-Hz (3 Hz) channel, continuous.
+        # Band-averaged over our 2 GHz: S = 1e10 Jy * 3 Hz / 2 GHz; L_nu = 4 pi d^2 S (toward Earth); EIRP = L_nu * 2 GHz.
+        from scipy.stats import chi2 as _chi2
+        _PC = 3.0857e16; _Sz = 1e10 * 3.0 / 2e9; _Lz = _Sz * 1e-26 * 4 * np.pi * (200 * _PC) ** 2
+        _floor1 = lambda x: (lambda e, m: (f"{m}\\times" if m > 1 else "") + f"10^{{{e}}}")(int(np.floor(np.log10(x))), int(x / 10 ** int(np.floor(np.log10(x)))))   # round DOWN, 1 sig. fig.
+        put("ZuckSband", f"{_Sz:.0f}"); put("ZuckL", sci(_Lz)); put("ZuckEIRP", sci(_Lz * 2e9))
+        put("ZuckMarginMed", _floor1(_Lz / PA.L_lim_steady.median())); put("ZuckMarginWorst", _floor1(_Lz / PA.L_lim_steady.max()))
+        put("LlimAllMax", sci(PA.L_lim_steady.max()))
+        # Zuckerman's target class F6-M2 (Pecaut & Mamajek 2013 table v2022.04.16: Bp-Rp 0.640 F6V, 2.23 M2V), apparently single
+        _BPlo, _BPhi = 0.64, 2.23; put("BPRPlo", f"{_BPlo:.2f}"); put("BPRPhi", f"{_BPhi:.2f}")
+        _G = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "ruwe", "non_single_star", "dMG"])
+        _Z = PA.merge(_G, on="source_id")
+        _Z = _Z[(_Z.bp_rp >= _BPlo) & (_Z.bp_rp <= _BPhi) & (_Z.ruwe < 1.4) & (_Z.non_single_star == 0) & (_Z.dMG > -0.5)]
+        _ku = int(_Z.unexplained_candidate.sum()); _mu = 0.5 * _chi2.ppf(0.95, 2 * (_ku + 1))     # classical Poisson UL, no background subtracted
+        put("NSolarSingle", com(len(_Z))); put("NSolarNat", str(int((_Z.natural & ~_Z.unexplained_candidate).sum())))
+        put("NSolarUnexpl", str(_ku)); put("FSolarSingle", sci(_mu / len(_Z)))
         put("FAllZeroFloor", sci(PP.f95_k0b0.min()))
         put("OneInNineAll", com(round(1 / fi(1e9), -2)))
         put("ReachIndAll", sci(PP.L_WHz[np.argmax(PP.f95.values < 1)], 1))
