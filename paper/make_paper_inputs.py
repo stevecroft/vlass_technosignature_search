@@ -207,6 +207,10 @@ if __name__ == "__main__":
         put("NVetoStarEp", str(cj["n_vetoed_star_epochs"])); put("NStarsVeto", str(cj["n_stars_any_veto"]))
         put("CtrlRateEp", sci(cj["ctrl_rate_per_epoch"])); put("CtrlRateAny", sci(cj["ctrl_rate_coadd_per_star"]))
         put("MedEpochs", f"{sm['median_epochs']:.0f}")
+        _E = pd.read_parquet(os.path.join(RES, "alleepoch_perstar_limits.parquet"), columns=["natural", "candidate"])
+        _em = _E.natural | _E.candidate          # stars whose limit is set by their own (natural or unexplained) emission
+        assert int(_em.sum()) == int(_E.natural.sum()) + int((_E.candidate & ~_E.natural).sum())
+        put("NEmitters", str(int(_em.sum()))); put("NEmitPct", f"{100 * _em.mean():.1f}")
         PA = pd.read_parquet(os.path.join(RES, "alleepoch_perstar_limits.parquet")); PA = PA[PA.S_lim_steady.notna()]
         q5, q50, q95 = np.percentile(PA.S_lim_steady, [5, 50, 95]); put("SlimAllMed", f"{q50:.2f}"); put("SlimAllLo", f"{q5:.2f}"); put("SlimAllHi", f"{q95:.2f}")
         put("LlimAllMed", sci(PA.L_lim_steady.median())); put("EIRPlimAllMed", sci(PA.L_lim_steady.median() * 2e9))
