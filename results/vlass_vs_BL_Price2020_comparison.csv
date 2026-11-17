@@ -1,4 +1,4 @@
-survey,band,signal_type,dwell,S_lim_Jy_at50pc,EIRP_lim_W_at50pc,fraction_UL95,N_stars_constraining
-Price+2020 GBT (narrowband),1.10-2.80 GHz,"<=~3 Hz, |drift|<=4 Hz/s",3x5 min ON,7.020402642533475,2100000000000.0,"<0.45% (L), <0.37% (S) [paper, P_det=0.5]",882
-Price+2020 Parkes (narrowband),2.60-3.45 GHz,"<=~3 Hz, |drift|<=4 Hz/s",multi-epoch,30.421744784311723,9100000000000.0,<2.0% [paper],189
-This work VLASS QL 1.1-4.1 (continuum),2-4 GHz,total in-band power of a steady signal,~5 s snapshots,0.0005375666031127365,3.2160259860233894e+17,<1.7e-04 (P_det=1); <3.4e-04 (P_det=0.5),26741
+survey,band,signal_type,dwell,S_lim_Jy_at50pc,EIRP_lim_W_at50pc,EIRP_published_W,fraction_UL95,N_stars_constraining
+Price+2020 GBT (narrowband),1.10-2.80 GHz,"<=~3 Hz, |drift|<=4 Hz/s",3x5 min ON,23.16732872036047,6930000000000.0,2100000000000.0,"<0.45% (L), <0.37% (S) [paper, P_det=0.5]",882
+Price+2020 Parkes (narrowband),2.60-3.45 GHz,"<=~3 Hz, |drift|<=4 Hz/s",multi-epoch,100.39175778822869,30030000000000.0,9100000000000.0,<2.0% [paper],189
+This work VLASS QL 1.1-4.1 (continuum),2-4 GHz,total in-band power of a steady signal,~5 s snapshots,0.0005375666031127365,3.2160259860233894e+17,,<1.7e-04 (P_det=1); <3.4e-04 (P_det=0.5),26741

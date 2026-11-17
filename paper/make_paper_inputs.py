@@ -183,8 +183,10 @@ if __name__ == "__main__":
 
     # --- BL comparison
     bl = pd.read_csv(os.path.join(RES, "vlass_vs_BL_Price2020_comparison.csv")); v = bl.iloc[-1]
-    put("VlassFiftyS", f"{v.S_lim_Jy_at50pc*1e3:.2f}"); put("VlassFiftyEIRP", sci(v.EIRP_lim_W_at50pc)); put("BLratio", sci(v.EIRP_lim_W_at50pc / 2.1e12))
-    put("FluxRatio", com(round((2.1e12 / (4*np.pi*(50*3.0857e16)**2)) / (v.S_lim_Jy_at50pc * 1e-26), -2))); put("NFifty", com(v.N_stars_constraining))
+    put("VlassFiftyS", f"{v.S_lim_Jy_at50pc*1e3:.2f}"); put("VlassFiftyEIRP", sci(v.EIRP_lim_W_at50pc)); g_ = bl.iloc[0]   # BL GBT row, EIRP and S include the Choza et al. (2024) factor of 3.3 (script 12)
+    put("BLratio", sci(v.EIRP_lim_W_at50pc / g_.EIRP_lim_W_at50pc)); put("BLratioPub", sci(v.EIRP_lim_W_at50pc / g_.EIRP_published_W))
+    put("BLEIRPcorr", sci(g_.EIRP_lim_W_at50pc)); put("BLEIRPpub", sci(g_.EIRP_published_W)); put("BLSJy", f"{g_.S_lim_Jy_at50pc:.0f}")
+    put("FluxRatio", com(round(g_.S_lim_Jy_at50pc / (v.S_lim_Jy_at50pc), -2))); put("NFifty", com(v.N_stars_constraining))
     MU = json.load(open(os.path.join(DER, "alleepoch_candidates.json")))["mu95_hidden"] if os.path.exists(os.path.join(DER, "alleepoch_candidates.json")) else 3.0
     put("FFifty", sci(MU / v.N_stars_constraining)); put("FFiftyHalf", sci(2 * MU / v.N_stars_constraining))
 
@@ -298,15 +300,22 @@ if __name__ == "__main__":
         big = SA[SA.N_clean >= 1000]; put("TopTenMax", f"{100 * big.top10_wfrac.max():.1f}")
         put("NStackAll", com(SA.N_clean.sum()))
         SLm = pd.read_csv(os.path.join(RES, "alleepoch_stack_limits.csv"))
+        def _cross(s):
+            # f95_mean = <L>_95 / L_T, with <L>_95 piecewise constant in L_T (it changes only when a shell drops out), so
+            # the f = 1 crossing is L_T = <L>_95 itself whenever that lies within the grid interval; else the grid point
+            i = int(np.nanargmax(s.f95_mean.values < 1)); Lc = s.f95_mean[i] * s.L_WHz[i]
+            return Lc if (i > 0 and s.L_WHz[i - 1] < Lc <= s.L_WHz[i]) else s.L_WHz[i]
         for t in ["AFGK", "M"]:
             s = SLm[SLm.cls == t].reset_index(drop=True)
-            put(f"ReachAll{t}", sci(s.L_WHz[np.nanargmax(s.f95_mean.values < 1)], 1))
+            put(f"ReachAll{t}", sci(_cross(s), 1))
             fm = lambda L0: float(np.interp(np.log10(L0), np.log10(s.L_WHz), s.f95_mean))
             put(f"FMeanSix{t}", f"{fm(1e6):.2f}"); put(f"FBratAll{t}", f"{fm(4e5):.2f}")
             md = s.set_index("L_WHz").f95_median
             put(f"FMedSix{t}", f"{md.get(1e6, np.nan):.2f}"); put(f"FMedSeven{t}", f"{md.get(1e7, np.nan):.3f}"); put(f"FMedNine{t}", f"{md.get(1e9, np.nan):.3f}")
-        reach = [SLm[SLm.cls == t].reset_index(drop=True).pipe(lambda s: s.L_WHz[np.nanargmax(s.f95_mean.values < 1)]) for t in ["AFGK", "M"]]
-        put("ReachEIRPAll", sci(min(reach) * 2e9))
+        reach = [_cross(SLm[SLm.cls == t].reset_index(drop=True)) for t in ["AFGK", "M"]]
+        for t in ["AFGK", "M"]:   # nearest shell alone, for comparison with Table 5 (not used for the limits)
+            r0 = SA[(SA.cls == t) & (SA.dmin == 0)].iloc[0]; put(f"NearShell{t}", sci(max(r0.meanL, 0) + 1.645 * r0.meanL_err, 1))
+        put("ReachEIRPAll", sci(float(f"{min(reach):.1e}") * 2e9))
         for t, L0 in zip(["AFGK", "M"], reach):   # EIRP from the *displayed* (rounded) L so the abstract is self-consistent
             put(f"ReachEIRPAll{t}", sci(float(f"{L0:.1e}") * 2e9))
         ALL = dict(SA=SA)
@@ -395,14 +404,15 @@ if __name__ == "__main__":
     for _, r in bl.iterrows():
         nm = "This work (VLASS QL)" if "VLASS" in r.survey else r.survey.replace("Price+2020 ", "BL ").replace(" (narrowband)", "")
         band = r.band.replace("-", "--"); dwell = re.sub(r"(\d)x(\d)", r"$\1\\times\2$", r.dwell).replace("~", r"$\sim$")
-        rows.append(f"{nm} & {band} & {dwell} & ${sci(r.S_lim_Jy_at50pc)}$ & ${sci(r.EIRP_lim_W_at50pc)}$ & {com(r.N_stars_constraining)} " + r"\\")
+        pub = f" (${sci(r.EIRP_published_W)}$)" if np.isfinite(r.EIRP_published_W) else ""
+        rows.append(f"{nm} & {band} & {dwell} & ${sci(r.S_lim_Jy_at50pc)}$ & ${sci(r.EIRP_lim_W_at50pc)}${pub} & {com(r.N_stars_constraining)} " + r"\\")
     open(os.path.join(HERE, "tables", "bl_comparison.tex"), "w").write(r"""\begin{deluxetable*}{llllrr}
 \tablecaption{Comparison with the Breakthrough Listen narrowband survey of \citet{Price2020} for a star at 50\,pc.\label{tab:bl}}
 \tablehead{\colhead{Survey} & \colhead{Band} & \colhead{Dwell} & \colhead{$S_{\rm lim}$ (Jy)} & \colhead{EIRP$_{\rm lim}$ (W)} & \colhead{$N_\star$}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Breakthrough Listen (BL) limits apply to signals $\lesssim$3\,Hz wide with $|\dot\nu|\le4$\,Hz\,s$^{-1}$ and use the 1\,Hz transmitter-width convention of \citet{Price2020}; the VLASS limit applies to the total in-band power of any signal. $N_\star$ is the number of stars constraining the occurrence limit (for VLASS: stars within 50\,pc).}
+\tablecomments{Breakthrough Listen (BL) limits apply to signals $\lesssim$3\,Hz wide with $|\dot\nu|\le4$\,Hz\,s$^{-1}$ and use the 1\,Hz transmitter-width convention of \citet{Price2020}, including the factor of 3.3 correction of \citet{Choza2024} (published values in parentheses), as in Figure~\ref{fig:tr}; the VLASS limit applies to the total in-band power of any signal. $N_\star$ is the number of stars constraining the occurrence limit (for VLASS: stars within 50\,pc).}
 \end{deluxetable*}
 """)
     rows = [f"{r.image} & {r.epoch:.2f} & {r.peak_mJy:.2f} & {r.SNR:.1f} & ${r.tgt_E:+.2f}\\pm{r.err_E:.2f}$ & ${r.tgt_N:+.2f}\\pm{r.err_N:.2f}$ & ${r.star_E:+.2f}$ & ${r.star_N:+.2f}$ \\\\" for _, r in ast.iterrows()]

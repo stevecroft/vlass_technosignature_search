@@ -154,13 +154,13 @@ component parquet holds exactly the same data.
 - **Population (steady):** f < 6.6×10⁻³ / 1.9×10⁻⁴ / 2.2×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹; per snapshot f·δ < 1.4×10⁻⁵.
   (Epoch-1 catalogue, Poisson limit with no unexplained secure association: 2.1×10⁻² / 6.4×10⁻⁴ / 2.2×10⁻⁵, floor 1.4×10⁻⁵.)
 - **Stacks (all epochs):** M-dwarf mean > 4σ in 4 of 6 shells, 20–40 pc: (7.9 ± 1.1)×10⁵ W Hz⁻¹ (7.5σ); median S/σ shift including
-  detected stars 0.084 ± 0.013 (6.2σ). AFGK ≤ 3.8σ. Mean stacks reach f < 1 at L_T ≈ 1.3×10⁵ (AFGK) and 1.6×10⁵ (M) W Hz⁻¹ (nearest
-  shells); median stacks give f < 0.09–0.10 at 10⁷ and 0.015–0.028 at 10⁹ W Hz⁻¹.
-- **Versus Breakthrough Listen (Price et al. 2020):**
-  - VLASS (all epochs) is about 13,100× deeper in flux density.
-  - For narrowband lines it is about 1.5×10⁵× less sensitive in EIRP.
+  detected stars 0.084 ± 0.013 (6.2σ). AFGK ≤ 3.8σ. Mean stacks reach f < 1 at L_T ≈ 1.1×10⁵ (AFGK) and 1.5×10⁵ (M) W Hz⁻¹
+  (inverse-variance combination of all six shells; the nearest shell alone gives 7.3×10⁴ / 9.2×10⁴); median stacks give f < 0.09–0.10 at 10⁷ and 0.015–0.028 at 10⁹ W Hz⁻¹.
+- **Versus Breakthrough Listen (Price et al. 2020, with the ×3.3 turboSETI correction of Choza et al. 2024, as in Fig. 9):**
+  - VLASS (all epochs) is about 43,100× deeper in flux density (0.54 mJy vs ~23 Jy at 50 pc).
+  - For narrowband lines it is about 4.6×10⁴× less sensitive in EIRP (1.5×10⁵× against the published 2.1×10¹² W).
   - A search of the same GBT data matched to bandwidth B would lose sensitivity only as √B, so the continuum advantage is coverage
-    (signals the turboSETI pipeline does not search for) and sample size, not depth.
+    (signals the turboSETI pipeline does not search for) and every star in the volume, not depth.
 
 ## Reproducibility notes
 
