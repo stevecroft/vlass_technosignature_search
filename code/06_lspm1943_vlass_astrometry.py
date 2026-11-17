@@ -175,9 +175,9 @@ if __name__ == "__main__":
     imh = a2.imshow(stamp, origin="lower", cmap="magma", extent=ext, vmin=-0.3, vmax=1.1)
     a2.contour(stamp, levels=[0.375, 0.625, 0.875], colors="w", linewidths=0.5, extent=ext, origin="lower")
     r3 = ast[ast.image == "SE 3.2"].iloc[0]
-    for o, cc, mk, lab in [(star, "#5dade2", "+", "Star, 2024.4"), (comp, "#58d68d", "x", "Companion, 2024.4")]:
+    for o, cc, mk, ms, lab in [(star, "#5dade2", "+", 9, "Star, 2024.4"), (comp, "#58d68d", "s", 8, "Companion, 2024.4")]:   # as in Figure 3
         sa, sd = C.propagate(o.ra, o.dec, o.pmra, o.pmdec, r3.epoch, plx=o.parallax)
-        a2.plot((sa - RA0) * 3600 * cosd + r3.frame_off_E, (sd - DE0) * 3600 + r3.frame_off_N, mk, color=cc, ms=9, mew=1.4, label=lab)
+        a2.plot((sa - RA0) * 3600 * cosd + r3.frame_off_E, (sd - DE0) * 3600 + r3.frame_off_N, mk, color=cc, ms=ms, mew=1.4, mfc="none", label=lab)
     a2.set_xlim(8, -8); a2.set_ylim(-8, 8); a2.set_xlabel("\u0394RA (arcsec, E left)"); a2.set_ylabel("\u0394Dec (arcsec)")
     a2.set_title("VLASS 3.2 SE image, 2024.4", loc="left"); a2.legend(frameon=False, fontsize=6, loc="lower left", labelcolor="w")
     cb = fig.colorbar(imh, ax=a2, fraction=0.046, pad=0.02); cb.set_label("mJy beam$^{-1}$")

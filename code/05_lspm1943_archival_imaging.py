@@ -5,7 +5,8 @@ epoch position at other position angles (excluding +-40 deg around the target an
 Limits are calibrated against PS1 stars in a 4' field.
 
 Inputs : data/derived/matches_10arcsec.parquet (for the VLASS component position)
-Outputs: data/raw/lspm1943/{dss_*.fits, ps1_*.fits, ps1_calibration.csv, gaia_neighbours.csv}
+Outputs: data/raw/lspm1943/{dss_*.fits, ps1_*.fits, ps1_calibration.csv, gaia_neighbours.csv, gaia_astrometry_errors.csv},
+         data/derived/lspm1943_gaia_position_errors.csv
          results/lspm1943_imaging_limits.csv, results/lspm1943_archival_imaging.png
 Expected: no source at the radio position; 3-sigma limits g~20.4 / r~19.7 (POSS-I), ~20.9 (POSS-II B_J, R_F)
 """
@@ -113,9 +114,9 @@ def figure(vl, star, comp, res):
         lo, hi = np.nanpercentile(cut, [10, 99.5])
         ax.imshow(np.arcsinh((im - lo) / (0.05 * (hi - lo))), origin="lower", cmap="gray_r", vmin=0, vmax=np.arcsinh(20))
         ax.add_patch(Ellipse((xv, yv), 2 * 3.34 / ps, 2 * 1.32 / ps, angle=90 + 108.95, fill=False, ec="#c0392b", lw=0.9))
-        for o, cc, mk in [(star, "#3b6ea8", "+"), (comp, "#2e8b57", "x")]:
+        for o, cc, mk, ms in [(star, "#3b6ea8", "+", 7), (comp, "#2e8b57", "s", 8)]:   # open square: leaves the white dwarf visible
             xs, ys = [float(v) for v in w.world_to_pixel(SkyCoord(*C.propagate(o.ra, o.dec, o.pmra, o.pmdec, ep, plx=o.parallax), unit="deg"))]
-            ax.plot(xs, ys, mk, ms=7, mew=1.0, color=cc)
+            ax.plot(xs, ys, mk, ms=ms, mew=1.0, color=cc, mfc="none")
         ax.set_xlim(xv - half, xv + half); ax.set_ylim(yv - half, yv + half); ax.set_xticks([]); ax.set_yticks([])
         rr = res[res.image == LABEL[name]].iloc[0]
         ax.set_title(f"{LABEL[name]}, {ep:.1f}", loc="left", fontsize=7)
@@ -123,10 +124,9 @@ def figure(vl, star, comp, res):
                 fontsize=6, va="bottom", bbox=dict(fc="white", ec="none", alpha=0.8, pad=1))
     h = [Line2D([], [], color="#c0392b", lw=0.9, label="VLASS component (deconvolved size, 2019.2)"),
          Line2D([], [], marker="+", ls="", color="#3b6ea8", mew=1, label="LSPM J1943+5337 at image epoch"),
-         Line2D([], [], marker="x", ls="", color="#2e8b57", mew=1, label=f"Co-moving companion (Gaia DR3 {COMPANION})")]
-    fig.legend(handles=h, loc="lower center", ncol=3, frameon=False, fontsize=6.5, bbox_to_anchor=(0.5, 0.0))
-    fig.suptitle("No optical source at the radio position when the star was displaced (24\u2033 \u00d7 24\u2033 cutouts)", x=0.01, ha="left", fontsize=8)
-    fig.tight_layout(rect=(0, 0.06, 1, 0.96)); fig.subplots_adjust(hspace=0.28, top=0.88, bottom=0.10)
+         Line2D([], [], marker="s", ls="", color="#2e8b57", mfc="none", mew=1, label=f"Co-moving companion (Gaia DR3 {COMPANION}) at image epoch")]
+    fig.legend(handles=h, loc="lower center", ncol=2, frameon=False, fontsize=6.5, bbox_to_anchor=(0.5, 0.0))
+    fig.tight_layout(rect=(0, 0.09, 1, 1)); fig.subplots_adjust(hspace=0.28, top=0.94, bottom=0.12)
     fig.savefig(os.path.join(C.RES, "lspm1943_archival_imaging.png"), dpi=300); fig.savefig(os.path.join(C.RES, "lspm1943_archival_imaging.pdf"), dpi=300)
 
 
@@ -138,6 +138,22 @@ if __name__ == "__main__":
     fetch(ra0, de0)
     nb = pd.read_csv(os.path.join(IMG, "gaia_neighbours.csv"))
     star = sv[sv.source_id == STAR].iloc[0]; comp = nb[nb.source_id == COMPANION].iloc[0]
+    # Gaia DR3 astrometric uncertainties of the star and companion, propagated to each image epoch (linear, including the
+    # position-proper-motion correlation, with the parallax error added in quadrature as an upper bound on its contribution)
+    fe = os.path.join(IMG, "gaia_astrometry_errors.csv")
+    if not os.path.exists(fe):
+        q = f"""SELECT source_id, ref_epoch, ra_error, dec_error, parallax_error, pmra_error, pmdec_error, ra_pmra_corr, dec_pmdec_corr
+        FROM gaiadr3.gaia_source WHERE source_id IN ({STAR}, {COMPANION})"""
+        pyvo.dal.TAPService(C.GAIA_TAP).search(q).to_table().to_pandas().to_csv(fe, index=False)
+    ge = pd.read_csv(fe); rows = []
+    for _, g in ge.iterrows():
+        for nm in LABEL:
+            dt = load(nm)[2] - g.ref_epoch
+            sa = np.sqrt(g.ra_error**2 + dt**2 * g.pmra_error**2 + 2 * dt * g.ra_pmra_corr * g.ra_error * g.pmra_error + g.parallax_error**2)
+            sd = np.sqrt(g.dec_error**2 + dt**2 * g.pmdec_error**2 + 2 * dt * g.dec_pmdec_corr * g.dec_error * g.pmdec_error + g.parallax_error**2)
+            rows.append(dict(source_id=int(g.source_id), object="star" if g.source_id == STAR else "companion", image=LABEL[nm],
+                             epoch=round(dt + g.ref_epoch, 2), sig_ra_mas=sa, sig_dec_mas=sd))
+    pd.DataFrame(rows).to_csv(os.path.join(C.DER, "lspm1943_gaia_position_errors.csv"), index=False)
     pcal = pd.read_csv(os.path.join(IMG, "ps1_calibration.csv"))
     pcal = pcal[(pcal.iMeanPSFMag > 0) & (np.abs(pcal.iMeanPSFMag - pcal.iMeanKronMag) < 0.1)]
     rng = np.random.default_rng(3)

@@ -131,7 +131,7 @@ component parquet holds exactly the same data.
 - **Multi-epoch (VLASS 1.1–4.1, 177 independent images):** 44/51 variable; 21 co-moving with their star, 17 inconclusive, 12 single-epoch, none stationary.
 - **LSPM J1943+5337:** the radio emission is not at the star: χ² = 77.9 for 3 dof in declination, 104 for 6 dof in RA+Dec
   (VLASS 1.2/2.2/3.2; frame tied to Gaia within 0.03″). Stationary vs co-moving at a ~0.8″ offset is not yet decided; RA positions
-  scatter beyond their errors (source extended E–W). Archival plates show no optical counterpart (POSS-I g ≳ 20.4, r ≳ 19.7–19.9; POSS-II ≳ 20.9).
+  scatter beyond their errors (source extended E–W). Archival plates show no optical counterpart (POSS-I g ≳ 20.4, r ≳ 19.7–19.9; POSS-II B_J ≳ 21.1, R_F ≳ 20.9; at the corrected Epoch-1 position).
 - **Forced photometry, all epochs (720,108 star-epochs; median 3 per star):** peak-loss factor κ = 0.861 from injection–recovery
   (catalogue cross-check 0.899 ± 0.010, a 4% systematic); injected sources are recovered at 5σ in 51% of cases, as Φ(S/σ − 5) predicts.
 - **Forced detections** (the paper's term; scripts and files still say 'candidates'): 161 stars at ≥ 5σ (coadd or any epoch),

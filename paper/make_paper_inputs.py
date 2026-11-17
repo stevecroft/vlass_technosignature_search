@@ -156,6 +156,10 @@ if __name__ == "__main__":
     lim = pd.read_csv(os.path.join(RES, "lspm1943_imaging_limits.csv")).set_index("image")
     put("PossIO", f"{lim.loc['POSS-I O','mag_limit_3sigma']:.1f}"); put("PossIE", f"{lim.loc['POSS-I E','mag_limit_3sigma']:.1f}")
     put("PossIIB", f"{lim.loc['POSS-II B_J','mag_limit_3sigma']:.1f}"); put("PossIIR", f"{lim.loc['POSS-II R_F','mag_limit_3sigma']:.1f}")
+    put("LspmOffPossI", f"{lim.loc['POSS-I O','star_offset_arcsec']:.1f}"); put("LspmOffPossII", f"{lim.loc['POSS-II B_J','star_offset_arcsec']:.1f}")
+    put("LspmOffPS", f"{lim.loc['PS1 g','star_offset_arcsec']:.1f}")
+    _ge = pd.read_csv(os.path.join(DER, "lspm1943_gaia_position_errors.csv")); _ge["s"] = _ge[["sig_ra_mas", "sig_dec_mas"]].max(axis=1)
+    put("GaiaErrStar", f"{_ge[_ge.object == 'star'].s.max():.1f}"); put("GaiaErrComp", f"{_ge[_ge.object == 'companion'].s.max():.0f}")
     lspm = T[T.source_id == 2137474969751117312].iloc[0]
     put("LspmChiTwoD", f"{aj['chi2_at_star_2d']:.0f}"); put("LspmDofTwoD", f"{aj['dof_at_star_2d']}")
     put("LspmChiRAstat", f"{aj['tgt_E_chi2_stationary']:.0f}"); put("LspmChiRAcomove", f"{aj['tgt_E_chi2_comoving']:.0f}")
