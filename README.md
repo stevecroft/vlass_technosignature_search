@@ -22,7 +22,7 @@ python 16_compare_srsc.py          # overlap with the Sydney Radio Star Catalogu
 # All-epoch analysis (needs the four cutout arrays, see 'Large files'):
 python 17_forced_photometry.py     # forced photometry, every star x epoch; injection-recovery calibration (~3 min)
 python 18_alleepoch_candidates.py  # forced detections, confusion veto, control background, SIMBAD/X-ray (cached; --offline)
-python 14_multiepoch_detections.py --candidates   # astrometry of the unexplained forced detections
+python 14_multiepoch_detections.py --candidates   # astrometry of the forced detections without activity evidence
 python 19_alleepoch_limits_stacks.py  # per-star, population and stack limits (~1 min)
 python 20_alleepoch_figures.py
 python 21_epoch_catalog_crosscheck.py --offline   # cross-check against per-epoch QL/SE/median-stack catalogues (~1 min)
@@ -126,7 +126,7 @@ component parquet holds exactly the same data.
   - 21 X-ray-active stars without a more specific type (19 with multiplicity evidence);
   - 1 emission-line star: 2MASS J17022950+1341015 (M dwarf, 30.5 pc; Epoch 1 only, forced S/N 4.9 then <2: a flare);
   - 1 radio source not coincident with its star (LSPM J1943+5337); in the all-epoch tests it is counted among the
-    unexplained forced detections like any other star, since the control-position background counts such coincidences.
+    forced detections without activity evidence like any other star, since the control-position background counts such coincidences.
   - 30 of the 51 are in the Sydney Radio Star Catalogue (11 circularly polarized); 41 are in De et al. (2024).
 - **Multi-epoch (VLASS 1.1–4.1, 177 independent images):** 44/51 variable; 21 co-moving with their star, 17 inconclusive, 12 single-epoch, none stationary.
 - **LSPM J1943+5337:** the radio emission is not at the star: χ² = 77.9 for 3 dof in declination, 104 for 6 dof in RA+Dec
@@ -135,14 +135,17 @@ component parquet holds exactly the same data.
 - **Forced photometry, all epochs (720,108 star-epochs; median 3 per star):** peak-loss factor κ = 0.861 from injection–recovery
   (catalogue cross-check 0.899 ± 0.010, a 4% systematic); injected sources are recovered at 5σ in 51% of cases, as Φ(S/σ − 5) predicts.
 - **Forced detections** (the paper's term; scripts and files still say 'candidates'): 161 stars at ≥ 5σ (coadd or any epoch),
-  149 with activity evidence (137 with a 2RXS/eRASS1 counterpart, 12 by SIMBAD types alone), 12 unexplained (including LSPM J1943+5337).
-  Steady test (coadd): 5 unexplained vs 11.4 expected at control positions → μ95 = 4.5. Single-epoch test: 13 vs 11.8 → μ95 = 9.7
+  149 with activity evidence (137 with a 2RXS/eRASS1 counterpart, 12 by SIMBAD types alone), 12 without activity evidence (including LSPM J1943+5337).
+  Each of the 5 in the steady test has a specific explanation: LSPM J1943+5337 and TYC 3573-1391-1 are offset from the star;
+  Gaia DR3 2563195186142791552 is 6.8–8.4″ from an extended 22 mJy background source; PM J20156+4321 is a marginal 5.5σ coadd excess;
+  G 133-48 is stellar (an over-luminous M dwarf, L_ν ≈ 4.6×10⁷ W Hz⁻¹). The other 7 are single-epoch 5.0–9.1σ events.
+  Steady test (coadd): 5 vs 11.4 expected at control positions → μ95 = 4.5. Single-epoch test: 13 vs 11.8 → μ95 = 9.7
   (P(n ≥ 13) = 0.40). Without the SIMBAD Em* and X types (which explain 6 forced detections): 8 vs 11.4 → 6.0 and 19 vs 11.8 → 16.2.
   Apart from LSPM J1943+5337, the one forced detection bright enough for per-epoch astrometry (TYC 3573-1391-1) lies 1.8″ from its star.
 - **Cross-check with per-epoch catalogues (21):** κ from the QL3.1–4.1 lists 0.83–0.87 (adopted 0.861). Our bias-corrected fluxes are
   1.13 ± 0.01 × the Single Epoch peaks (1.07–1.16 by epoch), and SE/QL = 0.975 ± 0.006 for the same Epoch-3 sources: faint compact QL
   peaks are less biased than the calibrator-based 0.92, so later-epoch fluxes and limits may be ≈13% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. Of the 12
-  unexplained forced detections, G 133-48 is detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in
+  forced detections without activity evidence, G 133-48 is detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in
   four catalogues; LSPM J1943+5337 is in two. An own-epoch confusion veto gives 5→8 vs b 11.4→23.4 (steady); the union of both vetoes changes
   μ95 by −5% (steady) and +12% (single-epoch; 13 vs 10.1, P = 0.22). The median stack
   (152,511 low-motion stars) finds no steady emitters missed by the coadd (9 unclassified matches, all 1.9–2.3″ off; 22 chance).

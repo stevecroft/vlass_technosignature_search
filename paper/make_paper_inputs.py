@@ -464,10 +464,48 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) \KSteady\ unexplained forced detections compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}). Multiplicity: SIMBAD binary type, RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge. Catalogs: independent per-epoch component catalogs with a $\ge5\sigma$ component within 4\arcsec\ of the star's position at that epoch, and the separation (E1: Epoch-1 QL; QL: NRAO QL lists; SE: Single Epoch lists; Med: QL median stack; Section~\ref{sec:catcheck}).}
+\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) these \KSteady\ forced detections compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}). Multiplicity: SIMBAD binary type, RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge. Catalogs: independent per-epoch component catalogs with a $\ge5\sigma$ component within 4\arcsec\ of the star's position at that epoch, and the separation (E1: Epoch-1 QL; QL: NRAO QL lists; SE: Single Epoch lists; Med: QL median stack; Section~\ref{sec:catcheck}).}
 \end{deluxetable*}
 }
 """)
+
+        # Section 4.4 notes on the forced detections without activity evidence. The prose discusses the five steady-test
+        # stars by name; if that set changes, the warning below says the text must be revisited.
+        _SA = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "ra", "dec"]).set_index("source_id")
+        def _gal(ra, dec):   # ICRS -> Galactic (l, b) in degrees
+            a, d = np.radians(ra), np.radians(dec)
+            M = np.array([[-0.0548755604, -0.8734370902, -0.4838350155], [0.4941094279, -0.4448296300, 0.7469822445],
+                          [-0.8676661490, -0.1980763734, 0.4559837762]])
+            x = M @ np.array([np.cos(d) * np.cos(a), np.cos(d) * np.sin(a), np.sin(d)])
+            return np.degrees(np.arctan2(x[1], x[0])) % 360, np.degrees(np.arcsin(x[2]))
+        Us, Ue = U[U.cand_coadd], U[~U.cand_coadd]
+        _IDS = {2137474969751117312, 349716170186042880, 2071061615589030400, 2563195186142791552, 2080884927342950272}
+        if set(Us.source_id) != _IDS:
+            print("WARNING: steady-test forced detections changed:", sorted(set(Us.source_id) ^ _IDS), "- revise ms.tex Section 4.4")
+        _lb = [_gal(_SA.ra[i], _SA.dec[i]) for i in Us.source_id]
+        put("NSteadyU", str(len(Us))); put("NSnapOnlyU", str(len(Ue)))
+        put("NSteadyNoErass", str(sum(not (179.944 < l < 359.944) for l, b in _lb)))   # eRASS1 = German half, 179.944 < l < 359.944
+        put("NSteadyCyg", str(sum((75 < l < 90) and abs(b) < 15 for l, b in _lb)))
+        _mx = [max(float(e.split(":")[1]) for e in str(t).split(";")) for t in Ue.epoch_snr]
+        put("SnapOnlyLo", f"{min(_mx):.1f}"); put("SnapOnlyHi", f"{max(_mx):.1f}")
+        put("NSnapOnlyMult", str(int(sum(isinstance(m, str) and m != "" for m in Ue.multiplicity_evidence))))
+        _g = Us.set_index("source_id")
+        _r = _g.loc[349716170186042880]; _L = 4 * np.pi * (_r.dist_pc * 3.0857e16) ** 2 * _r.S_coadd_mJy * 1e-29
+        put("GOTEL", sci(_L)); put("GOTELcgs", sci(_L * 1e7)); put("GOTEd", f"{_r.dist_pc:.0f}"); put("GOTEdMG", f"{-_r.dMG:.1f}")
+        _r = _g.loc[2080884927342950272]
+        put("PMJSNR", f"{_r.snr_coadd:.1f}"); put("PMJMaxEp", f"{max(float(e.split(':')[1]) for e in _r.epoch_snr.split(';')):.1f}")
+        _sid = 2563195186142791552; _ra, _de = _SA.ra[_sid], _SA.dec[_sid]
+        _E = pd.read_parquet(os.path.join(RAW, "vlass_e1ql_components.parquet"), columns=["RAJ2000", "DEJ2000", "Ftot", "DCMaj"],
+                             filters=[("DEJ2000", ">", _de - 0.01), ("DEJ2000", "<", _de + 0.01)])
+        _sep = np.hypot((_E.RAJ2000 - _ra) * np.cos(np.radians(_de)), _E.DEJ2000 - _de) * 3600; _E = _E[_sep < 15].assign(sep=_sep[_sep < 15])
+        put("GExtN", str(len(_E))); put("GExtSepLo", f"{_E.sep.min():.1f}"); put("GExtSepHi", f"{_E.sep.max():.1f}")
+        put("GExtF", f"{_E.Ftot.sum():.0f}"); put("GExtMaj", f"{_E.DCMaj.min():.1f}"); put("GExtMajHi", f"{_E.DCMaj.max():.1f}")
+        _EC = pd.read_csv(os.path.join(RES, "epoch_catalog_candidates.csv")).set_index("source_id")
+        put("GExtVetoOwn", str(int(_EC.n_veto_own[_sid]))); put("GExtNep", str(int(_EC.n_epochs[_sid])))
+        import sys; sys.path.insert(0, os.path.join(ROOT, "code")); import common as _C
+        _T = pd.read_csv(os.path.join(RES, "vlass_star_matches_classified.csv"))
+        _Mn = _T[(_T["class"] != "UNEXPLAINED") & ~_T["class"].str.startswith("background") & (_T.bp_rp >= _C.BPRP_SPLIT)]
+        put("NMSecNat", str(len(_Mn))); put("MSecLlo", sci(_Mn.Lnu_R_WHz.min())); put("MSecLhi", sci(_Mn.Lnu_R_WHz.max()))
 
     # per-epoch catalogue cross-check (21)
     fx = os.path.join(DER, "epoch_catalog_crosscheck.json")
