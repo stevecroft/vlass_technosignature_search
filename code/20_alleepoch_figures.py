@@ -64,7 +64,7 @@ if __name__ == "__main__":
              linewidths=0, extent=(1, 2, 5.0, 10.3))
     c.scatter(P.dist_pc[~far], P.L_lim_steady[~far], s=2, c="0.45", lw=0, zorder=2)
     c.scatter(Ts.dist_pc, Ts.Lnu_R_WHz, s=12, c="#3b6ea8", edgecolor="k", lw=0.3, zorder=3, label="Secure associations (Epoch 1)")
-    for ex, col, lab in [(True, "#e0a030", "Candidates with activity evidence"), (False, "#c0392b", "Unexplained candidates")]:
+    for ex, col, lab in [(True, "#e0a030", "Forced detections, activity evidence"), (False, "#c0392b", "Unexplained forced detections")]:
         x = CA[CA.explained == ex]
         c.scatter(x.dist_pc, C.lum(x.S_coadd_mJy.clip(lower=1e-3), x.dist_pc), s=14, marker="D" if ex else "x", c=col, lw=0.8 if not ex else 0.3,
                   edgecolor="k" if ex else None, zorder=4, label=lab)

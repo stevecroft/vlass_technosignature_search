@@ -221,6 +221,12 @@ if __name__ == "__main__":
         put("NCandExplStrict", str(cj["n_explained_strict"])); put("NCandExplWeak", str(cj["n_explained"] - cj["n_explained_strict"]))
         put("StrictPct", f"{100 * (cj['mu95_steady_strict'] / cj['mu95_steady'] - 1):.0f}")
         put("StrictSnapPct", f"{100 * (cj['mu95_snap_strict'] / cj['mu95_snap'] - 1):.0f}")
+        _CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); _ex = _CA[_CA.explained]
+        _ev = _ex.activity_evidence.fillna("").str.split("; "); _tc = _ev.explode().value_counts()
+        _xc = _ev.apply(lambda L: "X-ray" in L)
+        put("NCandXcat", str(int(_xc.sum()))); put("NCandSimbadOnly", str(int((~_xc).sum())))
+        for _k, _t in [("TX", "X-ray (SIMBAD)"), ("TFl", "flare"), ("TEm", "emission-line"), ("TBY", "BY Dra"), ("TRS", "RS CVn"), ("TY", "young"), ("TCP", "magnetic CP")]:
+            put("NCand" + _k, str(int(_tc.get(_t, 0))))
         put("NCandStars", str(cj["n_candidate_stars"])); put("NCandExpl", str(cj["n_explained"])); put("NCandMult", str(cj["n_multiplicity_only"]))
         put("KUnexpl", str(cj["k_unexplained"])); put("BExp", f"{cj['b_expected']:.1f}"); put("MuHidden", f"{cj['mu95_hidden']:.1f}")
         put("KSteady", str(cj["k_steady"])); put("BSteady", f"{cj['b_steady']:.1f}"); put("MuSteady", f"{cj['mu95_steady']:.1f}")
@@ -421,7 +427,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{$\langle L_\nu\rangle$: inverse-variance-weighted mean spectral luminosity of clean stars (no secure association, no candidate, no epoch with predicted catalogue contamination $\ge0.5\sigma$), after subtracting the mean at the control positions; the error is the larger of the formal error and the scatter among the eight control positions. $N_{\rm eff,w}=(\sum w)^2/\sum w^2$; Top 10: weight fraction carried by the ten highest-weight stars. $\Delta\,{\rm med}(S/\sigma)$: median $S/\sigma$ of all unvetoed stars in the shell, including detected stars, minus the median at control positions; bootstrap error.}
+\tablecomments{$\langle L_\nu\rangle$: inverse-variance-weighted mean spectral luminosity of clean stars (no secure association, no forced detection, no epoch with predicted catalogue contamination $\ge0.5\sigma$), after subtracting the mean at the control positions; the error is the larger of the formal error and the scatter among the eight control positions. $N_{\rm eff,w}=(\sum w)^2/\sum w^2$; Top 10: weight fraction carried by the ten highest-weight stars. $\Delta\,{\rm med}(S/\sigma)$: median $S/\sigma$ of all unvetoed stars in the shell, including detected stars, minus the median at control positions; bootstrap error.}
 \end{deluxetable*}
 """)
         CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); U = CA[~CA.explained].sort_values("dist_pc")
@@ -450,13 +456,13 @@ if __name__ == "__main__":
         open(os.path.join(HERE, "tables", "unexplained_candidates.tex"), "w").write(r"""{\setlength{\tabcolsep}{3pt}
 \begin{deluxetable*}{lrrrrr>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.4cm}}
 \tabletypesize{\scriptsize}
-\tablecaption{Candidates without activity evidence (any epoch or the coadd at $\ge5\sigma$).\label{tab:unexplained}}
+\tablecaption{Forced detections without activity evidence (any epoch or the coadd at $\ge5\sigma$).\label{tab:unexplained}}
 \tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$BP-RP$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{Multiplicity} & \colhead{Catalogs} \\
 \colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{} & \colhead{} & \colhead{} & \colhead{}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) \KSteady\ unexplained candidates compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}). Multiplicity: SIMBAD binary type, RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge. Catalogs: independent per-epoch component catalogs with a $\ge5\sigma$ component within 4\arcsec\ of the star's position at that epoch, and the separation (E1: Epoch-1 QL; QL: NRAO QL lists; SE: Single Epoch lists; Med: QL median stack; Section~\ref{sec:catcheck}).}
+\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) \KSteady\ unexplained forced detections compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}). Multiplicity: SIMBAD binary type, RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge. Catalogs: independent per-epoch component catalogs with a $\ge5\sigma$ component within 4\arcsec\ of the star's position at that epoch, and the separation (E1: Epoch-1 QL; QL: NRAO QL lists; SE: Single Epoch lists; Med: QL median stack; Section~\ref{sec:catcheck}).}
 \end{deluxetable*}
 }
 """)

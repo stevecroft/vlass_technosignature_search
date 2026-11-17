@@ -21,8 +21,8 @@ python 15_compare_de2024.py        # overlap with De et al. 2024 (VLASS-Gaia rad
 python 16_compare_srsc.py          # overlap with the Sydney Radio Star Catalogue (Driessen et al. 2024)
 # All-epoch analysis (needs the four cutout arrays, see 'Large files'):
 python 17_forced_photometry.py     # forced photometry, every star x epoch; injection-recovery calibration (~3 min)
-python 18_alleepoch_candidates.py  # candidates, confusion veto, control background, SIMBAD/X-ray (cached; --offline)
-python 14_multiepoch_detections.py --candidates   # astrometry of the unexplained candidates
+python 18_alleepoch_candidates.py  # forced detections, confusion veto, control background, SIMBAD/X-ray (cached; --offline)
+python 14_multiepoch_detections.py --candidates   # astrometry of the unexplained forced detections
 python 19_alleepoch_limits_stacks.py  # per-star, population and stack limits (~1 min)
 python 20_alleepoch_figures.py
 python 21_epoch_catalog_crosscheck.py --offline   # cross-check against per-epoch QL/SE/median-stack catalogues (~1 min)
@@ -102,7 +102,7 @@ component parquet holds exactly the same data.
 | `classification_overrides.csv` | Two literature reclassifications (LQ Hya, PW And: young single dwarfs), with references | — |
 | `de2024_vlass_gaia_table1.csv` | VizieR J/AJ/168/288/table1 (De et al. 2024; 605 rows) | — |
 | `srsc/` | Sydney Radio Star Catalogue (Driessen et al. 2024; radiostars.org): ReadMe, stars.dat, radio.dat | 1.3 MB |
-| `xray_counterparts.csv` | ROSAT 2RXS (40″) and eRASS1 (20″) nearest counterparts for the 73 candidate stars (VizieR mirror) | — |
+| `xray_counterparts.csv` | ROSAT 2RXS (40″) and eRASS1 (20″) nearest counterparts for the 77 stars with an Epoch-1 component within 2.5″ (VizieR mirror) | — |
 | `simbad_candidates.csv`, `simbad_nearest.csv` | SIMBAD (CfA mirror) identifications and object types | — |
 | `vlass_ql_catalogs_near_stars.parquet` | Components within 60″ of any sample star from the NRAO per-epoch lists, de-duplicated (cat = QL3.1, QL3.2, QL4.1: interim QL lists, VLASS Memo 22; QLMED: QL median stack of Epochs 1–3; SE2.1–SE3.2: Single Epoch Continuum Imaging lists, 2026-06 versions). Position errors in on-sky arcsec. Built by `21 --reduce` | 7.4 MB |
 | `vlass_catalog_images.parquet` | Every image (QL subtile / SE pointing) present in each of those lists, with its component count; defines the partial SE sky coverage | 0.3 MB |
@@ -120,7 +120,7 @@ component parquet holds exactly the same data.
   (corrected Epoch-1 offset 0.65″ vs 0.14″ in QL3.1) and is treated as confusion-limited.
 - **Classification of the 51** (secure associations only, R > 0.5; SIMBAD types first; an association is explained only by
   activity evidence -- a 2RXS/eRASS1 counterpart, a SIMBAD X-ray-source type (X), or a SIMBAD flare/BY Dra/RS CVn/
-  emission-line (Em*)/young/CV/magnetic CP type -- the same rule as for the all-epoch candidates; multiplicity is recorded
+  emission-line (Em*)/young/CV/magnetic CP type -- the same rule as for the forced detections; multiplicity is recorded
   separately and explains nothing):
   - 9 flare stars, 6 RS CVn, 6 BY Dra, 4 young stars, 2 CVs, 1 magnetic CP star;
   - 21 X-ray-active stars without a more specific type (19 with multiplicity evidence);
@@ -133,14 +133,15 @@ component parquet holds exactly the same data.
   scatter beyond their errors (source extended E–W). Archival plates show no optical counterpart (POSS-I g ≳ 20.4, r ≳ 19.7–19.9; POSS-II ≳ 20.9).
 - **Forced photometry, all epochs (720,108 star-epochs; median 3 per star):** peak-loss factor κ = 0.861 from injection–recovery
   (catalogue cross-check 0.899 ± 0.010, a 4% systematic); injected sources are recovered at 5σ in 51% of cases, as Φ(S/σ − 5) predicts.
-- **Candidates:** 160 stars at ≥ 5σ (coadd or any epoch), 149 with activity evidence (11 unexplained). Steady test (coadd): 4
+- **Forced detections** (the paper's term; scripts and files still say 'candidates'): 160 stars at ≥ 5σ (coadd or any epoch),
+  149 with activity evidence (137 with a 2RXS/eRASS1 counterpart, 12 by SIMBAD types alone), 11 unexplained. Steady test (coadd): 4
   unexplained vs 11.4 expected at control positions → μ95 = 4.1. Single-epoch test: 10 vs 11.8 → μ95 = 7.2. Without the SIMBAD
-  Em* and X types (which explain 6 candidates): 7 vs 11.4 → 5.5 and 16 vs 11.8 → 12.8. The one candidate bright enough for
+  Em* and X types (which explain 6 forced detections): 7 vs 11.4 → 5.5 and 16 vs 11.8 → 12.8. The one forced detection bright enough for
   per-epoch astrometry (TYC 3573-1391-1) lies 1.8″ from its star.
 - **Cross-check with per-epoch catalogues (21):** κ from the QL3.1–4.1 lists 0.83–0.87 (adopted 0.861). Our bias-corrected fluxes are
   1.13 ± 0.01 × the Single Epoch peaks (1.07–1.16 by epoch), and SE/QL = 0.975 ± 0.006 for the same Epoch-3 sources: faint compact QL
   peaks are less biased than the calibrator-based 0.92, so later-epoch fluxes and limits may be ≈13% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. Of the 11
-  unexplained candidates, G 133-48 is detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in
+  unexplained forced detections, G 133-48 is detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in
   four catalogues. An own-epoch confusion veto gives 4→7 vs b 11.4→23.4 (steady); the union of both vetoes changes μ95 by −6%
   (steady) and +11% (single-epoch). The median stack
   (152,511 low-motion stars) finds no steady emitters missed by the coadd (9 unclassified matches, all 1.9–2.3″ off; 22 chance).
