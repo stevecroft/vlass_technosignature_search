@@ -70,7 +70,7 @@ def finalize(text):
 
 DOIS = {
     "Price2020": "10.3847/1538-3881/ab65f1", "Enriquez2017": "10.3847/1538-4357/aa8d1b",
-    "Isaacson2017": "10.1088/1538-3873/aa5800", "Tremblay2025": "10.3847/1538-3881/ad9ea5",
+    "Isaacson2017": "10.1088/1538-3873/aa5800", "Tremblay2025": "10.3847/1538-3881/ad9ea5", "Czech2021": "10.1088/1538-3873/abf329",
     "Painter2025": "10.3847/1538-3881/adbc5e", "Wlodarczyk2020": "10.1093/mnras/staa2672",
     "Garrett2022": "10.1093/mnras/stac2607",
     "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378",

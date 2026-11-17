@@ -119,6 +119,14 @@ Condon, J.~J., Cotton, W.~D., Greisen, E.~W., {et~al.} 1998,
   \dodoi{10.1086/300337}
 
 % type= article
+\bibitem[{D. Czech {et~al.}(2021)Czech, Isaacson, Pearce, Cox, Sheikh, Brzycki,
+  Buchner, Croft, DeBoer, DeMarines, Drew, Gajjar, Lacki, Lebofsky, MacMahon,
+  Ng, de~Pater, Price, Siemion, Van~Rooyen, \& Pete~Worden}]{Czech2021}
+Czech, D., Isaacson, H., Pearce, L., {et~al.} 2021, \bibinfo{title}{{The
+  Breakthrough Listen Search for Intelligent Life: MeerKAT Target Selection},}
+  \pasp, 133, 064502, \dodoi{10.1088/1538-3873/abf329}
+
+% type= article
 \bibitem[{I. Davis {et~al.}(2026)Davis, Hallinan, Ayala, Dong, \&
   Myers}]{Davis2026}
 Davis, I., Hallinan, G., Ayala, C., Dong, D., \& Myers, S. 2026,
