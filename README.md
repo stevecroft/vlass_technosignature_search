@@ -102,7 +102,7 @@ component parquet holds exactly the same data.
 | `classification_overrides.csv` | Two literature reclassifications (LQ Hya, PW And: young single dwarfs), with references | — |
 | `de2024_vlass_gaia_table1.csv` | VizieR J/AJ/168/288/table1 (De et al. 2024; 605 rows) | — |
 | `srsc/` | Sydney Radio Star Catalogue (Driessen et al. 2024; radiostars.org): ReadMe, stars.dat, radio.dat | 1.3 MB |
-| `xray_counterparts.csv` | ROSAT 2RXS (40″) and eRASS1 (20″) nearest counterparts for the 77 stars with an Epoch-1 component within 2.5″ (VizieR mirror) | — |
+| `xray_counterparts.csv` | ROSAT 2RXS (40″) and eRASS1 (20″) nearest counterparts for the 77 stars that had an Epoch-1 component within 2.5″ before the w-term astrometric correction (75 after it; the paper uses those 75) (VizieR mirror) | — |
 | `simbad_candidates.csv`, `simbad_nearest.csv` | SIMBAD (CfA mirror) identifications and object types | — |
 | `vlass_ql_catalogs_near_stars.parquet` | Components within 60″ of any sample star from the NRAO per-epoch lists, de-duplicated (cat = QL3.1, QL3.2, QL4.1: interim QL lists, VLASS Memo 22; QLMED: QL median stack of Epochs 1–3; SE2.1–SE3.2: Single Epoch Continuum Imaging lists, 2026-06 versions). Position errors in on-sky arcsec. Built by `21 --reduce` | 7.4 MB |
 | `vlass_catalog_images.parquet` | Every image (QL subtile / SE pointing) present in each of those lists, with its component count; defines the partial SE sky coverage | 0.3 MB |

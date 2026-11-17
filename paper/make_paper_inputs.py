@@ -57,7 +57,17 @@ if __name__ == "__main__":
 
     # --- classification
     T = pd.read_csv(os.path.join(RES, "vlass_star_matches_classified.csv")); xr = pd.read_csv(os.path.join(RAW, "xray_counterparts.csv"))
-    put("NCand", str(len(xr))); put("NRxs", str(int(xr.rxs_r.notna().sum()))); put("NEra", str(int(xr.era_r.notna().sum())))
+    # stars with an Epoch-1 component within 2.5" in the *current* cross-match (the cached X-ray table can hold stars that
+    # dropped out after the astrometric correction, so it is restricted to these)
+    _m = pd.read_parquet(os.path.join(DER, "matches_10arcsec.parquet"), columns=["source_id", "sep", "rel"])
+    _m = _m[_m.sep <= 2.5].sort_values("rel", ascending=False).drop_duplicates("source_id")
+    xr = xr[xr.source_id.isin(_m.source_id)]; assert len(xr) == len(_m), "xray_counterparts.csv lacks current 2.5-arcsec matches; rerun 04"
+    put("NCand", str(len(_m))); put("NRxs", str(int(xr.rxs_r.notna().sum()))); put("NEra", str(int(xr.era_r.notna().sum())))
+    _ns = _m[_m.rel <= 0.5]; _xs = xr.set_index("source_id").reindex(_ns.source_id)
+    put("NCandNonSec", str(len(_ns))); put("NonSecSepMed", f"{_ns.sep.median():.1f}"); put("SecSepMed", f"{_m[_m.rel > 0.5].sep.median():.2f}")
+    put("NNonSecRxs", str(int(_xs.rxs_r.notna().sum())))
+    _o = pd.read_parquet(os.path.join(DER, "offset_pairs.parquet"), columns=["istar", "sep", "k"])
+    put("NCandChance", f"{_o[_o.sep <= 2.5].groupby('k').istar.nunique().sum() / _o.k.nunique():.0f}")
     S = T[T.secure].copy(); vc = S["class"].value_counts()
     CLS = [("UNEXPLAINED", "Unexpl", "U"), ("emission-line star", "Em", "Em"), ("flare star", "Flare", "Fl"), ("RS CVn binary", "RS", "RS"), ("BY Dra variable", "BY", "BY"),
            ("young star", "Young", "Y"), ("cataclysmic variable", "CV", "CV"), ("X-ray-active star", "XA", "X"), ("magnetic CP star", "CP", "CP")]
