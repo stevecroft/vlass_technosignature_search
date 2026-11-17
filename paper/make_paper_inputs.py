@@ -215,7 +215,7 @@ if __name__ == "__main__":
         put("NNoEpochSouth", com((_dec.reindex(_P.source_id[_none]) < -38).sum()))
         put("NAllVeto", str(int((_P.n.isna() & (_P.n_ep_all > 0)).sum()))); put("NWithForced", com((~_none).sum()))
         from scipy.stats import poisson as _po
-        put("PSteadyLow", f"{_po.cdf(cj['k_steady'], cj['b_steady']):.3f}"); put("PSnapLow", f"{_po.cdf(cj['k_snap'], cj['b_snap']):.2f}")
+        put("PSteadyLow", f"{_po.cdf(cj['k_steady'], cj['b_steady']):.3f}"); put("PSnapLow", f"{_po.cdf(cj['k_snap'], cj['b_snap']):.2f}"); put("PSnapHigh", f"{_po.sf(cj['k_snap'] - 1, cj['b_snap']):.2f}")
         put("KSteadyStrict", str(cj["k_steady_strict"])); put("MuSteadyStrict", f"{cj['mu95_steady_strict']:.1f}")
         put("KSnapStrict", str(cj["k_snap_strict"])); put("MuSnapStrict", f"{cj['mu95_snap_strict']:.1f}")
         put("NCandExplStrict", str(cj["n_explained_strict"])); put("NCandExplWeak", str(cj["n_explained"] - cj["n_explained_strict"]))
@@ -286,7 +286,9 @@ if __name__ == "__main__":
         put("NMShellsFour", str(int((SA[SA.cls == "M"].meanL_snr >= 4).sum())))
         fc = os.path.join(RES, "vlass_detections_variability_candidates.csv")
         if os.path.exists(fc):
-            vc_ = pd.read_csv(fc); multi = vc_[vc_.n_det >= 2]
+            vc_ = pd.read_csv(fc)
+            _sec = set(pd.read_csv(os.path.join(RES, "vlass_star_matches_classified.csv")).source_id)   # secure ones have their own astrometry (Sections 4.2-4.3)
+            multi = vc_[(vc_.n_det >= 2) & ~vc_.source_id.isin(_sec)]
             put("NCandAstro", str(len(multi)))
             if len(multi):
                 r_ = multi.sort_values("S_mean_mJy").iloc[-1]
@@ -496,6 +498,11 @@ if __name__ == "__main__":
         for tag, k in (("Own", "own_epoch"), ("Union", "union")):
             put(f"Xc{tag}Ks", str(V[k]["k_steady"])); put(f"Xc{tag}Bs", f"{V[k]['b_steady']:.1f}"); put(f"Xc{tag}Mus", f"{V[k]['mu95_steady']:.1f}")
             put(f"Xc{tag}Ke", str(V[k]["k_snap"])); put(f"Xc{tag}Be", f"{V[k]['b_snap']:.1f}"); put(f"Xc{tag}Mue", f"{V[k]['mu95_snap']:.1f}")
+        from scipy.stats import poisson as _pv
+        _pp = {(k, t): _pv.sf(V[k][f"k_{t}"] - 1, V[k][f"b_{t}"]) for k in ("own_epoch", "union") for t in ("steady", "snap")}
+        _kmin = min(_pp, key=_pp.get)
+        if _kmin != ("union", "snap"): print("WARNING: largest veto-variant excess is", _kmin, "- update ms.tex Section 4.5 text")
+        put("XcUnionPe", f"{_pp[('union', 'snap')]:.2f}")
         put("XcOwnAdded", str(len(V["own_epoch"]["added_vs_adopted"]))); put("XcOwnAddedUnexpl", str(len(V["own_epoch"]["added_unexplained"])))
         put("XcOwnNotEOne", str(X["star_epochs_veto"]["own_not_E1"]))
         put("XcMuSnapChange", f"{100 * (V['union']['mu95_snap'] / V['adopted_E1']['mu95_snap'] - 1):+.0f}")

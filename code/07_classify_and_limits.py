@@ -126,9 +126,10 @@ if __name__ == "__main__":
     L.loc[conf.index, "S_lim_mJy"] = np.maximum(L.loc[conf.index, "S_lim_mJy"], conf.values)
     det = A[A.rel > 0.5]
     L["detected"] = False; L.loc[det.istar.values, "detected"] = True
-    # secure associations whose emission is explained (natural emitter, or a background source not at the star);
-    # unexplained secure associations are treated like any other star in the all-epoch candidate test (18, 19)
-    L["explained_detection"] = L.source_id.isin(T.source_id[T.secure & (T["class"] != "UNEXPLAINED")])
+    # secure associations whose emission is explained by a natural stellar mechanism. Unexplained secure associations and
+    # sources shown not to be at the star (background) are tested like any other star in the forced-detection test (18, 19):
+    # the control-position background b counts such chance coincidences, so removing the demonstrable ones would bias k low.
+    L["explained_detection"] = L.source_id.isin(T.source_id[T.secure & (T["class"] != "UNEXPLAINED") & ~T["class"].str.startswith("background")])
     L.loc[det.istar.values, "S_lim_mJy"] = (det.Ftot.values + C.Z95 * det.e_Ftot.values) / C.int_bias(det.half.values)
     L["Lnu_lim_WHz"] = C.lum(L.S_lim_mJy, L.dist_pc); L["EIRP_lim_W_2GHz"] = L.Lnu_lim_WHz * C.BAND_HZ
     # stars with any non-secure catalogued component within 10" (excluded from stacking in script 10)
