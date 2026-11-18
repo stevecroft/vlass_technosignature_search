@@ -13,7 +13,8 @@ A star-epoch is a candidate if its forced S/N (17) is >= 5 and the star is not a
     magnetic CP/emission-line type). The *_strict values repeat the tests without the emission-line and SIMBAD X-ray types. Stars with
     only multiplicity evidence are listed separately and counted as unexplained (conservative).
   * Chance background: the same estimator and the same 3" catalogue veto at 8 control positions 14" from each star.
-    b = (control rate) x (number of unvetoed, non-secure star-epochs). Control positions carry no stellar emission,
+    b = (control rate) x (number of unvetoed, non-secure star-epochs), both counted only around stars without activity
+    evidence (04b), because a detection at a star with activity evidence is classified as natural whatever its origin. Control positions carry no stellar emission,
     so b counts sidelobes and unrelated sources only, matching the unexplained candidates.
   * Upper limit on the number of transmitter detections hidden among the k unexplained candidates, given background b:
     the conditional (Zech 1989) 95% limit, P(n<=k | mu+b) / P(n<=k | b) = 0.05.
@@ -58,6 +59,16 @@ def predicted(ra, de, comp, tree, exclude_sid=None, own=None):
 
 def zech_ul(k, b, cl=0.95):
     f = lambda mu: poisson.cdf(k, mu + b) / poisson.cdf(k, b) - (1 - cl)
+    return brentq(f, 0, 100 + 10 * k)
+
+
+def zech_ul_marg(k, hits, scale, cl=0.95, n=20000, seed=1):
+    """Zech limit marginalized over the uncertainty in b, estimated from 'hits' control detections:
+    b ~ Gamma(hits + 1/2) * scale (Jeffreys prior on the control rate), and mu_95 solves
+    E_b[P(n<=k | mu+b)] / E_b[P(n<=k | b)] = 1 - cl."""
+    bs = np.random.default_rng(seed).gamma(hits + 0.5, 1.0, n) * scale
+    den = poisson.cdf(k, bs).mean()
+    f = lambda mu: poisson.cdf(k, mu + bs).mean() / den - (1 - cl)
     return brentq(f, 0, 100 + 10 * k)
 
 
@@ -106,18 +117,42 @@ if __name__ == "__main__":
     # Two tests, each with its own trials and chance background:
     #   steady   : one trial per star, the coadd S/N >= 5           -> k_steady, b_steady (limits on f)
     #   snapshot : one trial per star-epoch, single-epoch S/N >= 5   -> k_snap, b_snap     (limits on f * delta)
-    co_hits = co_tot = 0; ep_hits = ep_tot = 0
-    for j in range(N_CTRL):
-        ok = ~U[f"cv{j}"].values & np.isfinite(U[f"c{j}"].values)
-        Uj = U[ok]; ep_hits += int((Uj[f"c{j}"] >= THR).sum()); ep_tot += len(Uj)
-        num = (Uj[f"c{j}"] / Uj.sigma_mJy).groupby(Uj.source_id).sum(); den = np.sqrt((1 / Uj.sigma_mJy ** 2).groupby(Uj.source_id).sum())
-        zc = num / den; co_hits += int((zc >= THR).sum()); co_tot += len(zc)
+    # Activity evidence for every star (04b). A forced detection at a star with activity evidence is classified as a
+    # natural emitter and removed from k, whatever its origin, so chance detections around such stars must also be
+    # removed from the background: b is the control-position rate around stars without activity evidence, times the
+    # number of trials at those stars.
+    ACT = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"), columns=["source_id", "active", "activity_evidence"])
+    active_ids = set(ACT.source_id[ACT.active])
+    _wk = {"emission-line", "X-ray (SIMBAD)"}                    # robustness variant without these two types (k_*_strict)
+    active_strict = set(ACT.source_id[ACT.activity_evidence.apply(lambda e: any(x and x not in _wk for x in e.split("; ")))])
+    def ctrl_counts(keep):
+        """Control-position hits and trials (steady, single-epoch) over the star-epochs selected by 'keep'."""
+        ch = ct = eh = et = 0
+        for j in range(N_CTRL):
+            ok = ~U[f"cv{j}"].values & np.isfinite(U[f"c{j}"].values) & keep
+            Uj = U[ok]; eh += int((Uj[f"c{j}"] >= THR).sum()); et += len(Uj)
+            num = (Uj[f"c{j}"] / Uj.sigma_mJy).groupby(Uj.source_id).sum(); den = np.sqrt((1 / Uj.sigma_mJy ** 2).groupby(Uj.source_id).sum())
+            zc = num / den; ch += int((zc >= THR).sum()); ct += len(zc)
+        return ch, ct, eh, et
+    inact = ~U.source_id.isin(active_ids).values
+    co_hits, co_tot, ep_hits, ep_tot = ctrl_counts(inact)
     rate_co, rate_ep = co_hits / co_tot, ep_hits / ep_tot
     rate_any = rate_co                                    # (name kept for the summary)
     anyep_star = (U.snr >= THR).groupby(U.source_id).any()
     CO["cand_coadd"] = CO.snr >= THR; CO["cand_epoch"] = anyep_star.reindex(CO.index).fillna(False).astype(bool)
     CO["cand"] = CO.cand_coadd | CO.cand_epoch
-    b_s = rate_co * len(CO); b_e = rate_ep * len(U); b = b_s
+    n_inact_star, n_inact_ep = int((~CO.index.isin(active_ids)).sum()), int(inact.sum())
+    b_s = rate_co * n_inact_star; b_e = rate_ep * n_inact_ep; b = b_s
+    # for comparison: the unfiltered background (all stars), and the background excluding control positions around
+    # stars with emission (sidelobes of the star's own emission could inflate b there)
+    h0, t0_, e0, et0 = ctrl_counts(np.ones(len(U), bool))
+    b_s_all, b_e_all = h0 / t0_ * len(CO), e0 / et0 * len(U)
+    emit = CO.index[CO.cand].union(pd.Index(LT.source_id[LT.detected].unique()))
+    h1, t1_, e1, et1 = ctrl_counts(inact & ~U.source_id.isin(emit).values)
+    b_s_noemit, b_e_noemit = h1 / t1_ * n_inact_star, e1 / et1 * n_inact_ep
+    inact0 = ~U.source_id.isin(active_strict).values
+    h2, t2_, e2, et2 = ctrl_counts(inact0)
+    b_s_strict, b_e_strict = h2 / t2_ * int((~CO.index.isin(active_strict)).sum()), e2 / et2 * int(inact0.sum())
     for tag in LT.tag.unique():
         x = LT[LT.tag == tag]; per_tag[tag] = dict(n_star_epochs=int(len(x)), n_veto=int(x.veto.sum()), n_ge5=int(((x.snr >= THR) & ~x.detected).sum()))
     cand_ids = CO.index[CO.cand].values
@@ -164,8 +199,16 @@ if __name__ == "__main__":
                k_steady=k_s, b_steady=b_s, mu95_steady=zech_ul(k_s, b_s),
                k_snap=k_e, b_snap=b_e, mu95_snap=zech_ul(k_e, b_e),
                k_unexplained=k, b_expected=b_s, mu95_hidden=zech_ul(k_s, b_s),
-               k_steady_strict=k_s0, mu95_steady_strict=zech_ul(k_s0, b_s), k_snap_strict=k_e0, mu95_snap_strict=zech_ul(k_e0, b_e),
+               k_steady_strict=k_s0, mu95_steady_strict=zech_ul(k_s0, b_s_strict), k_snap_strict=k_e0, mu95_snap_strict=zech_ul(k_e0, b_e_strict),
+               b_steady_strict=b_s_strict, b_snap_strict=b_e_strict,
                n_explained_strict=int(S.explained_strict.sum()),
+               n_active_sample=int(len(active_ids)), f_active_sample=len(active_ids) / int(len(ACT)),
+               n_inactive_stars_coadd=n_inact_star, n_inactive_star_epochs=n_inact_ep,
+               ctrl_hits_steady=co_hits, ctrl_trials_steady=co_tot, ctrl_hits_snap=ep_hits, ctrl_trials_snap=ep_tot,
+               b_steady_err=float(np.sqrt(co_hits) / co_tot * n_inact_star), b_snap_err=float(np.sqrt(ep_hits) / ep_tot * n_inact_ep),
+               mu95_steady_marg=zech_ul_marg(k_s, co_hits, n_inact_star / co_tot), mu95_snap_marg=zech_ul_marg(k_e, ep_hits, n_inact_ep / ep_tot),
+               b_steady_unfiltered=b_s_all, b_snap_unfiltered=b_e_all, mu95_steady_unfiltered=zech_ul(k_s, b_s_all), mu95_snap_unfiltered=zech_ul(k_e, b_e_all),
+               b_steady_noemit=b_s_noemit, b_snap_noemit=b_e_noemit,
                n_vetoed_star_epochs=int(LT.veto.sum()), n_stars_any_veto=int(LT.groupby("source_id").veto.any().sum()))
     json.dump(res, open(os.path.join(C.DER, "alleepoch_candidates.json"), "w"), indent=1)
     print(json.dumps(res, indent=1))

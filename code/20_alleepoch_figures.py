@@ -2,7 +2,7 @@
 
 Outputs (results/, PNG and PDF):
   alleepoch_population_limit : 95% upper limit on the fraction of stars hosting a transmitter vs L_nu (steady, all
-                               epochs; Epoch-1 catalogue analysis for comparison; per-snapshot duty-cycle limit f*delta;
+                               epochs; Epoch-1 catalog analysis for comparison; per-snapshot duty-cycle limit f*delta;
                                mean- and median-stack limits by spectral class)
   alleepoch_perstar_limits   : steady per-star limits vs distance, with secure associations and candidates
   alleepoch_stacks           : (a) mean L_nu of clean stars per shell, (b) median S/sigma shift including detected
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # ---- population limit
     fig, d = plt.subplots(figsize=(3.6, 3.1))
     d.loglog(POP.L_WHz, clip1(POP.f95), color="k", lw=1.6, label="All epochs, steady")
-    d.loglog(old.Lnu_star_WHz, clip1(old.f_UL95), color="0.55", lw=1.0, ls="--", label="Epoch 1 catalogue")
+    d.loglog(old.Lnu_star_WHz, clip1(old.f_UL95), color="0.55", lw=1.0, ls="--", label="Epoch 1 catalog")
     d.loglog(POP.L_WHz, clip1(POP.fdelta95), color="k", lw=1.0, ls=":", label="Per snapshot ($f\\delta$)")
     for cl in ["AFGK", "M"]:
         s = SL[SL.cls == cl]

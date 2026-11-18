@@ -97,7 +97,7 @@ if __name__ == "__main__":
     put("NImgPerStarMin", str(int(va.n_images.min()))); put("NImgPerStarMax", str(int(va.n_images.max())))
     fs = me.groupby("epoch_label").flux_scale.first()
     put("FluxScaleMin", f"{fs.min():.2f}"); put("FluxScaleMax", f"{fs.max():.2f}")
-    # the reference-source scale (later epoch / Epoch-1 catalogue) predicted by the Kimball et al. biases: the x.1
+    # the reference-source scale (later epoch / Epoch-1 catalog) predicted by the Kimball et al. biases: the x.1
     # half-epochs re-observe the 1.1 sky (peak bias 0.85), the x.2 half-epochs the 1.2 sky (0.92)
     lab = fs.index.map(lambda v: f"{v:.1f}")
     pred = np.array([C_PEAK(l) / (C_PEAK("1.1") if l.endswith(".1") else C_PEAK("1.2")) for l in lab])
@@ -180,6 +180,7 @@ if __name__ == "__main__":
     # --- stacking
     F = pd.read_csv(os.path.join(RES, "vlass_ep1_stack_results.csv")); fv = pd.read_csv(os.path.join(RES, "vlass_fraction_vs_power_limits.csv"))
     m24 = F[(F.shell_pc == "20-40") & (F.type == "M")].iloc[0]
+    put("StackMSL", sci(m24.Lmean_WHz, 1)); put("StackMSLerr", sci(m24.L_err_WHz, 1)); put("StackMSLsnr", f"{m24.L_SNR:.1f}")
     put("StackMS", f"{m24.S_mean_uJy:.1f}"); put("StackMSerr", f"{m24.S_err_uJy:.1f}"); put("StackMSNR", f"{m24.S_SNR:.1f}"); put("StackMN", com(m24.N))
     put("StackML", sci(m24.Lmean_WHz)); put("StackMMed", f"{m24.S_median_uJy:.1f}"); put("StackMMedSNR", f"{m24.S_median_uJy / m24.S_median_err_uJy:.1f}")
     put("StackFGKmaxSNR", f"{F[F.type == 'FGK'].L_SNR.max():.1f}"); put("NStackStars", com(F.N.sum()))
@@ -231,6 +232,22 @@ if __name__ == "__main__":
         put("NNoEpochSouth", com((_dec.reindex(_P.source_id[_none]) < -38).sum()))
         put("NAllVeto", str(int((_P.n.isna() & (_P.n_ep_all > 0)).sum()))); put("NWithForced", com((~_none).sum()))
         from scipy.stats import poisson as _po
+        _bm = os.path.join(RES, "bright_dwarfs_missing.csv")
+        if os.path.exists(_bm): put("NBrightMissing", str(len(pd.read_csv(_bm))))
+        put("PctInactive", f"{100 * (1 - cj['f_active_sample']):.0f}")
+        # chance probability of an unrelated X-ray source within the match radius, from the full-catalog source densities
+        for _nm, _r, _area, _key in [("2rxs", 40.0, 4 * np.pi, "PChanceRxs"), ("erass1", 20.0, 2 * np.pi, "PChanceEra")]:
+            _f = os.path.join(RAW, f"xray_{_nm}_positions.parquet")
+            if os.path.exists(_f):
+                _dens = len(pd.read_parquet(_f)) / _area                       # per steradian (eRASS1: half the sky)
+                put(_key, sci(1 - np.exp(-_dens * np.pi * np.radians(_r / 3600) ** 2), 0))
+        put("NActive", com(cj["n_active_sample"])); put("PctActive", f"{100 * cj['f_active_sample']:.1f}")
+        put("BSteadyErr", f"{cj['b_steady_err']:.1f}"); put("BSnapErr", f"{cj['b_snap_err']:.1f}")
+        put("NCtrlSteady", str(cj["ctrl_hits_steady"])); put("NCtrlSnap", str(cj["ctrl_hits_snap"]))
+        put("MuSteadyMarg", f"{cj['mu95_steady_marg']:.1f}"); put("MuSnapMarg", f"{cj['mu95_snap_marg']:.1f}")
+        put("BSteadyAll", f"{cj['b_steady_unfiltered']:.1f}"); put("BSnapAll", f"{cj['b_snap_unfiltered']:.1f}")
+        put("BSteadyNoEmit", f"{cj['b_steady_noemit']:.1f}"); put("BSnapNoEmit", f"{cj['b_snap_noemit']:.1f}")
+        put("PSteadyLowAll", f"{_po.cdf(cj['k_steady'], cj['b_steady_unfiltered']):.3f}")
         put("PSteadyLow", f"{_po.cdf(cj['k_steady'], cj['b_steady']):.3f}"); put("PSnapLow", f"{_po.cdf(cj['k_snap'], cj['b_snap']):.2f}"); put("PSnapHigh", f"{_po.sf(cj['k_snap'] - 1, cj['b_snap']):.2f}")
         put("KSteadyStrict", str(cj["k_steady_strict"])); put("MuSteadyStrict", f"{cj['mu95_steady_strict']:.1f}")
         put("KSnapStrict", str(cj["k_snap_strict"])); put("MuSnapStrict", f"{cj['mu95_snap_strict']:.1f}")
@@ -287,8 +304,11 @@ if __name__ == "__main__":
         _Z = PA.merge(_G, on="source_id")
         _Z = _Z[(_Z.bp_rp >= _BPlo) & (_Z.bp_rp <= _BPhi) & (_Z.ruwe < 1.4) & (_Z.non_single_star == 0) & (_Z.dMG > -0.5)]
         _ku = int(_Z.unexplained_candidate.sum()); _mu = 0.5 * _chi2.ppf(0.95, 2 * (_ku + 1))     # classical Poisson UL, no background subtracted
+        _actZ = set(pd.read_parquet(os.path.join(DER, "activity_all.parquet")).query("active").source_id)
+        _nin = int((~_Z.source_id.isin(_actZ)).sum())                     # stars without activity evidence (p_i = 1 at this L)
         put("NSolarSingle", com(len(_Z))); put("NSolarNat", str(int((_Z.natural & ~_Z.unexplained_candidate).sum())))
-        put("NSolarUnexpl", str(_ku)); put("FSolarSingle", sci(_mu / len(_Z)))
+        put("NSolarActive", com(len(_Z) - _nin)); put("NSolarInactive", com(_nin))
+        put("NSolarUnexpl", str(_ku)); put("FSolarSingle", sci(_mu / _nin))
         put("FAllZeroFloor", sci(PP.f95_k0b0.min()))
         put("OneInNineAll", com(round(1 / fi(1e9), -2)))
         put("ReachIndAll", sci(PP.L_WHz[np.argmax(PP.f95.values < 1)], 1))
@@ -370,7 +390,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the catalogued total flux density corrected for the Quick Look integrated-flux bias (divided by 0.90 in half-epoch 1.1; \citealt{Kimball2026}). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalogue without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): Fl = flare star; Em = emission-line star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}). Machine-readable version in the reproducibility package.}
+\tablecomments{Sorted by distance. Separation at the epoch of the component's VLASS image. $S_{3\,\rm GHz}$ is the cataloged total flux density corrected for the Quick Look integrated-flux bias (divided by 0.90 in half-epoch 1.1; \citealt{Kimball2026}). X-ray: R = ROSAT 2RXS, E = eRASS1. Multiplicity evidence (Mult.): S = SIMBAD binary type, N = Gaia non-single-star solution, R = RUWE\,$>1.4$, O = over-luminous by $>0.5$\,mag. Radio-star evidence: P = in the Sydney Radio Star Catalogue \citep{Driessen2024} with a circularly polarized detection, K = in that catalog without one, D = in \citet{De2024}, v = significantly variable and c = co-moving with the star across VLASS epochs 1.1--4.1 (Section~\ref{sec:multiepoch}). Class (SIMBAD object types, except LQ~Hya and PW~And, young single stars; \citealt{Lehtinen2012,LopezSantiago2003}): Fl = flare star; Em = emission-line star; RS = RS~CVn binary; BY = BY~Dra variable; Y = young star; CV = cataclysmic variable; X = X-ray-active star; CP = magnetic chemically peculiar star; BG = not coincident with the star (Section~\ref{sec:lspm}). Machine-readable version in the reproducibility package.}
 \end{deluxetable*}
 }
 """)
@@ -399,7 +419,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{E1: Epoch-1 catalogue analysis. $N_{\rm ep}$, $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star, i.e.\ to projected separations below roughly the value in the ``1\arcsec'' column; a transmitter on a planet at a wider separation would lie outside the measured position.}
+\tablecomments{E1: Epoch-1 catalog analysis. $N_{\rm ep}$, $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star, i.e.\ to projected separations below roughly the value in the ``1\arcsec'' column; a transmitter on a planet at a wider separation would lie outside the measured position.}
 \end{deluxetable*}
 """)
     else:
@@ -437,7 +457,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Offsets are relative to the Epoch 1 catalogue position, after tying each image to five compact reference components. Subscript $\star$: Gaia position of the star at the image epoch.}
+\tablecomments{Offsets are relative to the Epoch 1 catalog position, after tying each image to five compact reference components. Subscript $\star$: Gaia position of the star at the image epoch.}
 \end{deluxetable}
 """)
     # all-epoch tables
@@ -453,11 +473,11 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{$\langle L_\nu\rangle$: inverse-variance-weighted mean spectral luminosity of clean stars (no secure association, no forced detection, no epoch with predicted catalogue contamination $\ge0.5\sigma$), after subtracting the mean at the control positions; the error is the larger of the formal error and the scatter among the eight control positions. $N_{\rm eff,w}=(\sum w)^2/\sum w^2$; Top 10: weight fraction carried by the ten highest-weight stars. $\Delta\,{\rm med}(S/\sigma)$: median $S/\sigma$ of all unvetoed stars in the shell, including detected stars, minus the median at control positions; bootstrap error.}
+\tablecomments{$\langle L_\nu\rangle$: inverse-variance-weighted mean spectral luminosity of clean stars (no secure association, no forced detection, no epoch with predicted catalog contamination $\ge0.5\sigma$), after subtracting the mean at the control positions; the error is the larger of the formal error and the scatter among the eight control positions. $N_{\rm eff,w}=(\sum w)^2/\sum w^2$; Top 10: weight fraction carried by the ten highest-weight stars. $\Delta\,{\rm med}(S/\sigma)$: median $S/\sigma$ of all unvetoed stars in the shell, including detected stars, minus the median at control positions; bootstrap error.}
 \end{deluxetable*}
 """)
         CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); U = CA[~CA.explained].sort_values("dist_pc")
-        # per-epoch catalogue detections (21): "cat:sep"/flux/snr" entries, plus the QL median stack
+        # per-epoch catalog detections (21): "cat:sep"/flux/snr" entries, plus the QL median stack
         catd = {}
         fe, fm = os.path.join(RES, "epoch_catalog_candidates.csv"), os.path.join(RES, "medstack_star_matches.csv")
         if os.path.exists(fe):
@@ -526,12 +546,17 @@ if __name__ == "__main__":
         put("GExtF", f"{_E.Ftot.sum():.0f}"); put("GExtMaj", f"{_E.DCMaj.min():.1f}"); put("GExtMajHi", f"{_E.DCMaj.max():.1f}")
         _EC = pd.read_csv(os.path.join(RES, "epoch_catalog_candidates.csv")).set_index("source_id")
         put("GExtVetoOwn", str(int(_EC.n_veto_own[_sid]))); put("GExtNep", str(int(_EC.n_epochs[_sid])))
+        _cd = str(_EC.cats_det.get(349716170186042880, ""))
+        _seps = [float(e.split(":", 1)[1].split('"')[0]) for e in _cd.split(";") if ":" in e]
+        if _seps: put("GOTEsep", f"{min(_seps):.1f}")
+        _ty = CA[CA.source_id == 2071061615589030400]
+        if len(_ty): put("CandAstroScoadd", f"{_ty.S_coadd_mJy.iloc[0]:.2f}")
         import sys; sys.path.insert(0, os.path.join(ROOT, "code")); import common as _C
         _T = pd.read_csv(os.path.join(RES, "vlass_star_matches_classified.csv"))
         _Mn = _T[(_T["class"] != "UNEXPLAINED") & ~_T["class"].str.startswith("background") & (_T.bp_rp >= _C.BPRP_SPLIT)]
         put("NMSecNat", str(len(_Mn))); put("MSecLlo", sci(_Mn.Lnu_R_WHz.min())); put("MSecLhi", sci(_Mn.Lnu_R_WHz.max()))
 
-    # per-epoch catalogue cross-check (21)
+    # per-epoch catalog cross-check (21)
     fx = os.path.join(DER, "epoch_catalog_crosscheck.json")
     if os.path.exists(fx):
         X = json.load(open(fx)); pc = X["per_catalogue"]

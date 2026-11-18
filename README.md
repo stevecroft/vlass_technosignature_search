@@ -14,6 +14,8 @@ conda env create -f environment.yml && conda activate vlass-technosig
 cd code
 # Everything below runs offline from data/raw (no network needed):
 python 03_sample_crossmatch.py      # ~1 min
+python 03b_bright_star_check.py     # bright (V<4) nearby dwarfs missing from the Gaia DR3 sample (SIMBAD TAP)
+python 04b_activity_all.py          # activity evidence for every sample star: full 2RXS/eRASS1 (HEASARC TAP, cached) + SIMBAD types
 python 07_classify_and_limits.py    # needs 05/06 outputs only for the LSPM J1943+5337 verdict (already in data/)
 python 10_stack.py                  # ~35 s; holds the 1.3 GB cutout array + float64 shell copies (interactive run peaked at ~17 GB)
 python 11_figures.py
@@ -107,6 +109,8 @@ component parquet holds exactly the same data.
 | `srsc/` | Sydney Radio Star Catalogue (Driessen et al. 2024; radiostars.org): ReadMe, stars.dat, radio.dat | 1.3 MB |
 | `xray_counterparts.csv` | ROSAT 2RXS (40″) and eRASS1 (20″) nearest counterparts for the 77 stars that had an Epoch-1 component within 2.5″ before the w-term astrometric correction (75 after it; the paper uses those 75) (VizieR mirror) | — |
 | `simbad_candidates.csv`, `simbad_nearest.csv` | SIMBAD (CfA mirror) identifications and object types | — |
+| `xray_2rxs_positions.parquet`, `xray_erass1_positions.parquet` | Positions of all 135,118 2RXS and 930,203 eRASS1 Main sources (HEASARC TAP `rass2rxs`, `erass1main`), for the activity lookup of every star (04b) | 2.7 + 15 MB |
+| `simbad_otypes_all.parquet` | SIMBAD activity object types (X, Er\*, Fl\*, BY\*, RS\*, TT\*, Y\*O, CV\*, a2\*, Em\*) of all objects with a Gaia DR3 identifier and parallax > 9 mas (04b) | 0.5 MB |
 | `vlass_ql_catalogs_near_stars.parquet` | Components within 60″ of any sample star from the NRAO per-epoch lists, de-duplicated (cat = QL3.1, QL3.2, QL4.1: interim QL lists, VLASS Memo 22; QLMED: QL median stack of Epochs 1–3; SE2.1–SE3.2: Single Epoch Continuum Imaging lists, 2026-06 versions). Position errors in on-sky arcsec. Built by `21 --reduce` | 7.4 MB |
 | `vlass_catalog_images.parquet` | Every image (QL subtile / SE pointing) present in each of those lists, with its component count; defines the partial SE sky coverage | 0.3 MB |
 | `vlass_e1ql_position_offsets.csv` | Per-subtile Epoch-1 minus Epoch-3 QL position offsets (w-term; Kimball et al. 2026) from 242,942 compact S/N > 20 pairs, with tile and declination fallbacks; written by `02b_e1_astrometry.py` | 2.1 MB |
@@ -142,20 +146,25 @@ component parquet holds exactly the same data.
   Each of the 5 in the steady test has a specific explanation: LSPM J1943+5337 and TYC 3573-1391-1 are offset from the star;
   Gaia DR3 2563195186142791552 is 6.8–8.4″ from an extended 22 mJy background source; PM J20156+4321 is a marginal 5.5σ coadd excess;
   G 133-48 is stellar (an over-luminous M dwarf, L_ν ≈ 4.6×10⁷ W Hz⁻¹). The other 7 are single-epoch 5.0–9.1σ events.
-  Steady test (coadd): 5 vs 11.4 expected at control positions → μ95 = 4.5. Single-epoch test: 13 vs 11.8 → μ95 = 9.7
-  (P(n ≥ 13) = 0.40). Without the SIMBAD Em* and X types (which explain 6 forced detections): 8 vs 11.4 → 6.0 and 19 vs 11.8 → 16.2.
+  The chance background is counted only around the 87.7% of stars without activity evidence (25,882 stars, 12.3%, have it;
+  04b), because a detection at an active star is classified as natural whatever its origin. Steady test (coadd): 5 vs 10.0 ± 1.1
+  expected at control positions → μ95 = 4.7 (4.9 marginalized over b; 11.4 without the activity filter). Single-epoch test:
+  13 vs 9.8 ± 1.1 → μ95 = 11.2 (11.4 marginalized; P(n ≥ 13) = 0.19). Without the SIMBAD Em* and X types (which explain
+  6 forced detections): 8 vs 10.4 → 6.4 and 19 vs 9.9 → 18.0.
   Apart from LSPM J1943+5337, the one forced detection bright enough for per-epoch astrometry (TYC 3573-1391-1) lies 1.8″ from its star.
 - **Cross-check with per-epoch catalogues (21):** κ from the QL3.1–4.1 lists 0.83–0.87 (adopted 0.861). Our bias-corrected fluxes are
   1.13 ± 0.01 × the Single Epoch peaks (1.07–1.16 by epoch), and SE/QL = 0.975 ± 0.006 for the same Epoch-3 sources: faint compact QL
   peaks are less biased than the calibrator-based 0.92, so later-epoch fluxes and limits may be ≈13% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. Of the 12
   forced detections without activity evidence, G 133-48 is detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in
-  four catalogues; LSPM J1943+5337 is in two. An own-epoch confusion veto gives 5→8 vs b 11.4→23.4 (steady); the union of both vetoes changes
-  μ95 by −5% (steady) and +12% (single-epoch; 13 vs 10.1, P = 0.22). The median stack
+  four catalogues; LSPM J1943+5337 is in two. An own-epoch confusion veto gives 5→8 vs b 10.0→19.8 (steady); the union of both vetoes changes
+  μ95 by −7% (steady) and +8% (single-epoch; 13 vs 8.8, P = 0.11). The median stack
   (152,511 low-motion stars) finds no steady emitters missed by the coadd (9 unclassified matches, all 1.9–2.3″ off; 22 chance).
 - **Per-star limits (95%, all epochs, steady):** median 0.54 mJy, L_ν < 4.0×10⁸ W Hz⁻¹; Barnard's star L_ν < 2.3×10⁵ W Hz⁻¹
   (Epoch-1 catalogue analysis: median 1.09 mJy; Barnard 5.1×10⁵).
-- **Population (steady):** f < 6.6×10⁻³ / 1.9×10⁻⁴ / 2.2×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹; per snapshot f·δ < 1.4×10⁻⁵.
-  (Epoch-1 catalogue, Poisson limit with no unexplained secure association: 2.1×10⁻² / 6.4×10⁻⁴ / 2.2×10⁻⁵, floor 1.4×10⁻⁵.)
+- **Population (steady; stars without activity evidence, p_i = 0 at the 25,882 active stars):** f < 1.6×10⁻² / 2.7×10⁻⁴ / 2.6×10⁻⁵
+  above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹ (182,590 stars at the floor); per snapshot f·δ < 1.8×10⁻⁵.
+  (Epoch-1 catalogue, Poisson limit with no unexplained secure association: 9.4×10⁻² / 1.1×10⁻³ / 2.6×10⁻⁵, floor 1.6×10⁻⁵.)
+  Within 50 pc: f < 2.4×10⁻⁴ for 19,975 inactive stars, ~8× tighter than the GBT narrowband occurrence limits.
 - **Stacks (all epochs):** M-dwarf mean > 4σ in 4 of 6 shells, 20–40 pc: (7.9 ± 1.1)×10⁵ W Hz⁻¹ (7.5σ); median S/σ shift including
   detected stars 0.084 ± 0.013 (6.2σ). AFGK ≤ 3.8σ. Mean stacks reach f < 1 at L_T ≈ 1.1×10⁵ (AFGK) and 1.5×10⁵ (M) W Hz⁻¹
   (inverse-variance combination of all six shells; the nearest shell alone gives 7.3×10⁴ / 9.2×10⁴); median stacks give f < 0.09–0.10 at 10⁷ and 0.015–0.028 at 10⁹ W Hz⁻¹.

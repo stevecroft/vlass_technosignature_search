@@ -12,7 +12,8 @@ Background tests for UNEXPLAINED matches:
 Limits: non-detections S_lim = (5 + 1.645) * subtile MeanIslrms / peak_bias (95% completeness; QL peak bias 0.85 in
 half-epoch 1.1, 0.92 in 1.2, Kimball et al. 2026); confused stars (unrelated component < 3") use max(S_lim, that
 component's flux); detected stars use (F + 1.645 sigma) / int_bias (integrated bias 0.90 in 1.1, 1.00 in 1.2).
-Population: f < 3.0 / N_eff(L*) (95%, zero unexplained detections), N_eff = stars whose limit is below L*.
+Population: f < 3.0 / N_eff(L*) (95%, zero unexplained detections), N_eff = stars without activity evidence (04b)
+whose limit is below L*.
 
 Inputs : data/derived/{ms_sample_vlass, matches_10arcsec}.parquet, data/raw/{xray_counterparts, simbad_candidates,
          simbad_nearest}.csv, data/derived/lspm1943_astrometry.json (optional)
@@ -140,7 +141,11 @@ if __name__ == "__main__":
 
     # ---------------- population limit (no unexplained detections remain)
     k_unexpl = int(((T["class"] == "UNEXPLAINED") & T.secure).sum())
-    Lgrid = np.logspace(5, 10.5, 300); Neff = np.searchsorted(np.sort(L.Lnu_lim_WHz.values), Lgrid)
+    # stars with activity evidence (04b) would be classified as natural emitters whatever the origin of their emission,
+    # so they cannot yield an unexplained detection and are left out of N_eff (their per-star limits are unaffected)
+    fa = os.path.join(C.DER, "activity_all.parquet")
+    act = set(pd.read_parquet(fa).query("active").source_id) if os.path.exists(fa) else set()
+    Lgrid = np.logspace(5, 10.5, 300); Neff = np.searchsorted(np.sort(L.Lnu_lim_WHz[~L.source_id.isin(act)].values), Lgrid)
     fUL = np.where(Neff > 0, C.poisson_ul95(k_unexpl) / np.maximum(Neff, 1), np.nan)
     pd.DataFrame({"Lnu_star_WHz": Lgrid, "EIRP_2GHz_W": Lgrid * C.BAND_HZ, "N_eff": Neff, "k_unexplained": k_unexpl, "f_UL95": fUL}).to_csv(
         os.path.join(C.RES, "vlass_population_limit_curve.csv"), index=False)

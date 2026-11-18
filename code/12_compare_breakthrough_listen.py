@@ -27,7 +27,9 @@ if __name__ == "__main__":
     A50 = 4 * np.pi * (50 * C.PC_M) ** 2
     S50 = np.median(L.S_lim_mJy[(L.dist_pc > 45) & (L.dist_pc <= 50)])
     E50 = A50 * S50 * 1e-29 * C.BAND_HZ
-    L50 = L[L.dist_pc <= 50]; Lstar = np.percentile(L50.Lnu_lim_WHz, 95); N50 = int((L50.Lnu_lim_WHz < Lstar).sum())
+    L50 = L[L.dist_pc <= 50]; Lstar = np.percentile(L50.Lnu_lim_WHz, 95)
+    act = set(pd.read_parquet(os.path.join(C.DER, "activity_all.parquet")).query("active").source_id)   # 04b; p_i = 0 there
+    N50 = int(((L50.Lnu_lim_WHz < Lstar) & ~L50.source_id.isin(act)).sum())
     rows = [dict(survey=f"Price+2020 {k} (narrowband)", band=v["band"], signal_type="<=~3 Hz, |drift|<=4 Hz/s", dwell=v["dwell"],
                  S_lim_Jy_at50pc=CHOZA * v["EIRP"] / A50 / 1e-26, EIRP_lim_W_at50pc=CHOZA * v["EIRP"], EIRP_published_W=v["EIRP"], fraction_UL95=v["frac"], N_stars_constraining=v["N"]) for k, v in BL.items()]
     rows.append(dict(survey=label, band="2-4 GHz", signal_type="total in-band power of a steady signal",

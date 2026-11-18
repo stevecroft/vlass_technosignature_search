@@ -10,7 +10,8 @@ Per-star limits (95%), from the forced photometry of 17 and the vetoes of 18:
               S_lim_bestepoch (the limit if the transmitter happened to be on in the lowest-noise epoch).
 Population (steady transmitter of spectral luminosity L, flux S_L = L / 4 pi d^2):
   p_i(L) = Phi((S_L - t_i) / sigma_coadd)   (steady test: coadd only, one trial per star),
-  with t_i = 5 sigma_coadd, or S_coadd + 5 sigma_coadd for stars with natural emission (a transmitter must exceed it).
+  with t_i = 5 sigma_coadd, or S_coadd + 5 sigma_coadd for forced detections without activity evidence (a transmitter
+  must exceed it), and p_i = 0 for stars with activity evidence (04b), which would be classified as natural emitters.
   The expected number of detected transmitters is f * sum_i p_i = f * N_eff(L); with k unexplained candidates over an
   expected chance background b (18, steady test), f_95(L) = mu_95(k, b) / N_eff(L).
   Duty cycle: a transmitter on in a random fraction delta of snapshots gives (f delta)_95 = mu_95,snap / sum_i sum_e p_ie(L),
@@ -86,6 +87,10 @@ if __name__ == "__main__":
     LT = LT.merge(sv, on="source_id", how="left")
     natural = set(CA.source_id[CA.explained]) | set(LT.source_id[LT.detected])
     cand = set(CA.source_id)
+    # stars with activity evidence (04b): a transmitter there would be classified as a natural emitter, so they cannot
+    # contribute a detection to k and get p_i = 0 in N_eff (their per-star limits are unaffected)
+    ACT = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"), columns=["source_id", "active"])
+    active = set(ACT.source_id[ACT.active])
     # ---------------- per-star limits
     U = LT[~LT.veto]
     co = U.groupby("source_id")[["S_mJy", "sigma_mJy"]].apply(coadd)
@@ -109,8 +114,9 @@ if __name__ == "__main__":
     # ---------------- population: N_eff(L) = sum_i p_i(L)
     ok = P.n.notna().values
     d = P.dist_pc.values[ok]; sig = P.sig.values[ok]; Sco = P.S.values[ok]; nat = (P.natural | P.candidate).values[ok]
-    t_co = np.where(nat, Sco + THR * sig, THR * sig)
-    Ue = U[~U.source_id.isin(natural | cand)]                # single-epoch route only for emission-free stars
+    act = P.index.isin(active)[ok]
+    t_co = np.where(act, np.inf, np.where(nat, Sco + THR * sig, THR * sig))     # p_i = 0 at stars with activity evidence
+    Ue = U[~U.source_id.isin(natural | cand | active)]       # single-epoch route only for emission-free, inactive stars
     de, se = Ue.dist_pc.values, Ue.sigma_mJy.values; sid_e = Ue.source_id.values
     _, inv = np.unique(sid_e, return_inverse=True)
     mu95, kk, bb = cj["mu95_steady"], cj["k_steady"], cj["b_steady"]          # steady test: coadd, one trial per star
@@ -205,7 +211,8 @@ if __name__ == "__main__":
                 S_lim_any_med=float(P.S_lim_anyepoch.median()), S_lim_best_med=float(P.S_lim_bestepoch.median()),
                 f95_1e7=g(1e7), f95_1e8=g(1e8), f95_1e9=g(1e9), f95_floor=float(POP.f95.min()), Neff_max=float(POP.N_eff.max()),
                 mu95=mu95, k=kk, b=bb, mu95_snap=mu95e, k_snap=cj["k_snap"], b_snap=cj["b_snap"], fdelta95_floor=float(POP.fdelta95.min()),
-                n_unexplained_candidates=int(P.unexplained_candidate.sum()))
+                n_unexplained_candidates=int(P.unexplained_candidate.sum()),
+                n_active_with_photometry=int(act.sum()), n_inactive_with_photometry=int((~act).sum()))
     json.dump(summ, open(os.path.join(C.DER, "alleepoch_summary.json"), "w"), indent=1)
     print(json.dumps(summ, indent=1))
     print(ST[ST.scope == "all"][["shell", "cls", "N_all", "N_clean", "meanL", "meanL_err", "meanL_snr", "Neff_w", "top10_wfrac", "dmed_z", "dmed_z_err"]].to_string(index=False, float_format="%.3g"))

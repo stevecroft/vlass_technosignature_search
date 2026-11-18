@@ -416,6 +416,12 @@ Flewelling, H.~A., Magnier, E.~A., Chambers, K.~C., {et~al.} 2020,
   properties},} \aap, 674, A1, \dodoi{10.1051/0004-6361/202243940}
 
 % type= article
+\bibitem[{M.~A. Garrett(2015)Garrett}]{Garrett2015}
+Garrett, M.~A. 2015, \bibinfo{title}{{Application of the mid-IR radio
+  correlation to the {\^G} sample and the search for advanced extraterrestrial
+  civilisations},} \aap, 581, L5, \dodoi{10.1051/0004-6361/201526687}
+
+% type= article
 \bibitem[{M.~A. Garrett(2026)Garrett}]{Garrett2026}
 Garrett, M.~A. 2026, \bibinfo{title}{{Isolating broad-band radio
   technosignatures (BRaTs): a framework for detecting planetary-scale
@@ -554,6 +560,34 @@ Lehtinen, J., Jetsu, L., Hackman, T., Kajatkari, P., \& Henry, G.~W. 2012,
   2011},} \aap, 542, A38, \dodoi{10.1051/0004-6361/201219185}
 
 % type= article
+\bibitem[{L. Lindegren {et~al.}(2021)Lindegren, Klioner, Hern{\'a}ndez,
+  Bombrun, Ramos-Lerate, Steidelm{\"u}ller, Bastian, Biermann, de~Torres,
+  Gerlach, Geyer, Hilger, Hobbs, Lammers, McMillan, Stephenson, Casta{\~n}eda,
+  Davidson, Fabricius, Gracia-Abril, Portell, Rowell, Teyssier, Torra,
+  Bartolom{\'e}, Clotet, Garralda, Gonz{\'a}lez-Vidal, Torra, Abbas, Altmann,
+  Anglada~Varela, Balaguer-N{\'u}{\~n}ez, Balog, Barache, Becciani, Bernet,
+  Bertone, Bianchi, Bouquillon, Brown, Bucciarelli, Busonero, Butkevich, Buzzi,
+  Cancelliere, Carlucci, Charlot, Cioni, Crosta, Crowley, del Peloso, del Pozo,
+  Drimmel, Esquej, Fienga, Fraile, Gai, Garcia-Reinaldos, Guerra, Hambly,
+  Hauser, Jan{\ss}en, Jordan, Kostrzewa-Rutkowska, Lattanzi, Liao, Licata,
+  Lister, L{\"o}ffler, Marchant, Masip, Mignard, Mints, Molina, Mora,
+  Morbidelli, Murphy, Pagani, Panuzzo, Pe{\~n}alosa~Esteller, Poggio,
+  Re~Fiorentin, Riva, Sagrist{\`a}~Sell{\'e}s, Sanchez~Gimenez, Sarasso,
+  Sciacca, Siddiqui, Smart, Souami, Spagna, Steele, Taris, Utrilla, van Reeven,
+  \& Vecchiato}]{Lindegren2021}
+Lindegren, L., Klioner, S.~A., Hern{\'a}ndez, J., {et~al.} 2021,
+  \bibinfo{title}{{Gaia Early Data Release 3: The astrometric solution},} \aap,
+  649, A2, \dodoi{10.1051/0004-6361/202039709}
+
+% type= article
+\bibitem[{A. Loeb {\&} M. Zaldarriaga(2007)Loeb \&
+  Zaldarriaga}]{LoebZaldarriaga2007}
+Loeb, A., \& Zaldarriaga, M. 2007, \bibinfo{title}{{Eavesdropping on radio
+  broadcasts from galactic civilizations with upcoming observatories for
+  redshifted 21 cm radiation},} Journal of Cosmology and Astroparticle Physics,
+  2007, 020, \dodoi{10.1088/1475-7516/2007/01/020}
+
+% type= article
 \bibitem[{J. L{\'o}pez-Santiago {et~al.}(2003)L{\'o}pez-Santiago, Montes,
   Fern{\'a}ndez-Figueroa, \& Ramsey}]{LopezSantiago2003}
 L{\'o}pez-Santiago, J., Montes, D., Fern{\'a}ndez-Figueroa, M.~J., \& Ramsey,
@@ -686,6 +720,13 @@ Siemion, A. P.~V., Demorest, P., Korpela, E., {et~al.} 2013, \bibinfo{title}{{A
   1.1-1.9 GHz SETI SURVEY OF THE KEPLER FIELD. I. A SEARCH FOR NARROW-BAND
   EMISSION FROM SELECT TARGETS},} \apj, 767, 94,
   \dodoi{10.1088/0004-637x/767/1/94}
+
+% type= article
+\bibitem[{W.~T. Sullivan {et~al.}(1978)Sullivan, Brown, \&
+  Wetherill}]{Sullivan1978}
+Sullivan, W.~T., Brown, S., \& Wetherill, C. 1978,
+  \bibinfo{title}{{Eavesdropping: The Radio Signature of the Earth},} Science,
+  199, 377, \dodoi{10.1126/science.199.4327.377}
 
 % type= article
 \bibitem[{J. Tarter(2001)Tarter}]{Tarter2001}

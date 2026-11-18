@@ -395,8 +395,8 @@
   "adopted_E1": {
    "n_trials_steady": 208164,
    "n_trials_snap": 719858,
-   "b_steady": 11.376092993312323,
-   "b_snap": 11.751438610847668,
+   "b_steady": 10.000855815609393,
+   "b_snap": 9.751096890835395,
    "n_vetoed": 76,
    "n_cand_stars": 161,
    "n_cand_coadd": 114,
@@ -406,8 +406,8 @@
    "new_unclassified": [],
    "k_steady": 5,
    "k_snap": 13,
-   "mu95_steady": 4.514749690473452,
-   "mu95_snap": 9.712105665566462,
+   "mu95_steady": 4.734440590939766,
+   "mu95_snap": 11.209986029810779,
    "lost_vs_adopted": [],
    "lost_unexplained": [],
    "added_vs_adopted": [],
@@ -416,8 +416,8 @@
   "own_epoch": {
    "n_trials_steady": 208179,
    "n_trials_snap": 719880,
-   "b_steady": 23.37530878282225,
-   "b_snap": 30.25225353822302,
+   "b_steady": 19.750229843747324,
+   "b_snap": 25.251710286515326,
    "n_vetoed": 54,
    "n_cand_stars": 168,
    "n_cand_coadd": 121,
@@ -427,8 +427,8 @@
    "new_unclassified": [],
    "k_steady": 8,
    "k_snap": 18,
-   "mu95_steady": 4.271198909747509,
-   "mu95_snap": 6.147411676142227,
+   "mu95_steady": 4.556359423762952,
+   "mu95_snap": 7.1980559351550655,
    "lost_vs_adopted": [
     2563195186142791552
    ],
@@ -455,8 +455,8 @@
   "union": {
    "n_trials_steady": 208164,
    "n_trials_snap": 719848,
-   "b_steady": 10.000966879280018,
-   "b_snap": 10.126327602726558,
+   "b_steady": 9.000776396452402,
+   "b_snap": 8.751055465752799,
    "n_vetoed": 86,
    "n_cand_stars": 160,
    "n_cand_coadd": 113,
@@ -466,8 +466,8 @@
    "new_unclassified": [],
    "k_steady": 4,
    "k_snap": 13,
-   "mu95_steady": 4.284403389259218,
-   "mu95_snap": 10.90602721949482,
+   "mu95_steady": 4.426018785158125,
+   "mu95_snap": 12.067097238472858,
    "lost_vs_adopted": [
     2563195186142791552
    ],

@@ -196,6 +196,17 @@ def match(X, K, t):
     return P.set_index("row")
 
 
+_ACTIVE = None
+
+
+def active_ids():
+    """Stars with activity evidence (04b); as in 18, the background is counted only around stars without it."""
+    global _ACTIVE
+    if _ACTIVE is None:
+        _ACTIVE = set(pd.read_parquet(os.path.join(C.DER, "activity_all.parquet")).query("active").source_id)
+    return _ACTIVE
+
+
 def tests(LT, CT, veto, cveto):
     """Steady (coadd) and single-epoch tests of 18 for a given star veto and control-veto matrix."""
     keep = (~LT.detected.values) & (~veto)
@@ -204,12 +215,13 @@ def tests(LT, CT, veto, cveto):
     CO = pd.DataFrame({"S": (U.S_mJy * U.w).groupby(U.source_id).sum() / g.w.sum(), "sig": g.w.sum() ** -0.5})
     CO["snr"] = CO.S / CO.sig
     co_hits = co_tot = ep_hits = ep_tot = 0
+    inact = ~U.source_id.isin(active_ids()).values
     for j in range(N_CTRL):
-        ok = ~Cv[:, j] & np.isfinite(Cs[:, j]); z = Cs[ok, j]; s = U.sigma_mJy.values[ok]; sid = U.source_id.values[ok]
+        ok = ~Cv[:, j] & np.isfinite(Cs[:, j]) & inact; z = Cs[ok, j]; s = U.sigma_mJy.values[ok]; sid = U.source_id.values[ok]
         ep_hits += int((z >= THR).sum()); ep_tot += int(ok.sum())
         zc = pd.Series(z / s).groupby(sid).sum() / np.sqrt(pd.Series(1 / s ** 2).groupby(sid).sum())
         co_hits += int((zc >= THR).sum()); co_tot += len(zc)
-    b_s = co_hits / co_tot * len(CO); b_e = ep_hits / ep_tot * len(U)
+    b_s = co_hits / co_tot * int((~CO.index.isin(active_ids())).sum()); b_e = ep_hits / ep_tot * int(inact.sum())
     return U, dict(n_trials_steady=int(len(CO)), n_trials_snap=int(len(U)), b_steady=b_s, b_snap=b_e, n_vetoed=int(veto.sum())), \
         set(CO.index[CO.snr >= THR]), set(U.source_id[U.snr >= THR])
 

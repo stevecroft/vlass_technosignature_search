@@ -58,6 +58,9 @@ def finalize(text):
     # CrossRef 'issued' is the online date; use the volume year where they differ
     for key, yr in {"Garrett2022": 2023, "Choza2024": 2024}.items():
         text = re.sub(r"(" + key + r",[^@]*?year=\{)\d{4}(\})", r"\g<1>" + str(yr) + r"\2", text, count=1)
+    # Science record: CrossRef appends the abstract-style subtitle to the title
+    text = text.replace("title={{Eavesdropping: The Radio Signature of the Earth: Television leakage from the earth allows detection of our civilization at interstellar distances.}}",
+                        "title={{Eavesdropping: The Radio Signature of the Earth}}")
     # SPIE record: CrossRef gives a lower-case title and the page count instead of the paper number
     text = text.replace("title={{The Karl G. Jansky very large array sky survey (VLASS): data products}}",
                         "title={{The Karl G. Jansky Very Large Array Sky Survey (VLASS). Data Products}}")
@@ -70,7 +73,7 @@ def finalize(text):
 
 DOIS = {
     "Price2020": "10.3847/1538-3881/ab65f1", "Enriquez2017": "10.3847/1538-4357/aa8d1b",
-    "Isaacson2017": "10.1088/1538-3873/aa5800", "Tremblay2025": "10.3847/1538-3881/ad9ea5", "Czech2021": "10.1088/1538-3873/abf329",
+    "Isaacson2017": "10.1088/1538-3873/aa5800", "Tremblay2025": "10.3847/1538-3881/ad9ea5", "Czech2021": "10.1088/1538-3873/abf329", "Sullivan1978": "10.1126/science.199.4327.377", "LoebZaldarriaga2007": "10.1088/1475-7516/2007/01/020", "Lindegren2021": "10.1051/0004-6361/202039709", "Garrett2015": "10.1051/0004-6361/201526687",
     "Painter2025": "10.3847/1538-3881/adbc5e", "Wlodarczyk2020": "10.1093/mnras/staa2672",
     "Garrett2022": "10.1093/mnras/stac2607",
     "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378",
