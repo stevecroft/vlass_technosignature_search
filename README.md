@@ -153,7 +153,7 @@ component parquet holds exactly the same data.
   149 with activity evidence (137 with a 2RXS/eRASS1 counterpart, 12 by SIMBAD types alone), 12 without activity evidence (including LSPM J1943+5337).
   Each of the 5 in the steady test has a specific explanation: LSPM J1943+5337 and TYC 3573-1391-1 are offset from the star;
   Gaia DR3 2563195186142791552 is 6.8–8.4″ from an extended 22 mJy background source; PM J20156+4321 is a marginal 5.5σ coadd excess;
-  G 133-48 is stellar (an over-luminous M dwarf, L_ν ≈ 4.6×10⁷ W Hz⁻¹). The other 7 are single-epoch 5.0–9.1σ events.
+  G 133-48 is most likely stellar (an over-luminous M dwarf and rapid rotator, P = 0.216 d, v sin i = 47.6 km s⁻¹; L_ν ≈ 4.6×10⁷ W Hz⁻¹), kept in k. The other 7 are single-epoch 5.0–9.1σ events.
   G 133-48's cutout positions follow the star (χ² = 0.6 for 6 dof at the star; stationary rejected, p = 0.044; 22).
   The chance background is counted only around the 88% of stars without activity evidence (25,882 stars have it;
   04b). A component that would be a secure association of a control position is exempt from its veto, as a star's own is (16);
@@ -174,10 +174,11 @@ component parquet holds exactly the same data.
 - **Per-star limits (95%, all epochs, steady):** median 0.54 mJy, L_ν < 4.0×10⁸ W Hz⁻¹; Barnard's star L_ν < 2.3×10⁵ W Hz⁻¹
   (Epoch-1 catalogue analysis: median 1.09 mJy; Barnard 5.1×10⁵).
 - **Population (steady; stars without activity evidence, p_i = 0 at the active stars):** headline, no background subtracted
-  (all 5 coadd detections treated as possible transmitters): f < 3.6×10⁻² / 6.1×10⁻⁴ / 5.8×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹
+  (no allowance for chance background; all 5 coadd detections counted, with t_i = 5σ_i in p_i as in k): f < 3.6×10⁻² / 6.1×10⁻⁴ / 5.8×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹
   (182,586 stars at the floor). With the control background subtracted: 1.6×10⁻² / 2.7×10⁻⁴ / 2.6×10⁻⁵.
-  Duty cycle, counted per host: f < 4.7×10⁻⁵ / 6.6×10⁻⁵ / 1.5×10⁻⁴ for δ = 1 / 0.3 / 0.1; f·δ < 1.4×10⁻⁵ as δ → 0.
-  Within 50 pc (19,975 inactive stars), common construction (P_det = 0.5, no background): f < 1.1×10⁻³, ~6× tighter than
+  Duty cycle, counted per host (independent snapshots): f < 9.3×10⁻⁵ / 1.3×10⁻⁴ / 3.1×10⁻⁴ for δ = 1 / 0.3 / 0.1, f·δ < 2.7×10⁻⁵ as δ → 0
+  without background subtraction (4.7×10⁻⁵ / 6.6×10⁻⁵ / 1.5×10⁻⁴ and 1.4×10⁻⁵ background-subtracted).
+  Within 50 pc (19,974 inactive stars, 2 steady detections), common construction (P_det = 0.5, no background): f < 6.3×10⁻⁴, ~9× tighter than
   the 0.60% for the 1,005 GBT S-band targets of Price et al. (2020).
 - **Sample:** 91% of the 229,425 non-WD GCNS objects within 100 pc at δ > −41° (03d); 35 bright dwarfs missing from
   Gaia measured at SIMBAD positions (03c): 3 detected (Algol, θ Aur, ξ Tau), Sirius L_ν < 5.4×10⁵ W Hz⁻¹.
@@ -186,9 +187,9 @@ component parquet holds exactly the same data.
   of which the stars with activity evidence give (1.9×10⁶ ± 1.7×10⁵) (11.3σ) and those without (4.3×10⁵ ± 1.1×10⁵)
   (4.1σ); median S/σ shift including detected stars 0.084 ± 0.014. Limits use inactive stars only, a per-L_T
   host-S/N ≤ 3 selection and host-sampling variance: f < 1 at L_T ≈ 3.7×10⁵ (AFGK) and 2.2×10⁵ (M) W Hz⁻¹; at 10⁶,
-  f < 0.40 / 0.28 with N_eff = 55 / 479 (nearest stars); coverage ≥ 0.88 (8 control realizations).
+  f < 0.40 / 0.28 with N_eff = 55 / 479 (nearest stars); coverage ≥ 0.88 over L_T = 1.5×10⁵–10⁷ W Hz⁻¹ and f = 0.1–1 (8 noise realizations × 25 host draws; approximate near f = 1).
   Median stacks (pooled 0–100 pc): f < 0.090 / 0.057 at 10⁷ and 0.016 / 0.010 at 10⁹ W Hz⁻¹.
-- **Versus Breakthrough Listen (Price et al. 2020, with the ×3.3 turboSETI correction of Choza et al. 2024; Fig. 9 plots published values except Choza et al.):**
+- **Versus Breakthrough Listen (Price et al. 2020, with the ×3.3 turboSETI correction of Choza et al. 2024; also applied in Fig. 9 to Enriquez et al. 2017, Price et al. 2020, Garrett & Siemion 2023 and Uno et al. 2023):**
   - VLASS (all epochs) is about 43,100× deeper in flux density (0.54 mJy vs ~23 Jy at 50 pc).
   - For narrowband lines it is about 4.6×10⁴× less sensitive in EIRP (1.5×10⁵× against the published 2.1×10¹² W).
   - A search of the same GBT data matched to bandwidth B would lose sensitivity only as √B, so the continuum advantage is coverage

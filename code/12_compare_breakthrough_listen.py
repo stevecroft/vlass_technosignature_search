@@ -4,7 +4,8 @@ Price et al. quote EIRP_min = 4 pi d^2 S_min * (1 Hz) at d = 50 pc: 2.1e12 W (GB
 (Parkes 10-cm, 2.60-3.45 GHz), before the factor-of-3.3 correction of Choza et al. (2024) applied below; occurrence limits
 < 0.45% (L, 882 stars), < 0.37% (S, 1005 stars), < 2.0% (Parkes, 189 stars), assuming P_det = 0.5. The GBT S band
 (1.80-2.80 GHz) is the one that overlaps VLASS. For a common construction we also give the 95% limit for zero detections
-with P_det = 0.5 and no background, 3 / (0.5 N), and use the same construction (mu_95 without background subtraction) for VLASS.
+with P_det = 0.5 and no background, 3 / (0.5 N), and use the same construction for VLASS: mu_95 without background
+subtraction for the k_50 steady-test detections among the constraining stars within 50 pc (not all k of the 100 pc search).
 
 Inputs : results/vlass_perstar_limits_100pc_MS.parquet
 Output : results/vlass_vs_BL_Price2020_comparison.csv
@@ -13,11 +14,13 @@ import os, sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  
 import common as C
 import json
 import numpy as np, pandas as pd
+from scipy.stats import chi2
 
 BL = {"GBT": dict(EIRP=2.1e12, band="1.80-2.80 GHz", frac="<0.37% [paper]; <0.60% [3/(0.5 N)]", N=1005, dwell="3x5 min ON", f_common=3 / (0.5 * 1005)),
       "Parkes": dict(EIRP=9.1e12, band="2.60-3.45 GHz", frac="<2.0% [paper]; <3.2% [3/(0.5 N)]", N=189, dwell="multi-epoch", f_common=3 / (0.5 * 189))}
 # Choza et al. (2024) found that the turboSETI S/N used by Price et al. (2020) is overestimated by a factor of ~3.3, so the
-# published EIRP limits are too low by that factor. We apply it here, as in Figure 9 (seti_limits_py3 uses m = 10 x 3.3 = 33).
+# published EIRP limits are too low by that factor. We apply it here, as in Figure 9
+# (seti_limits_py3 uses m = 10 x 3.3 = 33 for Price et al., 25 x 3.3 for Enriquez et al., and x3.3 for Garrett & Siemion and Uno et al.).
 CHOZA = 3.3
 
 if __name__ == "__main__":
@@ -32,14 +35,23 @@ if __name__ == "__main__":
     E50 = A50 * S50 * 1e-29 * C.BAND_HZ
     L50 = L[L.dist_pc <= 50]; Lstar = np.percentile(L50.Lnu_lim_WHz, 95)
     act = set(pd.read_parquet(os.path.join(C.DER, "activity_all.parquet")).query("active").source_id)   # 04b; p_i = 0 there
-    N50 = int(((L50.Lnu_lim_WHz < Lstar) & ~L50.source_id.isin(act)).sum())
+    # constraining stars: within 50 pc, no activity evidence, and a noise-only detection threshold (5 + 1.645) sigma below
+    # the 50 pc EIRP threshold (so that the detected stars, whose limits include their measured flux, are not dropped)
+    Lnoise = (5 + 1.645) * L50.sig * 1e-29 * 4 * np.pi * (L50.dist_pc * C.PC_M) ** 2
+    cons = (Lnoise < Lstar) & ~L50.source_id.isin(act)
+    N50 = int(cons.sum())
+    CA = pd.read_csv(os.path.join(C.RES, "alleepoch_candidates.csv")); cj = json.load(open(os.path.join(C.DER, "alleepoch_candidates.json")))
+    steady = set(CA.source_id[CA.cand_coadd & ~CA.explained & ~CA.source_id.isin(cj["coadd_vetoed_ids"])])   # the k of 18
+    K50 = int(L50.source_id[cons].isin(steady).sum())
+    MU = chi2.ppf(0.95, 2 * (K50 + 1)) / 2 if os.path.exists(fa) else MU                # one-sided 95% Poisson, b = 0
+    print("steady detections among the", N50, "constraining stars within 50 pc:", K50, "mu95 =", round(MU, 3))
     rows = [dict(survey=f"Price+2020 {k} (narrowband)", band=v["band"], signal_type="<=~3 Hz, |drift|<=4 Hz/s", dwell=v["dwell"],
                  S_lim_Jy_at50pc=CHOZA * v["EIRP"] / A50 / 1e-26, EIRP_lim_W_at50pc=CHOZA * v["EIRP"], EIRP_published_W=v["EIRP"], fraction_UL95=v["frac"], N_stars_constraining=v["N"],
                  f95_common=v["f_common"]) for k, v in BL.items()]
     rows.append(dict(survey=label, band="2-4 GHz", signal_type="total in-band power of a steady signal",
                      dwell="~5 s snapshots", S_lim_Jy_at50pc=S50 * 1e-3, EIRP_lim_W_at50pc=E50, EIRP_published_W=np.nan,
                      fraction_UL95=f"<{MU/N50:.1e} (P_det=1); <{MU/(0.5*N50):.1e} (P_det=0.5)", N_stars_constraining=N50,
-                     f95_common=MU / (0.5 * N50)))
+                     f95_common=MU / (0.5 * N50), k_det=K50, mu95=MU))
     out = pd.DataFrame(rows); out.to_csv(os.path.join(C.RES, "vlass_vs_BL_Price2020_comparison.csv"), index=False)
     print(out.to_string(index=False))
     print(f"EIRP ratio VLASS/BL-GBT = {E50/(CHOZA*2.1e12):.2e} (corrected; {E50/2.1e12:.2e} published); "

@@ -202,7 +202,8 @@ if __name__ == "__main__":
     put("BLratio", sci(v.EIRP_lim_W_at50pc / g_.EIRP_lim_W_at50pc)); put("BLratioPub", sci(v.EIRP_lim_W_at50pc / g_.EIRP_published_W))
     put("BLEIRPcorr", sci(g_.EIRP_lim_W_at50pc)); put("BLEIRPpub", sci(g_.EIRP_published_W)); put("BLSJy", f"{g_.S_lim_Jy_at50pc:.0f}")
     put("FluxRatio", com(round(g_.S_lim_Jy_at50pc / (v.S_lim_Jy_at50pc), -2))); put("NFifty", com(v.N_stars_constraining))
-    MU = json.load(open(os.path.join(DER, "alleepoch_candidates.json")))["mu95_steady_b0"] if os.path.exists(os.path.join(DER, "alleepoch_candidates.json")) else 3.0   # no background subtraction
+    MU = float(v.mu95) if "mu95" in bl.columns else 3.0      # no background subtraction; steady detections within 50 pc (script 12)
+    put("KFifty", str(int(v.k_det)) if "k_det" in bl.columns else "0"); put("MuFifty", f"{MU:.1f}")
     put("FFifty", sci(MU / v.N_stars_constraining)); put("FFiftyHalf", sci(2 * MU / v.N_stars_constraining))
     put("BLfCommon", f"{100 * g_.f95_common:.2f}"); put("NGBTS", com(int(g_.N_stars_constraining)))
 
@@ -249,6 +250,10 @@ if __name__ == "__main__":
         put("NCoaddStars", com(sm["n_with_coadd"])); put("NInactPhot", com(sm["n_inactive_with_photometry"]))
         for _x, _k in [(1e7, "Seven"), (1e8, "Eight"), (1e9, "Nine")]: put(f"FBz{_k}", sci(sm[f"f95_b0_1e{int(np.log10(_x))}"]))
         put("FBzFloor", sci(sm["f95_b0_floor"])); put("FDeltaFloorBz", sci(sm["fdelta95_b0_floor"])); put("FDeltaEpochCount", sci(sm["fdelta95_epochcount_floor"]))
+        put("FDutyOneBz", sci(sm["f95_duty1_b0_floor"])); put("FDutyThreeBz", sci(sm["f95_duty0.3_b0_floor"])); put("FDutyTenthBz", sci(sm["f95_duty0.1_b0_floor"]))
+        _PP = pd.read_csv(os.path.join(RES, "alleepoch_population_limits.csv")); _okp = np.isfinite(_PP.f95_b0) & (_PP.f95_b0 < 1)
+        put("AddDiffPct", f"{100 * ((_PP.f95_b0_add / _PP.f95_b0)[_okp].max() - 1):.2f}")   # S_i + 5 sigma_i rule at candidates vs 5 sigma_i
+        put("ReachIndBz", sci(sm["f95_b0_reach1"], 1))
         put("FDutyOne", sci(sm["f95_duty1_floor"])); put("FDutyThree", sci(sm["f95_duty0.3_floor"])); put("FDutyTenth", sci(sm["f95_duty0.1_floor"]))
         put("BzFactor", f"{sm['f95_b0_floor'] / sm['f95_floor']:.1f}")
         _xv = json.load(open(os.path.join(DER, "epoch_catalog_crosscheck.json")))["veto_variants"]["own_epoch"]
@@ -396,6 +401,8 @@ if __name__ == "__main__":
         for _pp, _T in [("Act", SAa), ("In", SAi)]:
             _m = _T[(_T.shell == "20-40") & (_T.cls == "M")].iloc[0]
             put(f"AllMSL{_pp}", sci(_m.meanL)); put(f"AllMSLErr{_pp}", sci(_m.meanL_err)); put(f"AllMSNR{_pp}", f"{_m.meanL_snr:.1f}"); put(f"AllMN{_pp}", com(_m.N_clean))
+        _ma, _mi = [_T[(_T.shell == "20-40") & (_T.cls == "M")].iloc[0].meanL for _T in (SAa, SAi)]
+        put("ActInRatio", f"{_ma / _mi:.1f}")                          # active / inactive mean luminosity, M dwarfs at 20-40 pc
         put("ActFracMForty", f"{100 * SAa[(SAa.shell == '20-40') & (SAa.cls == 'M')].N_clean.iloc[0] / SA[(SA.shell == '20-40') & (SA.cls == 'M')].N_clean.iloc[0]:.0f}")
         put("InMmaxSNR", f"{SAi[SAi.cls == 'M'].meanL_snr.max():.1f}"); put("ActAFGKmaxSNR", f"{SAa[SAa.cls == 'AFGK'].meanL_snr.max():.1f}")
         put("InAFGKmaxSNR", f"{SAi[SAi.cls == 'AFGK'].meanL_snr.max():.1f}")
@@ -443,8 +450,13 @@ if __name__ == "__main__":
             r0 = SA[(SA.cls == t) & (SA.dmin == 0)].iloc[0]; put(f"NearShell{t}", sci(max(r0.meanL, 0) + 1.645 * r0.meanL_err, 1))
         put("ReachEIRPAll", sci(float(f"{min(reach):.1e}") * 2e9))
         _COV = pd.read_csv(os.path.join(RES, "alleepoch_stack_coverage.csv"))
+        sm_all = json.load(open(os.path.join(DER, "alleepoch_summary.json")))
+        _ca = pd.read_csv(os.path.join(RES, "cutout_astrometry.csv")); _g = _ca[_ca.source_id == 349716170186042880]
+        put("GoteSnrLo", f"{_g.snr_fit.min():.1f}"); put("GoteSnrHi", f"{_g.snr_fit.max():.1f}"); put("GoteNep", str(len(_g)))
         put("CovAFGKmin", f"{_COV[_COV.cls == 'AFGK'].coverage.min():.2f}"); put("CovMmin", f"{_COV[_COV.cls == 'M'].coverage.min():.2f}")
         put("CovNangles", "8")
+        _rl = {t: float(f"{L0:.1e}") for t, L0 in zip(["AFGK", "M"], reach)}
+        put("ReachRatioAFGK", f"{sm_all['f95_b0_reach1'] / _rl['AFGK']:.0f}"); put("ReachRatioM", f"{sm_all['f95_b0_reach1'] / _rl['M']:.0f}")
         for t, L0 in zip(["AFGK", "M"], reach):   # EIRP from the *displayed* (rounded) L so the abstract is self-consistent
             put(f"ReachEIRPAll{t}", sci(float(f"{L0:.1e}") * 2e9))
         ALL = dict(SA=SA, ST=ST[ST.scope == "all"])
@@ -546,7 +558,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Breakthrough Listen (BL) limits apply to signals $\lesssim$3\,Hz wide with $|\dot\nu|\le4$\,Hz\,s$^{-1}$ and use the 1\,Hz transmitter-width convention of \citet{Price2020}, including the factor of 3.3 correction of \citet{Choza2024} (published values in parentheses), as in Figure~\ref{fig:tr}; the VLASS limit applies to the total in-band power of any signal. $N_\star$ is the number of stars constraining the occurrence limit (for BL GBT, the S-band targets, the band that overlaps VLASS; for VLASS, stars within 50\,pc without activity evidence). $f_{95}$ is the 95\% upper limit on the fraction of stars hosting a transmitter above EIRP$_{\rm lim}$ in a common construction: a 50\% detection probability per star, as adopted by \citet{Price2020}, and no background subtraction ($3/0.5N_\star$ for no detections; for VLASS $\mu_{95}=\MuSteadyBz$ for the \KSteady\ steady-test detections). \citet{Price2020} quote 0.37\% (GBT S band) and 2.0\% (Parkes).}
+\tablecomments{Breakthrough Listen (BL) limits apply to signals $\lesssim$3\,Hz wide with $|\dot\nu|\le4$\,Hz\,s$^{-1}$ and use the 1\,Hz transmitter-width convention of \citet{Price2020}, including the factor of 3.3 correction of \citet{Choza2024} (published values in parentheses), as in Figure~\ref{fig:tr}; the VLASS limit applies to the total in-band power of signals that survive the interference flagging (Section~\ref{sec:limits_method}). $N_\star$ is the number of stars constraining the occurrence limit (for BL GBT, the S-band targets, the band that overlaps VLASS; for VLASS, stars within 50\,pc without activity evidence). $f_{95}$ is the 95\% upper limit on the fraction of stars hosting a transmitter above EIRP$_{\rm lim}$ in a common construction: a 50\% detection probability per star, as adopted by \citet{Price2020}, and no background subtraction ($3/0.5N_\star$ for no detections; for VLASS $\mu_{95}=\MuFifty$ for the \KFifty\ steady-test detections among these stars). \citet{Price2020} quote 0.37\% (GBT S band) and 2.0\% (Parkes).}
 \end{deluxetable*}
 """)
     rows = [f"{r.image} & {r.epoch:.2f} & {r.peak_mJy:.2f} & {r.SNR:.1f} & ${r.tgt_E:+.2f}\\pm{r.err_E:.2f}$ & ${r.tgt_N:+.2f}\\pm{r.err_N:.2f}$ & ${r.star_E:+.2f}$ & ${r.star_N:+.2f}$ \\\\" for _, r in ast.iterrows()]

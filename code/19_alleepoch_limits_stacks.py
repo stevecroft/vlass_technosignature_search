@@ -10,7 +10,8 @@ Per-star limits (95%), from the forced photometry of 17 and the vetoes of 18:
               S_lim_bestepoch (the limit if the transmitter happened to be on in the lowest-noise epoch).
 Population (steady transmitter of spectral luminosity L, flux S_L = L / 4 pi d^2):
   p_i(L) = Phi((S_L - t_i) / sigma_coadd)   (steady test: coadd only, one trial per star),
-  with t_i = 5 sigma_coadd, or S_coadd + 5 sigma_coadd for forced detections without activity evidence (a transmitter
+  with t_i = 5 sigma_coadd at every star without activity evidence, the rule that defines k (S_coadd + 5 sigma_coadd at the
+  candidates, asking for an additional transmitter above the measured source, is kept as f95_b0_add; a transmitter
   must exceed it), and p_i = 0 for stars with activity evidence (04b), which would be classified as natural emitters.
   The expected number of detected transmitters is f * sum_i p_i = f * N_eff(L); with k unexplained candidates over an
   expected chance background b (18, steady test), f_95(L) = mu_95(k, b) / N_eff(L) (f95), and without background
@@ -122,8 +123,13 @@ if __name__ == "__main__":
     d = P.dist_pc.values[ok]; sig = P.sig.values[ok]; Sco = P.S.values[ok]; nat = (P.natural | P.candidate).values[ok]
     act = P.index.isin(active)[ok]
     cvet = P.index.isin(cj.get("coadd_vetoed_ids", []))[ok]                   # steady-test (coadd-unit) confusion veto of 18
-    t_co = np.where(act | cvet, np.inf, np.where(nat, Sco + THR * sig, THR * sig))   # p_i = 0 at stars with activity evidence
-    Ue = U[~U.source_id.isin(natural | cand | active)]       # single-epoch route only for emission-free, inactive stars
+    # p_i uses the rule that defines k: a star counts when its coadd reaches 5 sigma, so t_i = 5 sigma_i at every star
+    # without activity evidence, including the candidates themselves (each counted in k as a possible transmitter).
+    # t_add (S_i + 5 sigma_i at the candidates) instead asks whether an additional transmitter would stand out above the
+    # measured source; it is kept for comparison (f95_b0_add). p_i = 0 at stars with activity evidence.
+    t_co = np.where(act | cvet, np.inf, THR * sig)
+    t_add = np.where(act | cvet, np.inf, np.where(nat, Sco + THR * sig, THR * sig))
+    Ue = U[~U.source_id.isin(natural | active)]   # single-epoch route: every star without activity evidence (as k_host counts)
     de, se = Ue.dist_pc.values, Ue.sigma_mJy.values; sid_e = Ue.source_id.values
     _, inv = np.unique(sid_e, return_inverse=True)
     mu95, kk, bb = cj["mu95_steady"], cj["k_steady"], cj["b_steady"]          # steady test: coadd, one trial per star
@@ -133,12 +139,13 @@ if __name__ == "__main__":
     rows = []
     for Lg in LGRID:
         SL = Lg / lum(1.0, d)                                 # mJy at each star
-        p_co = norm.cdf((SL - t_co) / sig)
+        p_co = norm.cdf((SL - t_co) / sig); neff_add = norm.cdf((SL - t_add) / sig).sum()
         SLe = Lg / lum(1.0, de); p_e = norm.cdf((SLe - THR * se) / se)
         p = p_co.copy()
         neff, nsnap = p.sum(), p_e.sum()
         r_ = dict(L_WHz=Lg, N_eff=neff, f95=min(mu95 / neff, np.inf) if neff > 0 else np.inf,
                   f95_b0=cj["mu95_steady_b0"] / neff if neff > 0 else np.inf,
+                  f95_b0_add=cj["mu95_steady_b0"] / neff_add if neff_add > 0 else np.inf,
                   f95_k0b0=3.0 / neff if neff > 0 else np.inf, N_snap=nsnap,
                   # duty cycle, counted per host star: a host on in a random fraction delta of snapshots is detected at
                   # least once with probability 1 - prod_e (1 - delta p_ie); for small delta this tends to delta sum_e p_ie
@@ -148,6 +155,7 @@ if __name__ == "__main__":
         for dl in DELTAS:
             lq = np.zeros(inv.max() + 1); np.add.at(lq, inv, np.log1p(-dl * np.clip(p_e, 0, 1 - 1e-12)))
             nh = np.sum(1 - np.exp(lq)); r_[f"f95_duty{dl:g}"] = mu95h / nh if nh > 0 else np.inf
+            r_[f"f95_duty{dl:g}_b0"] = cj["mu95_host_b0"] / nh if nh > 0 else np.inf
         rows.append(r_)
     POP = pd.DataFrame(rows); POP.to_csv(os.path.join(C.RES, "alleepoch_population_limits.csv"), index=False)
     # ---------------- stacks
@@ -253,12 +261,13 @@ if __name__ == "__main__":
     cov_rows = []
     for cl in ["AFGK", "M"]:
         q = IN[IN.cls == cl]; sL_ = q.sigL.values; C_ = CZ[(IN.cls == cl).values]
-        for Lt in [4e5, 1e6, 1e7]:
+        for Lt in [1.5e5, 2.2e5, 3e5, 4e5, 1e6, 1e7]:
             sel0 = Lt <= HOST_SNR * sL_
             if sel0.sum() < 10: continue
-            for f_true in [0.1, 0.3, 0.6]:
-                ok_n = n_t = 0
+            for f_true in [0.1, 0.3, 0.6, 1.0]:
+                ok_n = n_t = 0; ok_j = []
                 for j in range(N_CTRL):
+                    ok0 = ok_n
                     zj = C_[:, j]
                     for rep in range(25):
                         host = rng.random(len(zj)) < f_true; zz = zj + host * Lt / sL_
@@ -267,7 +276,11 @@ if __name__ == "__main__":
                         Lp = zz * sL_
                         m_, s_m_, ne_, f_, _ = stack_lim(keep, Lp, sL_, others, Lt)
                         n_t += 1; ok_n += int((not np.isfinite(f_)) or (f_ >= f_true))
-                cov_rows.append(dict(cls=cl, L_WHz=Lt, f_true=f_true, coverage=ok_n / n_t, n_trials=n_t))
+                    ok_j.append((ok_n - ok0) / 25)
+                cov_rows.append(dict(cls=cl, L_WHz=Lt, f_true=f_true, coverage=ok_n / n_t, n_trials=n_t, n_noise=N_CTRL, n_host_draws=25,
+                                     n_noise_below95=int(np.sum(np.array(ok_j) < 0.95)), n_sel=int(sel0.sum()),
+                                     fail_angles=";".join(str(j) for j in range(N_CTRL) if ok_j[j] < 0.95),
+                                     angle_mean_z=";".join(f"{np.nanmean(C_[sel0, j]):.4f}" for j in range(N_CTRL))))
     COV = pd.DataFrame(cov_rows); COV.to_csv(os.path.join(C.RES, "alleepoch_stack_coverage.csv"), index=False)
     # median-based limits at a few L_T (Monte Carlo), all-epoch coadd, for the pre-specified pooled 0-100 pc sample of
     # stars without activity evidence in each class (no choice of shell after seeing the data)
@@ -300,6 +313,10 @@ if __name__ == "__main__":
                 f95_b0_1e9=float(np.interp(9, np.log10(POP.L_WHz), POP.f95_b0)), f95_b0_floor=float(POP.f95_b0.min()),
                 fdelta95_b0_floor=float(POP.fdelta95_b0.min()), fdelta95_epochcount_floor=float(POP.fdelta95_epochcount.min()),
                 **{f"f95_duty{dl:g}_floor": float(POP[f"f95_duty{dl:g}"].min()) for dl in DELTAS},
+                **{f"f95_duty{dl:g}_b0_floor": float(POP[f"f95_duty{dl:g}_b0"].min()) for dl in DELTAS},
+                f95_b0_add_1e7=float(np.interp(7, np.log10(POP.L_WHz), POP.f95_b0_add)), f95_b0_add_floor=float(POP.f95_b0_add.min()),
+                f95_b0_reach1=float(10 ** np.interp(0.0, -np.log10(POP.f95_b0.values[np.isfinite(POP.f95_b0.values)]),
+                                                     np.log10(POP.L_WHz.values[np.isfinite(POP.f95_b0.values)]))),
                 mu95_host=mu95h, k_host=cj["k_host"], b_host=cj["b_host"],
                 n_unexplained_candidates=int(P.unexplained_candidate.sum()),
                 n_active_with_photometry=int(act.sum()), n_inactive_with_photometry=int((~act).sum()))
