@@ -1,0 +1,21 @@
+{
+ "n_gcns_nonWD_100pc_dec41": 229425,
+ "status_counts": {
+  "in sample": 209549,
+  "outside main-sequence window": 17348,
+  "outside VLASS footprint": 1858,
+  "parallax <= 10 mas or parallax/error <= 10": 670
+ },
+ "frac_in_sample": 0.9133660237550397,
+ "status_counts_G_lt_15": {
+  "in sample": 120220,
+  "outside main-sequence window": 3589,
+  "outside VLASS footprint": 1057,
+  "parallax <= 10 mas or parallax/error <= 10": 11
+ },
+ "n_sample": 210191,
+ "n_sample_not_gcns_100pc": 642,
+ "frac_sample_not_gcns": 0.00305436483959827,
+ "dist_50_pc_median_of_plx_cut_losses": 92.65679121017456,
+ "n_gcns_100pc_dec41_all": 247677
+}

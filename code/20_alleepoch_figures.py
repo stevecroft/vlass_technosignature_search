@@ -40,22 +40,24 @@ if __name__ == "__main__":
     tags = sorted(k for k in cal if k.startswith("ep"))
 
     # ---- population limit
-    fig, d = plt.subplots(figsize=(3.6, 3.1))
-    d.loglog(POP.L_WHz, clip1(POP.f95), color="k", lw=1.6, label="All epochs, steady")
+    fig, d = plt.subplots(figsize=(3.6, 3.9))
+    d.loglog(POP.L_WHz, clip1(POP.f95_b0), color="k", lw=1.6, label="All epochs, steady (no background subtracted)")
+    d.loglog(POP.L_WHz, clip1(POP.f95), color="k", lw=0.8, ls="-.", label="All epochs, steady (control background)")
     d.loglog(old.Lnu_star_WHz, clip1(old.f_UL95), color="0.55", lw=1.0, ls="--", label="Epoch 1 catalog")
-    d.loglog(POP.L_WHz, clip1(POP.fdelta95), color="k", lw=1.0, ls=":", label="Per snapshot ($f\\delta$)")
+    d.loglog(POP.L_WHz, clip1(POP.fdelta95), color="k", lw=1.0, ls=":", label="Per snapshot ($f\\delta$, per host)")
     for cl in ["AFGK", "M"]:
         s = SL[SL.cls == cl]
-        ind = np.interp(np.log10(s.L_WHz), np.log10(POP.L_WHz), POP.f95)        # draw stacks only where they are tighter
+        ind = np.interp(np.log10(s.L_WHz), np.log10(POP.L_WHz), POP.f95_b0)     # draw stacks only where they are tighter
         fm = clip1(s.f95_mean); fm[~(fm < ind)] = np.nan
-        d.loglog(s.L_WHz, fm, color=COLT[cl], lw=1.3, label=f"{cl} mean stack ($fL_T$)")
+        d.loglog(s.L_WHz, fm, color=COLT[cl], lw=1.3, label=f"{cl} mean stack")
         m = s[s.f95_median.notna()]
         d.scatter(m.L_WHz, m.f95_median, s=14, marker="s", facecolor="white", edgecolor=COLT[cl], lw=1, zorder=3,
                   label=f"{cl} median stack")
     d.set_xlim(1e5, 3e10); d.set_ylim(1e-5, 1)
     d.set_xlabel("Transmitter $L_\\nu$ at 3 GHz (W Hz$^{-1}$)"); d.set_ylabel("Fraction of stars hosting one (95% UL)")
     d2 = d.secondary_xaxis("top", functions=(lambda x: x * C.BAND_HZ, lambda x: x / C.BAND_HZ)); d2.set_xlabel("EIRP, 2 GHz-wide (W)")
-    d.legend(frameon=False, fontsize=5, loc="lower left", handlelength=1.6, borderaxespad=0.3); fig.tight_layout(); save(fig, "alleepoch_population_limit"); plt.close(fig)
+    d.legend(frameon=False, fontsize=5, loc="upper center", bbox_to_anchor=(0.5, -0.17), ncol=2, handlelength=1.8, columnspacing=1.0)
+    fig.tight_layout(); save(fig, "alleepoch_population_limit"); plt.close(fig)
 
     # ---- per-star steady limits
     fig, c = plt.subplots(figsize=(3.6, 3.0))
@@ -78,13 +80,18 @@ if __name__ == "__main__":
     a = fig.add_subplot(gs[0, 0]); b = fig.add_subplot(gs[0, 1]); e = fig.add_subplot(gs[1, :])
     for cl, dx in [("AFGK", -1.5), ("M", 1.5)]:
         for sc, alpha, ms in [(t, 0.35, 10) for t in tags] + [("all", 1.0, 26)]:
-            s = ST[(ST.cls == cl) & (ST.scope == sc)]
+            s = ST[(ST.cls == cl) & (ST.scope == sc) & (ST["pop"] == "all")]
             if not len(s): continue
             x = np.array([MIDS[k] for k in s.shell]) + dx + (0 if sc == "all" else 0.4 * (tags.index(sc) - 1.5))
             a.errorbar(x, s.meanL / 1e6, yerr=s.meanL_err / 1e6, fmt="o", ms=np.sqrt(ms), color=COLT[cl], alpha=alpha, lw=0.8, capsize=1.5,
-                       label=f"{cl}" if sc == "all" else None)
+                       label=f"{cl}, all clean stars" if sc == "all" else None)
             b.errorbar(x, s.dmed_z, yerr=s.dmed_z_err, fmt="s", ms=np.sqrt(ms), color=COLT[cl], alpha=alpha, lw=0.8, capsize=1.5,
                        label=f"{cl}" if sc == "all" else None)
+        for pp, mk, off in [("active", "^", 0.7), ("inactive", "v", -0.7)]:      # all-epoch coadd split by activity evidence
+            s = ST[(ST.cls == cl) & (ST.scope == "all") & (ST["pop"] == pp)]
+            x = np.array([MIDS[k] for k in s.shell]) + dx + off
+            a.errorbar(x, s.meanL / 1e6, yerr=s.meanL_err / 1e6, fmt=mk, ms=3.5, mfc="white", color=COLT[cl], lw=0.7, capsize=1.2,
+                       label=f"{cl}, {'with' if pp == 'active' else 'without'} activity evidence")
     for ax, yl in [(a, "Mean $L_\\nu$ of clean stars (10$^6$ W Hz$^{-1}$)"), (b, "Median $S/\\sigma$ shift vs controls")]:
         ax.axhline(0, color="0.6", lw=0.6); ax.set_xticks(list(MIDS.values())); ax.set_xticklabels([k for k in MIDS], fontsize=6)
         ax.set_xlabel("Distance shell (pc)"); ax.set_ylabel(yl); ax.legend(frameon=False, fontsize=6)

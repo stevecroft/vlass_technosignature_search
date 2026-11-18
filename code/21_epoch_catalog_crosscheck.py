@@ -207,23 +207,35 @@ def active_ids():
     return _ACTIVE
 
 
-def tests(LT, CT, veto, cveto):
-    """Steady (coadd) and single-epoch tests of 18 for a given star veto and control-veto matrix."""
+def tests(LT, CT, veto, cveto, scz, ccz):
+    """Steady (coadd) and single-epoch tests of 18 for a given star veto and control-veto matrix; scz / ccz are the
+    per-epoch contamination S/N at the stars / controls, used for the coadd-unit veto of the steady test as in 18."""
     keep = (~LT.detected.values) & (~veto)
-    U = LT[keep].copy(); Cv = cveto[keep]; Cs = CT[keep]
+    U = LT[keep].copy(); Cv = cveto[keep]; Cs = CT[keep]; Cz = ccz[keep]; U["cz"] = scz[keep]
     U["w"] = 1 / U.sigma_mJy ** 2; g = U.groupby("source_id")
     CO = pd.DataFrame({"S": (U.S_mJy * U.w).groupby(U.source_id).sum() / g.w.sum(), "sig": g.w.sum() ** -0.5})
     CO["snr"] = CO.S / CO.sig
-    co_hits = co_tot = ep_hits = ep_tot = 0
-    inact = ~U.source_id.isin(active_ids()).values
+    CO["cc"] = (U.cz / U.sigma_mJy).groupby(U.source_id).sum() / np.sqrt((1 / U.sigma_mJy ** 2).groupby(U.source_id).sum())
+    COs = CO[CO.cc < VETO_SNR]
+    co_hits = co_tot = ep_hits = ep_tot = 0; per_angle = []
+    inact = ~U.source_id.isin(active_ids()).values; hs = []
     for j in range(N_CTRL):
         ok = ~Cv[:, j] & np.isfinite(Cs[:, j]) & inact; z = Cs[ok, j]; s = U.sigma_mJy.values[ok]; sid = U.source_id.values[ok]
         ep_hits += int((z >= THR).sum()); ep_tot += int(ok.sum())
-        zc = pd.Series(z / s).groupby(sid).sum() / np.sqrt(pd.Series(1 / s ** 2).groupby(sid).sum())
-        co_hits += int((zc >= THR).sum()); co_tot += len(zc)
-    b_s = co_hits / co_tot * int((~CO.index.isin(active_ids())).sum()); b_e = ep_hits / ep_tot * int(inact.sum())
-    return U, dict(n_trials_steady=int(len(CO)), n_trials_snap=int(len(U)), b_steady=b_s, b_snap=b_e, n_vetoed=int(veto.sum())), \
-        set(CO.index[CO.snr >= THR]), set(U.source_id[U.snr >= THR])
+        den = np.sqrt(pd.Series(1 / s ** 2).groupby(sid).sum())
+        zc = pd.Series(z / s).groupby(sid).sum() / den; cc = pd.Series(Cz[ok, j] / s).groupby(sid).sum() / den
+        zc = zc[cc < VETO_SNR]
+        co_hits += int((zc >= THR).sum()); co_tot += len(zc); per_angle.append(int((zc >= THR).sum()))
+        hs.append(pd.DataFrame(dict(h=(zc >= THR).astype(float), t=1.0)))
+    n_s = int((~COs.index.isin(active_ids())).sum())
+    b_s = co_hits / co_tot * n_s; b_e = ep_hits / ep_tot * int(inact.sum())
+    H = pd.concat(hs).groupby(level=0).sum(); rg = np.random.default_rng(3); bb = []
+    for _ in range(1000):
+        i_ = rg.integers(0, len(H), len(H)); bb.append(H.h.values[i_].sum() / H.t.values[i_].sum() * n_s)
+    return U, dict(n_trials_steady=int(len(COs)), n_trials_snap=int(len(U)), b_steady=b_s, b_snap=b_e, n_vetoed=int(veto.sum()),
+                   n_coadd_vetoed=int((CO.cc >= VETO_SNR).sum()), ctrl_hits_steady=co_hits, ctrl_hits_per_angle_steady=per_angle,
+                   b_steady_err_poisson=float(np.sqrt(co_hits) / co_tot * n_s), b_steady_err_boot=float(np.std(bb))), \
+        set(COs.index[COs.snr >= THR]), set(U.source_id[U.snr >= THR])
 
 
 def rstd(x):
@@ -256,6 +268,7 @@ if __name__ == "__main__":
     CTp = pd.read_parquet(os.path.join(C.DER, "alleepoch_forced_controls.parquet"))
     assert (CTp.source_id.values == LT.source_id.values).all() and (CTp.tag.values == LT.tag.values).all()
     CT = CTp[[f"c{j}" for j in range(N_CTRL)]].values; CV18 = CTp[[f"cv{j}" for j in range(N_CTRL)]].values.astype(bool)
+    CZ18 = CTp[[f"cz{j}" for j in range(N_CTRL)]].values.astype(float)
     LT = LT.merge(sv, on="source_id", how="left", validate="many_to_one")
     LT["half_epoch"] = LT.half_epoch.astype(str)
     cal = json.load(open(os.path.join(C.DER, "forced_calibration.json"))); kappa = cal["kappa"]
@@ -266,7 +279,7 @@ if __name__ == "__main__":
     LT["sig_cat"] = LT.sigma_mJy * LT.bp * kappa      # = eta * sigma_raw (QL image scale)
     chk = LT[LT.pred_contam > 0]; res["contam_snr_check_max_dev"] = float(np.abs(kappa * chk.pred_contam / chk.sig_cat - chk.contam_snr).max())
     LT["ra_e"], LT["de_e"] = C.propagate(LT.ra.values, LT.dec.values, LT.pmra.values, LT.pmdec.values, LT.ep.values, plx=LT.parallax.values)
-    LT["veto_own"] = LT.veto.values; CVown = CV18.copy(); LT["veto_cat"] = "E1(adopted)"; LT["own_contam_snr"] = LT.contam_snr
+    LT["veto_own"] = LT.veto.values; CVown = CV18.copy(); CZown = CZ18.copy(); LT["veto_cat"] = "E1(adopted)"; LT["own_contam_snr"] = LT.contam_snr
     long, per_cat = [], {}
     for half, clist in HALF.items():
         idx = LT.index[LT.half_epoch == half]
@@ -297,7 +310,7 @@ if __name__ == "__main__":
                 for j in range(N_CTRL):
                     th = j * 2 * np.pi / N_CTRL
                     rc = Xc.ra_e.values - R_CTRL * np.cos(th) / 3600 / np.cos(np.deg2rad(Xc.de_e.values)); dc = Xc.de_e.values + R_CTRL * np.sin(th) / 3600
-                    CVown[pos, j] = contam(rc, dc, K, t) * kappa / Xc.sig_cat.values >= VETO_SNR
+                    CZown[pos, j] = contam(rc, dc, K, t) * kappa / Xc.sig_cat.values; CVown[pos, j] = CZown[pos, j] >= VETO_SNR
     ML = pd.concat(long); ML["row"] = ML.index; ML = ML.reset_index(drop=True)
     ML["cmatch"] = (ML.m_sep <= R_MATCH) & (ML.m_SNR >= THR)
 
@@ -339,8 +352,9 @@ if __name__ == "__main__":
 
     # ---------------- D. tests with the own-epoch and union vetoes
     Cand = pd.read_csv(os.path.join(C.RES, "alleepoch_candidates.csv")); expl = Cand.set_index("source_id").explained
-    variants = {"adopted_E1": (LT.veto.values, CV18), "own_epoch": (LT.veto_own.values.astype(bool), CVown),
-                "union": (LT.veto.values | LT.veto_own.values.astype(bool), CV18 | CVown)}
+    sc18, scown = LT.contam_snr.values.astype(float), LT.own_contam_snr.values.astype(float)
+    variants = {"adopted_E1": (LT.veto.values, CV18, sc18, CZ18), "own_epoch": (LT.veto_own.values.astype(bool), CVown, scown, CZown),
+                "union": (LT.veto.values | LT.veto_own.values.astype(bool), CV18 | CVown, np.fmax(sc18, scown), np.fmax(CZ18, CZown))}
     # stars that only the catalogues (or only the own-epoch veto) bring in: classify them exactly as 18 does
     sec_ids = set(LT.source_id[LT.detected])
     near = ML[(ML.m_sep <= 1.0) & (ML.m_SNR >= THR) & ~ML.source_id.isin(sec_ids | set(expl.index))]
@@ -349,8 +363,8 @@ if __name__ == "__main__":
                                             peaks=("m_Peak_flux", lambda x: ",".join(f"{v:.2f}" for v in x)),
                                             forced_snr=("snr", lambda x: ",".join(f"{v:.1f}" for v in x)), vetoed=("veto", "any"))
     extra = set(catonly.index[catonly.n_epochs >= 2])
-    for name, (vv, cv) in variants.items():
-        _, _, cco, cep = tests(LT, CT, vv, cv); extra |= (cco | cep) - set(expl.index)
+    for name, (vv, cv, sz, cz_) in variants.items():
+        _, _, cco, cep = tests(LT, CT, vv, cv, sz, cz_); extra |= (cco | cep) - set(expl.index)
     extra = sorted(extra)
     if extra:
         import importlib
@@ -384,8 +398,8 @@ if __name__ == "__main__":
                                  ge2_epochs=[int(s) for s in catonly.index[catonly.n_epochs >= 2]])
     expl160 = expl; expl = expl_all
     vres = {}
-    for name, (vv, cv) in variants.items():
-        U, d, cco, cep = tests(LT, CT, vv, cv)
+    for name, (vv, cv, sz, cz_) in variants.items():
+        U, d, cco, cep = tests(LT, CT, vv, cv, sz, cz_)
         allc = cco | cep; new = sorted(allc - set(expl.index)); unexp = {s for s in allc if s in expl.index and not expl[s]}
         k_s = len(cco & unexp); k_e = int(((U.snr >= THR) & U.source_id.isin(unexp)).sum())
         d.update(n_cand_stars=len(allc), n_cand_coadd=len(cco), n_cand_epoch=len(cep), n_unexplained=len(unexp),

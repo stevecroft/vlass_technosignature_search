@@ -202,8 +202,9 @@ if __name__ == "__main__":
     put("BLratio", sci(v.EIRP_lim_W_at50pc / g_.EIRP_lim_W_at50pc)); put("BLratioPub", sci(v.EIRP_lim_W_at50pc / g_.EIRP_published_W))
     put("BLEIRPcorr", sci(g_.EIRP_lim_W_at50pc)); put("BLEIRPpub", sci(g_.EIRP_published_W)); put("BLSJy", f"{g_.S_lim_Jy_at50pc:.0f}")
     put("FluxRatio", com(round(g_.S_lim_Jy_at50pc / (v.S_lim_Jy_at50pc), -2))); put("NFifty", com(v.N_stars_constraining))
-    MU = json.load(open(os.path.join(DER, "alleepoch_candidates.json")))["mu95_hidden"] if os.path.exists(os.path.join(DER, "alleepoch_candidates.json")) else 3.0
+    MU = json.load(open(os.path.join(DER, "alleepoch_candidates.json")))["mu95_steady_b0"] if os.path.exists(os.path.join(DER, "alleepoch_candidates.json")) else 3.0   # no background subtraction
     put("FFifty", sci(MU / v.N_stars_constraining)); put("FFiftyHalf", sci(2 * MU / v.N_stars_constraining))
+    put("BLfCommon", f"{100 * g_.f95_common:.2f}"); put("NGBTS", com(int(g_.N_stars_constraining)))
 
     # --- all-epoch analysis (scripts 17-19)
     ALL = None
@@ -232,6 +233,82 @@ if __name__ == "__main__":
         put("NNoEpochSouth", com((_dec.reindex(_P.source_id[_none]) < -38).sum()))
         put("NAllVeto", str(int((_P.n.isna() & (_P.n_ep_all > 0)).sum()))); put("NWithForced", com((~_none).sum()))
         from scipy.stats import poisson as _po
+        # round-2 referee response: background diagnostics, host-level snapshot test, background-free limits
+        put("NCtrlAssoc", str(cj["n_ctrl_assoc_exempt"])); put("NCoaddVeto", str(cj["n_coadd_vetoed"]))
+        _pa = cj["ctrl_hits_per_angle_steady"]; put("CtrlAngleMin", str(min(_pa))); put("CtrlAngleMax", str(max(_pa)))
+        put("PRankSteady", f"{cj['p_rank_steady']:.2f}")
+        put("BSteadyErrBoot", f"{cj['b_steady_err_boot']:.1f}"); put("BSnapErrBoot", f"{cj['b_snap_err_boot']:.1f}")
+        put("KHost", str(cj["k_host"])); put("BHost", f"{cj['b_host']:.1f}"); put("MuHost", f"{cj['mu95_host']:.1f}")
+        put("MuSteadyBz", f"{cj['mu95_steady_b0']:.1f}")
+        _cd = cj["catalog_density"]
+        put("CatStarIn", str(_cd["star_1_2p5"])); put("CatCtrlIn", f"{_cd['ctrl_1_2p5']:.1f}"); put("CatPLow", f"{_cd['p_low_1_2p5']:.2f}")
+        put("CatStarZero", str(_cd["star_0_1"])); put("CatCtrlZero", f"{_cd['ctrl_0_1']:.1f}")
+        _bf = [_cd["by_G"][k] for k in ["15-17", "17-30"]]; _bb = [_cd["by_G"][k] for k in ["0-13", "13-15"]]
+        put("CatFaintStar", str(sum(x[0] for x in _bf))); put("CatFaintCtrl", f"{sum(x[1] for x in _bf):.1f}")
+        put("CatBrightStar", str(sum(x[0] for x in _bb))); put("CatBrightCtrl", f"{sum(x[1] for x in _bb):.1f}")
+        put("NCoaddStars", com(sm["n_with_coadd"])); put("NInactPhot", com(sm["n_inactive_with_photometry"]))
+        for _x, _k in [(1e7, "Seven"), (1e8, "Eight"), (1e9, "Nine")]: put(f"FBz{_k}", sci(sm[f"f95_b0_1e{int(np.log10(_x))}"]))
+        put("FBzFloor", sci(sm["f95_b0_floor"])); put("FDeltaFloorBz", sci(sm["fdelta95_b0_floor"])); put("FDeltaEpochCount", sci(sm["fdelta95_epochcount_floor"]))
+        put("FDutyOne", sci(sm["f95_duty1_floor"])); put("FDutyThree", sci(sm["f95_duty0.3_floor"])); put("FDutyTenth", sci(sm["f95_duty0.1_floor"]))
+        put("BzFactor", f"{sm['f95_b0_floor'] / sm['f95_floor']:.1f}")
+        _xv = json.load(open(os.path.join(DER, "epoch_catalog_crosscheck.json")))["veto_variants"]["own_epoch"]
+        put("XcOwnAngleMin", str(min(_xv["ctrl_hits_per_angle_steady"]))); put("XcOwnAngleMax", str(max(_xv["ctrl_hits_per_angle_steady"])))
+        put("XcOwnPLow", f"{_po.cdf(_xv['k_steady'], _xv['b_steady']):.4f}"); put("XcOwnBErrBoot", f"{_xv['b_steady_err_boot']:.1f}")
+        _ad = os.path.join(RES, "activity_by_distance.csv")
+        if os.path.exists(_ad):
+            _A = pd.read_csv(_ad).set_index("shell")
+            for _sh, _k in [("0-10", "Ten"), ("10-20", "Twenty"), ("20-40", "Forty"), ("80-100", "Hundred")]: put(f"PctAct{_k}", f"{100 * _A.f_active[_sh]:.0f}")
+        _gc = os.path.join(RES, "gcns_comparison.json")
+        if os.path.exists(_gc):
+            _g = json.load(open(_gc)); _sc = _g["status_counts"]
+            put("NGCNS", com(_g["n_gcns_nonWD_100pc_dec41"])); put("PctGCNS", f"{100 * _g['frac_in_sample']:.0f}")
+            put("NGCNSmsw", com(_sc.get("outside main-sequence window", 0))); put("PctGCNSmsw", f"{100 * _sc.get('outside main-sequence window', 0) / _g['n_gcns_nonWD_100pc_dec41']:.1f}")
+            put("NGCNSplx", com(_sc.get("parallax <= 10 mas or parallax/error <= 10", 0))); put("NGCNSfoot", com(_sc.get("outside VLASS footprint", 0)))
+            put("NContam", com(_g["n_sample_not_gcns_100pc"])); put("PctContam", f"{100 * _g['frac_sample_not_gcns']:.1f}")
+        _bl = os.path.join(RES, "bright_dwarfs_limits.csv")
+        if os.path.exists(_bl):
+            _B = pd.read_csv(_bl).set_index("main_id"); put("NBrightMeas", str(len(_B))); _det = _B[_B.snr_coadd >= 5]
+            put("NBrightDet", str(len(_det))); put("NBrightUndet", str(len(_B) - len(_det)))
+            put("AlgolS", f"{_B.S['* bet Per']:.0f}"); put("ThetAurSNR", f"{_B.snr_coadd['* tet Aur']:.1f}"); put("XiTauSNR", f"{_B.snr_coadd['* ksi Tau']:.1f}")
+            for _n, _k in [("* alf CMa", "Sirius"), ("* alf Aql", "Altair"), ("* alf Lyr", "Vega"), ("* alf PsA", "Fomalhaut")]: put(f"BrightL{_k}", sci(_B.L_lim_WHz[_n]))
+            put("BrightUndetMaxSNR", f"{_B.snr_coadd[_B.snr_coadd < 5].max():.1f}")
+        _ca = os.path.join(DER, "cutout_astrometry.json")
+        if os.path.exists(_ca):
+            _st = json.load(open(_ca))["stars"]; g1 = _st["349716170186042880"]; l1 = _st["2137474969751117312"]; t1 = _st["2071061615589030400"]
+            put("NInjAstro", str(json.load(open(_ca)).get("n_inject", 300)))
+            put("GoteChiStar", f"{g1['chi2_at_star']:.1f}"); put("GoteDofStar", str(g1["dof_at_star"])); put("GoteChiStat", f"{g1['chi2_stationary']:.1f}")
+            put("GoteDofStat", str(g1["dof_2"])); put("GotePStat", f"{g1['p_stationary']:.3f}"); put("GoteMotion", f"{g1['motion_arcsec']:.2f}")
+            put("LspmQLChiStat", f"{l1['chi2_stationary']:.1f}"); put("LspmQLChiCo", f"{l1['chi2_comoving']:.1f}"); put("LspmQLDof", str(l1["dof_2"]))
+            put("LspmQLPCo", f"{l1['p_comoving']:.3f}"); put("LspmQLPStat", f"{l1['p_stationary']:.2f}")
+            put("TycMotion", f"{t1['motion_arcsec']:.2f}"); put("TycPStat", f"{t1['p_stationary']:.2f}"); put("TycPCo", f"{t1['p_comoving']:.2f}")
+            put("TycOffset", f"{np.hypot(*t1['offset_comoving']):.1f}")
+        _cs = os.path.join(DER, "cosmos_flux_scale.json")
+        if os.path.exists(_cs):
+            _c = json.load(open(_cs)); _O = pd.read_csv(os.path.join(RES, "cosmos_flux_scale.csv"))
+            put("CosN", com(_c["n_sources_measured"])); put("CosNmeas", com(_c["n_measurements"])); put("CosNiso", com(_c["n_compact_isolated"])); put("CosNcat", com(_c["n_cosmos"]))
+            put("CosRatioFaint", f"{_c['ratio_below_0p5mJy']:.2f}"); put("CosRatioFaintErr", f"{_c['ratio_below_0p5mJy_err']:.2f}")
+            _lo = _O.iloc[0]; put("CosLoBin", f"{1e3 * _lo.S_lo:.0f}--{1e3 * _lo.S_hi:.0f}"); put("CosLoRatio", f"{_lo.ratio:.2f}"); put("CosLoErr", f"{_lo.ratio_err:.2f}")
+            _r = _O[(_O.S_lo >= 0.05) & (_O.S_hi <= 1.0)]; put("CosRatioMin", f"{_r.ratio.min():.2f}"); put("CosRatioMax", f"{_r.ratio.max():.2f}")
+        _sv = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["ra", "dec"])
+        from scipy.spatial import cKDTree as _KD
+        _xyz = np.c_[np.cos(np.deg2rad(_sv.dec)) * np.cos(np.deg2rad(_sv.ra)), np.cos(np.deg2rad(_sv.dec)) * np.sin(np.deg2rad(_sv.ra)), np.sin(np.deg2rad(_sv.dec))]
+        _pr = _KD(_xyz).query_pairs(2 * np.sin(np.deg2rad(2.5 / 3600) / 2)); put("NPairsBeam", com(len(_pr))); put("NStarsPairs", com(len({i for q in _pr for i in q})))
+        _co = pd.read_csv(os.path.join(RES, "epoch_catalog_only_stars.csv")).merge(pd.read_parquet(os.path.join(DER, "activity_all.parquet"), columns=["source_id", "active"]), on="source_id", how="left")
+        _c1 = _co[_co.n_epochs == 1]; put("NCatOnlySingle", str(len(_c1))); put("NCatOnlySingleAct", str(int(_c1.active.astype(bool).sum())))
+        _KB = pd.read_csv(os.path.join(RES, "alleepoch_k_b_threshold.csv")).set_index("threshold")
+        put("KCoFour", str(int(_KB.k_steady[4.0]))); put("BCoFour", f"{_KB.b_steady[4.0]:.1f}")
+        put("KCoSeven", str(int(_KB.k_steady[7.0]))); put("BCoSeven", f"{_KB.b_steady[7.0]:.1f}")
+        put("KCoNegThree", str(int(_KB.k_steady_neg[3.0]))); put("BCoNegThree", f"{_KB.b_steady_neg[3.0]:.1f}")
+        # SCR J0612-1546B, the brightest single-epoch forced detection without activity evidence
+        _LT = pd.read_parquet(os.path.join(DER, "alleepoch_forced.parquet"), columns=["source_id", "half_epoch", "sigma_mJy", "snr", "S_mJy", "veto", "detected"])
+        _x = _LT[_LT.source_id == 2992871647243229824].sort_values("snr")
+        put("SCRsnr", f"{_x.snr.iloc[-1]:.1f}"); put("SCRS", f"{_x.S_mJy.iloc[-1]:.1f}"); put("SCRhalf", str(_x.half_epoch.iloc[-1]))
+        put("SCRnoiseRatio", f"{_x.sigma_mJy.iloc[-1] / _x.sigma_mJy.iloc[:-1].median():.1f}")
+        _CT = pd.read_parquet(os.path.join(DER, "alleepoch_forced_controls.parquet"))
+        _ok = (~_LT.detected & ~_LT.veto & ~_LT.source_id.isin(set(pd.read_parquet(os.path.join(DER, "activity_all.parquet")).query("active").source_id))).values
+        _h = [(_CT[f"c{j}"].values >= _x.snr.iloc[-1]) & ~_CT[f"cv{j}"].values & _ok for j in range(8)]
+        _h5 = [(_CT[f"c{j}"].values >= 5) & ~_CT[f"cv{j}"].values & _ok for j in range(8)]
+        put("SCRctrlAbove", str(int(sum(x.sum() for x in _h)))); put("SCRctrlTot", str(int(sum(x.sum() for x in _h5))))
         _bm = os.path.join(RES, "bright_dwarfs_missing.csv")
         if os.path.exists(_bm): put("NBrightMissing", str(len(pd.read_csv(_bm))))
         put("PctInactive", f"{100 * (1 - cj['f_active_sample']):.0f}")
@@ -276,6 +353,7 @@ if __name__ == "__main__":
         PA = pd.read_parquet(os.path.join(RES, "alleepoch_perstar_limits.parquet")); PA = PA[PA.S_lim_steady.notna()]
         q5, q50, q95 = np.percentile(PA.S_lim_steady, [5, 50, 95]); put("SlimAllMed", f"{q50:.2f}"); put("SlimAllLo", f"{q5:.2f}"); put("SlimAllHi", f"{q95:.2f}")
         put("LlimAllMed", sci(PA.L_lim_steady.median())); put("EIRPlimAllMed", sci(PA.L_lim_steady.median() * 2e9))
+        put("KardRatio", f"{PA.L_lim_steady.median() * 2e9 / 1e17:.0f}")      # Kardashev Type I level of Figure 9, 1e17 W
         put("SlimAnyMed", f"{PA.S_lim_anyepoch.median():.2f}")
         put("SlimBestMed", f"{PA.S_lim_bestepoch.median():.2f}")
         bn = PA.nsmallest(1, "dist_pc").iloc[0]; put("BarnardLAll", sci(bn.L_lim_steady)); put("BarnardEIRPAll", sci(bn.L_lim_steady * 2e9))
@@ -283,7 +361,7 @@ if __name__ == "__main__":
         put("EarthLeakAUAll", com(round(np.sqrt(400.0 / (4 * np.pi * PA.S_lim_steady.median() * 1e-29)) / 1.496e11, -2)))
         put("NBelowBrat", com(int((PA.L_lim_steady < 4e5).sum())))
         _s = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["bp_rp"]); put("NAstars", com(int((_s.bp_rp < 0.33).sum())))
-        put("FFiftyRatio", f"{0.0037 / (2 * MU / v.N_stars_constraining):.0f}")
+        put("FFiftyRatio", f"{g_.f95_common / (2 * MU / v.N_stars_constraining):.0f}")
         PP = pd.read_csv(os.path.join(RES, "alleepoch_population_limits.csv"))
         fi = lambda L0, col="f95": float(np.interp(np.log10(L0), np.log10(PP.L_WHz), PP[col]))
         for x, k in [(1e7, "Seven"), (1e8, "Eight"), (1e9, "Nine")]:
@@ -296,6 +374,7 @@ if __name__ == "__main__":
         _floor1 = lambda x: (lambda e, m: (f"{m}\\times" if m > 1 else "") + f"10^{{{e}}}")(int(np.floor(np.log10(x))), int(x / 10 ** int(np.floor(np.log10(x)))))   # round DOWN, 1 sig. fig.
         _nc = PA["class"].value_counts(); put("NRatioMA", f"{_nc['M'] / _nc['AFGK']:.1f}"); put("SqrtRatioMA", f"{np.sqrt(_nc['M'] / _nc['AFGK']):.1f}")
         put("ZuckSband", f"{_Sz:.0f}"); put("ZuckL", sci(_Lz)); put("ZuckEIRP", sci(_Lz * 2e9))
+        put("ZuckChan", sci(_Sz * 2e9 / 2e6, 1))          # the same signal concentrated in one 2 MHz VLASS channel (Jy)
         put("ZuckMarginMed", _floor1(_Lz / PA.L_lim_steady.median())); put("ZuckMarginWorst", _floor1(_Lz / PA.L_lim_steady.max()))
         put("LlimAllMax", sci(PA.L_lim_steady.max()))
         # Zuckerman's target class F6-M2 (Pecaut & Mamajek 2013 table v2022.04.16: Bp-Rp 0.640 F6V, 2.23 M2V), apparently single
@@ -312,7 +391,14 @@ if __name__ == "__main__":
         put("FAllZeroFloor", sci(PP.f95_k0b0.min()))
         put("OneInNineAll", com(round(1 / fi(1e9), -2)))
         put("ReachIndAll", sci(PP.L_WHz[np.argmax(PP.f95.values < 1)], 1))
-        ST = pd.read_csv(os.path.join(RES, "alleepoch_stacks.csv")); SA = ST[ST.scope == "all"]
+        ST = pd.read_csv(os.path.join(RES, "alleepoch_stacks.csv")); SA = ST[(ST.scope == "all") & (ST["pop"] == "all")]
+        SAi, SAa = ST[(ST.scope == "all") & (ST["pop"] == "inactive")], ST[(ST.scope == "all") & (ST["pop"] == "active")]
+        for _pp, _T in [("Act", SAa), ("In", SAi)]:
+            _m = _T[(_T.shell == "20-40") & (_T.cls == "M")].iloc[0]
+            put(f"AllMSL{_pp}", sci(_m.meanL)); put(f"AllMSLErr{_pp}", sci(_m.meanL_err)); put(f"AllMSNR{_pp}", f"{_m.meanL_snr:.1f}"); put(f"AllMN{_pp}", com(_m.N_clean))
+        put("ActFracMForty", f"{100 * SAa[(SAa.shell == '20-40') & (SAa.cls == 'M')].N_clean.iloc[0] / SA[(SA.shell == '20-40') & (SA.cls == 'M')].N_clean.iloc[0]:.0f}")
+        put("InMmaxSNR", f"{SAi[SAi.cls == 'M'].meanL_snr.max():.1f}"); put("ActAFGKmaxSNR", f"{SAa[SAa.cls == 'AFGK'].meanL_snr.max():.1f}")
+        put("InAFGKmaxSNR", f"{SAi[SAi.cls == 'AFGK'].meanL_snr.max():.1f}")
         m = SA[(SA.shell == "20-40") & (SA.cls == "M")].iloc[0]
         put("AllMSL", sci(m.meanL)); put("AllMSLErr", sci(m.meanL_err)); put("AllMSNR", f"{m.meanL_snr:.1f}"); put("AllMN", com(m.N_clean))
         put("AllMNeffW", com(round(m.Neff_w, -1))); put("AllMDmed", f"{m.dmed_z:.3f}"); put("AllMDmedErr", f"{m.dmed_z_err:.3f}")
@@ -335,24 +421,33 @@ if __name__ == "__main__":
         put("NStackAll", com(SA.N_clean.sum()))
         SLm = pd.read_csv(os.path.join(RES, "alleepoch_stack_limits.csv"))
         def _cross(s):
-            # f95_mean = <L>_95 / L_T, with <L>_95 piecewise constant in L_T (it changes only when a shell drops out), so
-            # the f = 1 crossing is L_T = <L>_95 itself whenever that lies within the grid interval; else the grid point
-            i = int(np.nanargmax(s.f95_mean.values < 1)); Lc = s.f95_mean[i] * s.L_WHz[i]
-            return Lc if (i > 0 and s.L_WHz[i - 1] < Lc <= s.L_WHz[i]) else s.L_WHz[i]
+            # lowest L_T at which f95_mean < 1, interpolated in log L between the bracketing grid points (f95_mean is
+            # NaN where even f = 1 is allowed)
+            ok = s.f95_mean.values < 1; i = int(np.nanargmax(ok))
+            if i == 0 or np.isfinite(s.f95_mean[i - 1]): return s.L_WHz[i]
+            y0 = s.f95_mean_nosamp[i - 1]; y1 = s.f95_mean[i]
+            t = np.log10(y0) / (np.log10(y0) - np.log10(y1)) if y0 > 1 > y1 else 1.0
+            return 10 ** (np.log10(s.L_WHz[i - 1]) + t * (np.log10(s.L_WHz[i]) - np.log10(s.L_WHz[i - 1])))
         for t in ["AFGK", "M"]:
             s = SLm[SLm.cls == t].reset_index(drop=True)
             put(f"ReachAll{t}", sci(_cross(s), 1))
             fm = lambda L0: float(np.interp(np.log10(L0), np.log10(s.L_WHz), s.f95_mean))
             put(f"FMeanSix{t}", f"{fm(1e6):.2f}"); put(f"FBratAll{t}", f"{fm(4e5):.2f}")
+            nm_ = lambda L0, col: float(np.interp(np.log10(L0), np.log10(s.L_WHz), s[col]))
+            put(f"NeffSix{t}", com(round(nm_(1e6, "Neff_comb")))); put(f"WtenSix{t}", f"{100 * nm_(1e6, 'wfrac_within10pc'):.0f}")
+            put(f"NeffBrat{t}", com(round(nm_(4e5, "Neff_comb")))); put(f"WtenBrat{t}", f"{100 * nm_(4e5, 'wfrac_within10pc'):.0f}")
             md = s.set_index("L_WHz").f95_median
             put(f"FMedSix{t}", f"{md.get(1e6, np.nan):.2f}"); put(f"FMedSeven{t}", f"{md.get(1e7, np.nan):.3f}"); put(f"FMedNine{t}", f"{md.get(1e9, np.nan):.3f}")
         reach = [_cross(SLm[SLm.cls == t].reset_index(drop=True)) for t in ["AFGK", "M"]]
         for t in ["AFGK", "M"]:   # nearest shell alone, for comparison with Table 5 (not used for the limits)
             r0 = SA[(SA.cls == t) & (SA.dmin == 0)].iloc[0]; put(f"NearShell{t}", sci(max(r0.meanL, 0) + 1.645 * r0.meanL_err, 1))
         put("ReachEIRPAll", sci(float(f"{min(reach):.1e}") * 2e9))
+        _COV = pd.read_csv(os.path.join(RES, "alleepoch_stack_coverage.csv"))
+        put("CovAFGKmin", f"{_COV[_COV.cls == 'AFGK'].coverage.min():.2f}"); put("CovMmin", f"{_COV[_COV.cls == 'M'].coverage.min():.2f}")
+        put("CovNangles", "8")
         for t, L0 in zip(["AFGK", "M"], reach):   # EIRP from the *displayed* (rounded) L so the abstract is self-consistent
             put(f"ReachEIRPAll{t}", sci(float(f"{L0:.1e}") * 2e9))
-        ALL = dict(SA=SA)
+        ALL = dict(SA=SA, ST=ST[ST.scope == "all"])
 
     # ---------------- tables
     code = {c: k for c, _, k in CLS}; code["background (multi-epoch astrometry)"] = "BG"
@@ -409,17 +504,22 @@ if __name__ == "__main__":
 \end{deluxetable*}
 """)
     if ALL is not None:      # all-epoch steady limits for the same stars
-        nearA = near.merge(PA[["source_id", "n", "S_lim_steady", "L_lim_steady"]], on="source_id", how="left")
-        rows = [f"{clean_name(r.main_id, r.source_id)} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.dist_pc:.1f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & "
-                f"{int(r.n) if np.isfinite(r.n) else 0} & {r.S_lim_steady:.2f} & ${sci(r.L_lim_steady)}$ & ${sci(r.L_lim_steady * 2e9)}$ \\\\" for _, r in nearA.iterrows()]
-        open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable*}{lrrrrrrrrr}
+        nearA = near.merge(PA[["source_id", "n", "S", "sig", "S_lim_steady", "L_lim_steady"]], on="source_id", how="left")
+        _act = set(pd.read_parquet(os.path.join(DER, "activity_all.parquet")).query("active").source_id)
+        FAMILIAR = {"G 272-61B": "UV Cet", "G 272-61A": "BL Cet", "HD 95735": "Lalande 21185", "CD-23 14742": "Ross 154", "HD 217987": "Lacaille 9352"}
+        def _nm(r):
+            n_ = clean_name(r.main_id, r.source_id).strip("{}"); return "{" + FAMILIAR.get(n_, n_) + "}"
+        rows = [f"{_nm(r)} & {'A' if r.source_id in _act else chr(92) + 'nodata'} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & "
+                f"{int(r.n) if np.isfinite(r.n) else 0} & ${r.S:+.2f}\\pm{r.sig:.2f}$ & {r.S_lim_steady:.2f} & ${sci(r.L_lim_steady)}$ & ${sci(r.L_lim_steady * 2e9)}$ \\\\" for _, r in nearA.iterrows()]
+        open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable*}{lcrrrrrrrrr}
+\tabletypesize{\footnotesize}
 \tablecaption{95\% limits on steady 2--4\,GHz emission at the positions of the twelve nearest stars in the sample (completeness thresholds, or upper confidence bounds for stars with emission; Section~\ref{sec:limits_method}).\label{tab:nearest}}
-\tablehead{\colhead{Star} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{1\arcsec} & \colhead{$S_{\rm lim}^{\rm E1}$} & \colhead{$L_{\nu,\rm lim}^{\rm E1}$} & \colhead{$N_{\rm ep}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
-\colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(au)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
+\tablehead{\colhead{Star} & \colhead{Act.} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm lim}^{\rm E1}$} & \colhead{$L_{\nu,\rm lim}^{\rm E1}$} & \colhead{$N_{\rm ep}$} & \colhead{$S_{\rm coadd}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
+\colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(mJy)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{E1: Epoch-1 catalog analysis. $N_{\rm ep}$, $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star, i.e.\ to projected separations below roughly the value in the ``1\arcsec'' column; a transmitter on a planet at a wider separation would lie outside the measured position.}
+\tablecomments{Act.: A = activity evidence (Section~\ref{sec:candidates}); such a star cannot contribute to the population limits, but its limit still constrains the flux density at its position. E1: Epoch-1 catalog analysis. $N_{\rm ep}$, $S_{\rm coadd}$ (measured coadd flux density and its error), $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star; 1\arcsec\ corresponds to $d$\,au projected, and a transmitter on a planet at a wider separation would lie outside the measured position.}
 \end{deluxetable*}
 """)
     else:
@@ -439,14 +539,14 @@ if __name__ == "__main__":
         nm = "This work (VLASS QL)" if "VLASS" in r.survey else r.survey.replace("Price+2020 ", "BL ").replace(" (narrowband)", "")
         band = r.band.replace("-", "--"); dwell = re.sub(r"(\d)x(\d)", r"$\1\\times\2$", r.dwell).replace("~", r"$\sim$")
         pub = f" (${sci(r.EIRP_published_W)}$)" if np.isfinite(r.EIRP_published_W) else ""
-        rows.append(f"{nm} & {band} & {dwell} & ${sci(r.S_lim_Jy_at50pc)}$ & ${sci(r.EIRP_lim_W_at50pc)}${pub} & {com(r.N_stars_constraining)} " + r"\\")
-    open(os.path.join(HERE, "tables", "bl_comparison.tex"), "w").write(r"""\begin{deluxetable*}{llllrr}
+        rows.append(f"{nm} & {band} & {dwell} & ${sci(r.S_lim_Jy_at50pc)}$ & ${sci(r.EIRP_lim_W_at50pc)}${pub} & {com(r.N_stars_constraining)} & ${100 * r.f95_common:.2g}$ " + r"\\")
+    open(os.path.join(HERE, "tables", "bl_comparison.tex"), "w").write(r"""\begin{deluxetable*}{llllrrr}
 \tablecaption{Comparison with the Breakthrough Listen narrowband survey of \citet{Price2020} for a star at 50\,pc.\label{tab:bl}}
-\tablehead{\colhead{Survey} & \colhead{Band} & \colhead{Dwell} & \colhead{$S_{\rm lim}$ (Jy)} & \colhead{EIRP$_{\rm lim}$ (W)} & \colhead{$N_\star$}}
+\tablehead{\colhead{Survey} & \colhead{Band} & \colhead{Dwell} & \colhead{$S_{\rm lim}$ (Jy)} & \colhead{EIRP$_{\rm lim}$ (W)} & \colhead{$N_\star$} & \colhead{$f_{95}$ (\%)}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Breakthrough Listen (BL) limits apply to signals $\lesssim$3\,Hz wide with $|\dot\nu|\le4$\,Hz\,s$^{-1}$ and use the 1\,Hz transmitter-width convention of \citet{Price2020}, including the factor of 3.3 correction of \citet{Choza2024} (published values in parentheses), as in Figure~\ref{fig:tr}; the VLASS limit applies to the total in-band power of any signal. $N_\star$ is the number of stars constraining the occurrence limit (for VLASS: stars within 50\,pc).}
+\tablecomments{Breakthrough Listen (BL) limits apply to signals $\lesssim$3\,Hz wide with $|\dot\nu|\le4$\,Hz\,s$^{-1}$ and use the 1\,Hz transmitter-width convention of \citet{Price2020}, including the factor of 3.3 correction of \citet{Choza2024} (published values in parentheses), as in Figure~\ref{fig:tr}; the VLASS limit applies to the total in-band power of any signal. $N_\star$ is the number of stars constraining the occurrence limit (for BL GBT, the S-band targets, the band that overlaps VLASS; for VLASS, stars within 50\,pc without activity evidence). $f_{95}$ is the 95\% upper limit on the fraction of stars hosting a transmitter above EIRP$_{\rm lim}$ in a common construction: a 50\% detection probability per star, as adopted by \citet{Price2020}, and no background subtraction ($3/0.5N_\star$ for no detections; for VLASS $\mu_{95}=\MuSteadyBz$ for the \KSteady\ steady-test detections). \citet{Price2020} quote 0.37\% (GBT S band) and 2.0\% (Parkes).}
 \end{deluxetable*}
 """)
     rows = [f"{r.image} & {r.epoch:.2f} & {r.peak_mJy:.2f} & {r.SNR:.1f} & ${r.tgt_E:+.2f}\\pm{r.err_E:.2f}$ & ${r.tgt_N:+.2f}\\pm{r.err_N:.2f}$ & ${r.star_E:+.2f}$ & ${r.star_N:+.2f}$ \\\\" for _, r in ast.iterrows()]
@@ -463,17 +563,21 @@ if __name__ == "__main__":
     # all-epoch tables
     if ALL is not None:
         rows = []
+        _sp = {(r.shell, r.cls, r["pop"]): r for _, r in ALL["ST"].iterrows()}
+        def _ms(sh, cl, pp):
+            r = _sp.get((sh, cl, pp)); return r"\nodata" if r is None else f"${r.meanL/1e5:.1f}\\pm{r.meanL_err/1e5:.1f}$"
         for _, r in ALL["SA"].iterrows():
             rows.append(f"{r.shell.replace('-', '--')} & {r.cls} & {com(r.N_all)} & {com(r.N_clean)} & ${r.meanL/1e5:.1f}\\pm{r.meanL_err/1e5:.1f}$ & "
-                        f"${r.meanL_snr:.1f}$ & {com(round(r.Neff_w))} & {100*r.top10_wfrac:.1f} & ${r.dmed_z:+.3f}\\pm{r.dmed_z_err:.3f}$ \\\\")
-        open(os.path.join(HERE, "tables", "stack_results_all.tex"), "w").write(r"""\begin{deluxetable*}{llrrrrrrr}
+                        f"${r.meanL_snr:.1f}$ & {_ms(r.shell, r.cls, 'active')} & {_ms(r.shell, r.cls, 'inactive')} & {com(round(r.Neff_w))} & {100*r.top10_wfrac:.1f} & ${r.dmed_z:+.3f}\\pm{r.dmed_z_err:.3f}$ \\\\")
+        open(os.path.join(HERE, "tables", "stack_results_all.tex"), "w").write(r"""\begin{deluxetable*}{llrrrrrrrrr}
+\tabletypesize{\footnotesize}
 \tablecaption{Stacks of the all-epoch coadded forced photometry.\label{tab:stacks_all}}
-\tablehead{\colhead{Shell} & \colhead{Class} & \colhead{$N_{\rm all}$} & \colhead{$N_{\rm clean}$} & \colhead{$\langle L_\nu\rangle$} & \colhead{SNR} & \colhead{$N_{\rm eff,w}$} & \colhead{Top 10} & \colhead{$\Delta\,{\rm med}(S/\sigma)$} \\
-\colhead{(pc)} & \colhead{} & \colhead{} & \colhead{} & \colhead{($10^5$ W\,Hz$^{-1}$)} & \colhead{} & \colhead{} & \colhead{(\%)} & \colhead{}}
+\tablehead{\colhead{Shell} & \colhead{Class} & \colhead{$N_{\rm all}$} & \colhead{$N_{\rm clean}$} & \colhead{$\langle L_\nu\rangle$} & \colhead{SNR} & \colhead{$\langle L_\nu\rangle_{\rm act}$} & \colhead{$\langle L_\nu\rangle_{\rm no\,act}$} & \colhead{$N_{\rm eff,w}$} & \colhead{Top 10} & \colhead{$\Delta\,{\rm med}(S/\sigma)$} \\
+\colhead{(pc)} & \colhead{} & \colhead{} & \colhead{} & \colhead{($10^5$ W\,Hz$^{-1}$)} & \colhead{} & \colhead{($10^5$ W\,Hz$^{-1}$)} & \colhead{($10^5$ W\,Hz$^{-1}$)} & \colhead{} & \colhead{(\%)} & \colhead{}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{$\langle L_\nu\rangle$: inverse-variance-weighted mean spectral luminosity of clean stars (no secure association, no forced detection, no epoch with predicted catalog contamination $\ge0.5\sigma$), after subtracting the mean at the control positions; the error is the larger of the formal error and the scatter among the eight control positions. $N_{\rm eff,w}=(\sum w)^2/\sum w^2$; Top 10: weight fraction carried by the ten highest-weight stars. $\Delta\,{\rm med}(S/\sigma)$: median $S/\sigma$ of all unvetoed stars in the shell, including detected stars, minus the median at control positions; bootstrap error.}
+\tablecomments{$\langle L_\nu\rangle$: inverse-variance-weighted mean spectral luminosity of clean stars (no secure association, no forced detection, no epoch with predicted catalog contamination $\ge0.5\sigma$), after subtracting the mean at the control positions; the error is the larger of the formal error and the scatter among the eight control positions. $N_{\rm eff,w}=(\sum w)^2/\sum w^2$; Top 10: weight fraction carried by the ten highest-weight stars. $\langle L_\nu\rangle_{\rm act}$ and $\langle L_\nu\rangle_{\rm no\,act}$: the same mean for the clean stars with and without activity evidence (Section~\ref{sec:candidates}); \nodata: fewer than ten stars. The control positions are subject to the same clean cuts as the stars. $\Delta\,{\rm med}(S/\sigma)$: median $S/\sigma$ of all unvetoed stars in the shell, including detected stars, minus the median at control positions; bootstrap error.}
 \end{deluxetable*}
 """)
         CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); U = CA[~CA.explained].sort_values("dist_pc")
@@ -503,7 +607,7 @@ if __name__ == "__main__":
 \begin{deluxetable*}{lrrrrr>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.4cm}}
 \tabletypesize{\scriptsize}
 \tablecaption{Forced detections without activity evidence (any epoch or the coadd at $\ge5\sigma$).\label{tab:unexplained}}
-\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$BP-RP$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{Multiplicity} & \colhead{Catalogs} \\
+\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{Multiplicity} & \colhead{Catalogs} \\
 \colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{} & \colhead{} & \colhead{} & \colhead{}}
 \startdata
 """ + "\n".join(rows) + r"""

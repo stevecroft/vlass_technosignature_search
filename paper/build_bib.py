@@ -73,7 +73,7 @@ def finalize(text):
 
 DOIS = {
     "Price2020": "10.3847/1538-3881/ab65f1", "Enriquez2017": "10.3847/1538-4357/aa8d1b",
-    "Isaacson2017": "10.1088/1538-3873/aa5800", "Tremblay2025": "10.3847/1538-3881/ad9ea5", "Czech2021": "10.1088/1538-3873/abf329", "Sullivan1978": "10.1126/science.199.4327.377", "LoebZaldarriaga2007": "10.1088/1475-7516/2007/01/020", "Lindegren2021": "10.1051/0004-6361/202039709", "Garrett2015": "10.1051/0004-6361/201526687",
+    "Isaacson2017": "10.1088/1538-3873/aa5800", "Tremblay2025": "10.3847/1538-3881/ad9ea5", "Czech2021": "10.1088/1538-3873/abf329", "Sullivan1978": "10.1126/science.199.4327.377", "LoebZaldarriaga2007": "10.1088/1475-7516/2007/01/020", "Lindegren2021": "10.1051/0004-6361/202039709", "Garrett2015": "10.1051/0004-6361/201526687", "White2007": "10.1086/507700", "Gajjar2022": "10.3847/1538-4357/ac6dd5", "Sheikh2025": "10.3847/1538-3881/ada3c7", "SutherlandSaunders1992": "10.1093/mnras/259.3.413", "Gudel2002": "10.1146/annurev.astro.40.060401.093806", "Williams2014": "10.1088/0004-637x/785/1/9", "Smolcic2017": "10.1051/0004-6361/201628704",
     "Painter2025": "10.3847/1538-3881/adbc5e", "Wlodarczyk2020": "10.1093/mnras/staa2672",
     "Garrett2022": "10.1093/mnras/stac2607",
     "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378",
@@ -101,6 +101,8 @@ DOIS = {
     "Kimball2026": "10.1117/12.3105474",
 }
 MANUAL = r"""
+@article{Kardashev1964, author={{Kardashev}, N. S.}, title={{Transmission of Information by Extraterrestrial Civilizations}}, journal={Soviet Astronomy}, year={1964}, volume={8}, pages={217}, adsurl={https://ui.adsabs.harvard.edu/abs/1964SvA.....8..217K}}
+
 @ARTICLE{Chambers2016,
   author = {{Chambers}, K.~C. and {Magnier}, E.~A. and {Metcalfe}, N. and others},
   title = "{The Pan-STARRS1 Surveys}",
@@ -149,4 +151,4 @@ if __name__ == "__main__":
         bib = re.sub(r"title=\{([^}]*)\}", lambda m: "title={{" + m.group(1).strip() + "}}", bib, count=1)  # protect capitalisation
         out.append(bib); time.sleep(0.5)
     open("refs.bib", "w").write(finalize("\n\n".join(out) + "\n" + MANUAL))
-    print(f"wrote refs.bib with {len(out)} CrossRef + 6 manual entries")
+    print(f"wrote refs.bib with {len(out)} CrossRef + {MANUAL.count('@')} manual entries")

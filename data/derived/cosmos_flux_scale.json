@@ -1,0 +1,9 @@
+{
+ "n_cosmos": 10830,
+ "n_compact_isolated": 6203,
+ "n_measurements": 18608,
+ "n_sources_measured": 6203,
+ "ratio_below_0p5mJy": 1.100894196822955,
+ "ratio_below_0p5mJy_err": 0.041868521009634965,
+ "median_sigma_mJy": 0.16099087945273902
+}

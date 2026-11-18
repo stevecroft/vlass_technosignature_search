@@ -31,8 +31,8 @@ def vlass_points():
     fa = os.path.join(C.RES, "alleepoch_population_limits.csv")
     if os.path.exists(fa):
         pop = pd.read_csv(fa); sl = pd.read_csv(os.path.join(C.RES, "alleepoch_stack_limits.csv"))
-        for _, r in pop[pop.f95 < 1].iterrows():
-            rows.append(("individual", r.L_WHz * C.BAND_HZ, 3.0 / r.f95, r.f95, r.f95 / (3.0 * NU_REL)))
+        for _, r in pop[pop.f95_b0 < 1].iterrows():      # background-free limit (the headline value, Section 4.6)
+            rows.append(("individual", r.L_WHz * C.BAND_HZ, 3.0 / r.f95_b0, r.f95_b0, r.f95_b0 / (3.0 * NU_REL)))
         for t in ["AFGK", "M"]:
             s = sl[(sl.cls == t) & (sl.f95_mean < 1)]
             for _, r in s.iterrows():

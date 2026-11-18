@@ -416,6 +416,14 @@ Flewelling, H.~A., Magnier, E.~A., Chambers, K.~C., {et~al.} 2020,
   properties},} \aap, 674, A1, \dodoi{10.1051/0004-6361/202243940}
 
 % type= article
+\bibitem[{V. Gajjar {et~al.}(2022)Gajjar, LeDuc, Chen, Siemion, Sheikh,
+  Brzycki, Croft, Czech, DeBoer, DeMarines, Drew, Isaacson, Lacki, Lebofsky,
+  MacMahon, Ng, de~Pater, Perez, Price, Suresh, Webb, \& Worden}]{Gajjar2022}
+Gajjar, V., LeDuc, D., Chen, J., {et~al.} 2022, \bibinfo{title}{{Searching for
+  Broadband Pulsed Beacons from 1883 Stars Using Neural Networks},} \apj, 932,
+  81, \dodoi{10.3847/1538-4357/ac6dd5}
+
+% type= article
 \bibitem[{M.~A. Garrett(2015)Garrett}]{Garrett2015}
 Garrett, M.~A. 2015, \bibinfo{title}{{Application of the mid-IR radio
   correlation to the {\^G} sample and the search for advanced extraterrestrial
@@ -461,6 +469,12 @@ Gordon, Y.~A., Boyce, M.~M., O'Dea, C.~P., {et~al.} 2021, \bibinfo{title}{{A
 Gray, R.~H., \& Mooley, K. 2017, \bibinfo{title}{{A VLA Search for Radio
   Signals from M31 and M33},} \aj, 153, 110,
   \dodoi{10.3847/1538-3881/153/3/110}
+
+% type= article
+\bibitem[{M. G{\"u}del(2002)G{\"u}del}]{Gudel2002}
+G{\"u}del, M. 2002, \bibinfo{title}{{Stellar Radio Astronomy: Probing Stellar
+  Atmospheres from Protostars to Giants},} \araa, 40, 217,
+  \dodoi{10.1146/annurev.astro.40.060401.093806}
 
 % type= article
 \bibitem[{M. G{\"u}del {\&} A.~O. Benz(1993)G{\"u}del \& Benz}]{GudelBenz1993}
@@ -521,6 +535,11 @@ Ivezi{\'c}, {\v Z}., Menou, K., Knapp, G.~R., {et~al.} 2002,
   \bibinfo{title}{{Optical and Radio Properties of Extragalactic Sources
   Observed by the FIRST Survey and the Sloan Digital Sky Survey},} \aj, 124,
   2364, \dodoi{10.1086/344069}
+
+% type= article
+\bibitem[{N.~S. {Kardashev}(1964){Kardashev}}]{Kardashev1964}
+{Kardashev}, N.~S. 1964, \bibinfo{title}{{Transmission of Information by
+  Extraterrestrial Civilizations},} Soviet Astronomy, 8, 217
 
 % type= inproceedings
 \bibitem[{A.~E. Kimball {et~al.}(2026)Kimball, Lacy, Ott, Tobin, Candelaria,
@@ -694,6 +713,14 @@ Saide, R.~C., Garrett, M.~A., \& Heeralall-Issur, N. 2023,
   \dodoi{10.1093/mnras/stad378}
 
 % type= article
+\bibitem[{S.~Z. Sheikh {et~al.}(2025)Sheikh, Huston, Fan, Wright, Beatty,
+  Martini, Kopparapu, \& Frank}]{Sheikh2025}
+Sheikh, S.~Z., Huston, M.~J., Fan, P., {et~al.} 2025, \bibinfo{title}{{Earth
+  Detecting Earth: At What Distance Could Earth's Constellation of
+  Technosignatures Be Detected with Present-day Technology?},} \aj, 169, 118,
+  \dodoi{10.3847/1538-3881/ada3c7}
+
+% type= article
 \bibitem[{T.~W. Shimwell {et~al.}(2022)Shimwell, Hardcastle, Tasse, Best,
   R{\"o}ttgering, Williams, Botteon, Drabent, Mechev, Shulevski, van Weeren,
   Bester, Br{\"u}ggen, Brunetti, Callingham, Chy{\.z}y, Conway, Dijkema,
@@ -722,11 +749,29 @@ Siemion, A. P.~V., Demorest, P., Korpela, E., {et~al.} 2013, \bibinfo{title}{{A
   \dodoi{10.1088/0004-637x/767/1/94}
 
 % type= article
+\bibitem[{V. Smol{\v c}i{\'c} {et~al.}(2017)Smol{\v c}i{\'c}, Novak, Bondi,
+  Ciliegi, Mooley, Schinnerer, Zamorani, Navarrete, Bourke, Karim, Vardoulaki,
+  Leslie, Delhaize, Carilli, Myers, Baran, Delvecchio, Miettinen, Banfield,
+  Balokovi{\'c}, Bertoldi, Capak, Frail, Hallinan, Hao, Herrera~Ruiz, Horesh,
+  Ilbert, Intema, Jeli{\'c}, Kl{\"o}ckner, Krpan, Kulkarni, McCracken, Laigle,
+  Middleberg, Murphy, Sargent, Scoville, \& Sheth}]{Smolcic2017}
+Smol{\v c}i{\'c}, V., Novak, M., Bondi, M., {et~al.} 2017, \bibinfo{title}{{The
+  VLA-COSMOS 3 GHz Large Project: Continuum data and source catalog release},}
+  \aap, 602, A1, \dodoi{10.1051/0004-6361/201628704}
+
+% type= article
 \bibitem[{W.~T. Sullivan {et~al.}(1978)Sullivan, Brown, \&
   Wetherill}]{Sullivan1978}
 Sullivan, W.~T., Brown, S., \& Wetherill, C. 1978,
   \bibinfo{title}{{Eavesdropping: The Radio Signature of the Earth},} Science,
   199, 377, \dodoi{10.1126/science.199.4327.377}
+
+% type= article
+\bibitem[{W. Sutherland {\&} W. Saunders(1992)Sutherland \&
+  Saunders}]{SutherlandSaunders1992}
+Sutherland, W., \& Saunders, W. 1992, \bibinfo{title}{{On the likelihood ratio
+  for source identification},} \mnras, 259, 413,
+  \dodoi{10.1093/mnras/259.3.413}
 
 % type= article
 \bibitem[{J. Tarter(2001)Tarter}]{Tarter2001}
@@ -789,6 +834,13 @@ Virtanen, P., Gommers, R., Oliphant, T.~E., {et~al.} 2020,
 Wenger, M., Ochsenbein, F., Egret, D., {et~al.} 2000, \bibinfo{title}{{The
   SIMBAD astronomical database: The CDS reference database for astronomical
   objects},} \aaps, 143, 9, \dodoi{10.1051/aas:2000332}
+
+% type= article
+\bibitem[{R.~L. White {et~al.}(2007)White, Helfand, Becker, Glikman, \&
+  de~Vries}]{White2007}
+White, R.~L., Helfand, D.~J., Becker, R.~H., Glikman, E., \& de~Vries, W. 2007,
+  \bibinfo{title}{{Signals from the Noise: Image Stacking for Quasars in the
+  FIRST Survey},} \apj, 654, 99, \dodoi{10.1086/507700}
 
 % type= article
 \bibitem[{B.~S. Wlodarczyk-Sroka {et~al.}(2020)Wlodarczyk-Sroka, Garrett, \&

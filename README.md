@@ -16,6 +16,8 @@ cd code
 python 03_sample_crossmatch.py      # ~1 min
 python 03b_bright_star_check.py     # bright (V<4) nearby dwarfs missing from the Gaia DR3 sample (SIMBAD TAP)
 python 04b_activity_all.py          # activity evidence for every sample star: full 2RXS/eRASS1 (HEASARC TAP, cached) + SIMBAD types
+python 03c_bright_dwarfs_forced.py  # forced photometry of the 03b bright dwarfs at their SIMBAD positions (CADC cutouts, cached)
+python 03d_gcns_comparison.py       # completeness and contamination against the Gaia Catalogue of Nearby Stars (cached)
 python 07_classify_and_limits.py    # needs 05/06 outputs only for the LSPM J1943+5337 verdict (already in data/)
 python 10_stack.py                  # ~35 s; holds the 1.3 GB cutout array + float64 shell copies (interactive run peaked at ~17 GB)
 python 11_figures.py
@@ -31,6 +33,8 @@ python 14_multiepoch_detections.py --candidates   # astrometry of the forced det
 python 19_alleepoch_limits_stacks.py  # per-star, population and stack limits (~1 min)
 python 20_alleepoch_figures.py
 python 21_epoch_catalog_crosscheck.py --offline   # cross-check against per-epoch QL/SE/median-stack catalogues (~1 min)
+python 22_cutout_astrometry.py     # per-epoch positions of faint steady emitters from the cutouts; co-motion tests (~3 min)
+python 23_cosmos_flux_scale.py     # sub-threshold flux scale on VLA-COSMOS 3 GHz sources (CADC cutouts; per-image results cached)
 ```
 
 Re-fetching from the archives (only needed to rebuild `data/raw`):
@@ -111,6 +115,10 @@ component parquet holds exactly the same data.
 | `simbad_candidates.csv`, `simbad_nearest.csv` | SIMBAD (CfA mirror) identifications and object types | — |
 | `xray_2rxs_positions.parquet`, `xray_erass1_positions.parquet` | Positions of all 135,118 2RXS and 930,203 eRASS1 Main sources (HEASARC TAP `rass2rxs`, `erass1main`), for the activity lookup of every star (04b) | 2.7 + 15 MB |
 | `simbad_otypes_all.parquet` | SIMBAD activity object types (X, Er\*, Fl\*, BY\*, RS\*, TT\*, Y\*O, CV\*, a2\*, Em\*) of all objects with a Gaia DR3 identifier and parallax > 9 mas (04b) | 0.5 MB |
+| `gcns_dec41.parquet` | Gaia Catalogue of Nearby Stars (Smart et al. 2021; Gaia archive `external.gaiaedr3_gcns_main_1`), δ > −41°, for the completeness check (03d) | 13 MB |
+| `bright_dwarfs_simbad_pm.csv`, `bright_dwarfs_cutouts.npz` | SIMBAD positions, proper motions and parallaxes of the 03b bright dwarfs, and their 41″ QL cutouts from CADC (03c) | 0.8 MB |
+| `vla_cosmos_3ghz.csv` | VLA-COSMOS 3 GHz catalogue (Smolčić et al. 2017; HEASARC `vlacos3ghz`), 10,830 sources (23) | 0.9 MB |
+| `cosmos_forced_parts/` | Per-image forced photometry of the compact, isolated VLA-COSMOS sources in QL half-epochs 1.1, 2.1, 3.1 (23; lets the script resume) | — |
 | `vlass_ql_catalogs_near_stars.parquet` | Components within 60″ of any sample star from the NRAO per-epoch lists, de-duplicated (cat = QL3.1, QL3.2, QL4.1: interim QL lists, VLASS Memo 22; QLMED: QL median stack of Epochs 1–3; SE2.1–SE3.2: Single Epoch Continuum Imaging lists, 2026-06 versions). Position errors in on-sky arcsec. Built by `21 --reduce` | 7.4 MB |
 | `vlass_catalog_images.parquet` | Every image (QL subtile / SE pointing) present in each of those lists, with its component count; defines the partial SE sky coverage | 0.3 MB |
 | `vlass_e1ql_position_offsets.csv` | Per-subtile Epoch-1 minus Epoch-3 QL position offsets (w-term; Kimball et al. 2026) from 242,942 compact S/N > 20 pairs, with tile and declination fallbacks; written by `02b_e1_astrometry.py` | 2.1 MB |
@@ -146,29 +154,41 @@ component parquet holds exactly the same data.
   Each of the 5 in the steady test has a specific explanation: LSPM J1943+5337 and TYC 3573-1391-1 are offset from the star;
   Gaia DR3 2563195186142791552 is 6.8–8.4″ from an extended 22 mJy background source; PM J20156+4321 is a marginal 5.5σ coadd excess;
   G 133-48 is stellar (an over-luminous M dwarf, L_ν ≈ 4.6×10⁷ W Hz⁻¹). The other 7 are single-epoch 5.0–9.1σ events.
-  The chance background is counted only around the 87.7% of stars without activity evidence (25,882 stars, 12.3%, have it;
-  04b), because a detection at an active star is classified as natural whatever its origin. Steady test (coadd): 5 vs 10.0 ± 1.1
-  expected at control positions → μ95 = 4.7 (4.9 marginalized over b; 11.4 without the activity filter). Single-epoch test:
-  13 vs 9.8 ± 1.1 → μ95 = 11.2 (11.4 marginalized; P(n ≥ 13) = 0.19). Without the SIMBAD Em* and X types (which explain
-  6 forced detections): 8 vs 10.4 → 6.4 and 19 vs 9.9 → 18.0.
+  G 133-48's cutout positions follow the star (χ² = 0.6 for 6 dof at the star; stationary rejected, p = 0.044; 22).
+  The chance background is counted only around the 88% of stars without activity evidence (25,882 stars have it;
+  04b). A component that would be a secure association of a control position is exempt from its veto, as a star's own is (16);
+  the steady test also vetoes in coadd units (5 stars). Steady test (coadd): 5 vs 10.0 ± 1.1
+  (bootstrap ± 1.1; per control angle 5–13) → μ95 = 4.7, or 10.5 without
+  background subtraction (adopted). Single-epoch test: 13 vs 12.3 → μ95 = 9.4 (P(n ≥ k) = 0.45); host-level
+  (duty cycle): 10 stars vs 9.3 → μ95 = 8.5. The steady shortfall (P = 0.067) is confined to 4.5–6σ
+  (33 vs 27.4 at ≥ 4σ) and is also seen in the Epoch-1 catalogue itself (15 vs 19.9 components at
+  1–2.5″ around inactive stars, no magnitude trend): a background fluctuation, so the headline limits subtract no background.
   Apart from LSPM J1943+5337, the one forced detection bright enough for per-epoch astrometry (TYC 3573-1391-1) lies 1.8″ from its star.
 - **Cross-check with per-epoch catalogues (21):** κ from the QL3.1–4.1 lists 0.83–0.87 (adopted 0.861). Our bias-corrected fluxes are
   1.13 ± 0.01 × the Single Epoch peaks (1.07–1.16 by epoch), and SE/QL = 0.975 ± 0.006 for the same Epoch-3 sources: faint compact QL
   peaks are less biased than the calibrator-based 0.92, so later-epoch fluxes and limits may be ≈13% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. Of the 12
   forced detections without activity evidence, G 133-48 is detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in
-  four catalogues; LSPM J1943+5337 is in two. An own-epoch confusion veto gives 5→8 vs b 10.0→19.8 (steady); the union of both vetoes changes
-  μ95 by −7% (steady) and +8% (single-epoch; 13 vs 8.8, P = 0.11). The median stack
+  four catalogues; LSPM J1943+5337 is in two. An own-epoch confusion veto gives 5→8 vs b 10.0→19.8 (steady; P = 0.0024, per angle 15–24);
+  the union of both vetoes: 4 vs 9.3 (steady) and 13 vs 11.3 (single-epoch, P = 0.34). The median stack
   (152,511 low-motion stars) finds no steady emitters missed by the coadd (9 unclassified matches, all 1.9–2.3″ off; 22 chance).
 - **Per-star limits (95%, all epochs, steady):** median 0.54 mJy, L_ν < 4.0×10⁸ W Hz⁻¹; Barnard's star L_ν < 2.3×10⁵ W Hz⁻¹
   (Epoch-1 catalogue analysis: median 1.09 mJy; Barnard 5.1×10⁵).
-- **Population (steady; stars without activity evidence, p_i = 0 at the 25,882 active stars):** f < 1.6×10⁻² / 2.7×10⁻⁴ / 2.6×10⁻⁵
-  above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹ (182,590 stars at the floor); per snapshot f·δ < 1.8×10⁻⁵.
-  (Epoch-1 catalogue, Poisson limit with no unexplained secure association: 9.4×10⁻² / 1.1×10⁻³ / 2.6×10⁻⁵, floor 1.6×10⁻⁵.)
-  Within 50 pc: f < 2.4×10⁻⁴ for 19,975 inactive stars, ~8× tighter than the GBT narrowband occurrence limits.
-- **Stacks (all epochs):** M-dwarf mean > 4σ in 4 of 6 shells, 20–40 pc: (7.9 ± 1.1)×10⁵ W Hz⁻¹ (7.5σ); median S/σ shift including
-  detected stars 0.084 ± 0.013 (6.2σ). AFGK ≤ 3.8σ. Mean stacks reach f < 1 at L_T ≈ 1.1×10⁵ (AFGK) and 1.5×10⁵ (M) W Hz⁻¹
-  (inverse-variance combination of all six shells; the nearest shell alone gives 7.3×10⁴ / 9.2×10⁴); median stacks give f < 0.09–0.10 at 10⁷ and 0.015–0.028 at 10⁹ W Hz⁻¹.
-- **Versus Breakthrough Listen (Price et al. 2020, with the ×3.3 turboSETI correction of Choza et al. 2024, as in Fig. 9):**
+- **Population (steady; stars without activity evidence, p_i = 0 at the active stars):** headline, no background subtracted
+  (all 5 coadd detections treated as possible transmitters): f < 3.6×10⁻² / 6.1×10⁻⁴ / 5.8×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹
+  (182,586 stars at the floor). With the control background subtracted: 1.6×10⁻² / 2.7×10⁻⁴ / 2.6×10⁻⁵.
+  Duty cycle, counted per host: f < 4.7×10⁻⁵ / 6.6×10⁻⁵ / 1.5×10⁻⁴ for δ = 1 / 0.3 / 0.1; f·δ < 1.4×10⁻⁵ as δ → 0.
+  Within 50 pc (19,975 inactive stars), common construction (P_det = 0.5, no background): f < 1.1×10⁻³, ~6× tighter than
+  the 0.60% for the 1,005 GBT S-band targets of Price et al. (2020).
+- **Sample:** 91% of the 229,425 non-WD GCNS objects within 100 pc at δ > −41° (03d); 35 bright dwarfs missing from
+  Gaia measured at SIMBAD positions (03c): 3 detected (Algol, θ Aur, ξ Tau), Sirius L_ν < 5.4×10⁵ W Hz⁻¹.
+  Activity evidence: 73% of stars within 10 pc, 27% at 20–40 pc, 9% at 80–100 pc.
+- **Stacks (all epochs):** M-dwarf mean > 4σ in 4 of 6 shells, 20–40 pc: (8.1×10⁵ ± 9.2×10⁴) W Hz⁻¹ (8.8σ),
+  of which the stars with activity evidence give (1.9×10⁶ ± 1.7×10⁵) (11.3σ) and those without (4.3×10⁵ ± 1.1×10⁵)
+  (4.1σ); median S/σ shift including detected stars 0.084 ± 0.014. Limits use inactive stars only, a per-L_T
+  host-S/N ≤ 3 selection and host-sampling variance: f < 1 at L_T ≈ 3.7×10⁵ (AFGK) and 2.2×10⁵ (M) W Hz⁻¹; at 10⁶,
+  f < 0.40 / 0.28 with N_eff = 55 / 479 (nearest stars); coverage ≥ 0.88 (8 control realizations).
+  Median stacks (pooled 0–100 pc): f < 0.090 / 0.057 at 10⁷ and 0.016 / 0.010 at 10⁹ W Hz⁻¹.
+- **Versus Breakthrough Listen (Price et al. 2020, with the ×3.3 turboSETI correction of Choza et al. 2024; Fig. 9 plots published values except Choza et al.):**
   - VLASS (all epochs) is about 43,100× deeper in flux density (0.54 mJy vs ~23 Jy at 50 pc).
   - For narrowband lines it is about 4.6×10⁴× less sensitive in EIRP (1.5×10⁵× against the published 2.1×10¹² W).
   - A search of the same GBT data matched to bandwidth B would lose sensitivity only as √B, so the continuum advantage is coverage
