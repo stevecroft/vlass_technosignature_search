@@ -7,7 +7,8 @@ Price et al. quote EIRP_min = 4 pi d^2 S_min * (1 Hz) at d = 50 pc: 2.1e12 W (GB
 with P_det = 0.5 and no background, 3 / (0.5 N), and use the same construction for VLASS: mu_95 without background
 subtraction for the k_50 steady-test detections among the constraining stars within 50 pc (not all k of the 100 pc search).
 
-Inputs : results/vlass_perstar_limits_100pc_MS.parquet
+Inputs : results/alleepoch_perstar_limits.parquet (19), results/alleepoch_candidates.csv and data/derived/alleepoch_candidates.json (18),
+         data/derived/activity_all.parquet (04b)
 Output : results/vlass_vs_BL_Price2020_comparison.csv
 """
 import os, sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # PYTHONSAFEPATH-safe
@@ -25,25 +26,24 @@ CHOZA = 3.3
 
 if __name__ == "__main__":
     fa = os.path.join(C.RES, "alleepoch_perstar_limits.parquet")
-    if os.path.exists(fa):     # all-epoch steady limits (19); mu95 from the candidate statistics (18)
-        L = pd.read_parquet(fa).rename(columns={"S_lim_steady": "S_lim_mJy", "L_lim_steady": "Lnu_lim_WHz"}).dropna(subset=["S_lim_mJy"])
-        MU = json.load(open(os.path.join(C.DER, "alleepoch_candidates.json")))["mu95_steady_b0"]; label = "This work VLASS QL 1.1-4.1 (continuum)"   # no background subtraction
-    else:
-        L = pd.read_parquet(os.path.join(C.RES, "vlass_perstar_limits_100pc_MS.parquet")); MU = 3.0; label = "This work VLASS QL E1 (continuum)"
+    if not os.path.exists(fa):  # needs the all-epoch steady limits of 19 (and the candidate statistics of 18)
+        sys.exit("12 needs results/alleepoch_perstar_limits.parquet: run 18 and 19 first")
+    L = pd.read_parquet(fa).rename(columns={"S_lim_steady": "S_lim_mJy", "L_lim_steady": "Lnu_lim_WHz"}).dropna(subset=["S_lim_mJy"])
+    label = "This work VLASS QL 1.1-4.1 (continuum)"
     A50 = 4 * np.pi * (50 * C.PC_M) ** 2
     S50 = np.median(L.S_lim_mJy[(L.dist_pc > 45) & (L.dist_pc <= 50)])
     E50 = A50 * S50 * 1e-29 * C.BAND_HZ
-    L50 = L[L.dist_pc <= 50]; Lstar = np.percentile(L50.Lnu_lim_WHz, 95)
+    L50 = L[L.dist_pc <= 50]; Lstar = E50 / C.BAND_HZ       # the representative 50 pc threshold quoted in the table (EIRP E50)
     act = set(pd.read_parquet(os.path.join(C.DER, "activity_all.parquet")).query("active").source_id)   # 04b; p_i = 0 there
     # constraining stars: within 50 pc, no activity evidence, and a noise-only detection threshold (5 + 1.645) sigma below
-    # the 50 pc EIRP threshold (so that the detected stars, whose limits include their measured flux, are not dropped)
+    # that same threshold, E50 (so that the detected stars, whose limits include their measured flux, are not dropped)
     Lnoise = (5 + 1.645) * L50.sig * 1e-29 * 4 * np.pi * (L50.dist_pc * C.PC_M) ** 2
     cons = (Lnoise < Lstar) & ~L50.source_id.isin(act)
     N50 = int(cons.sum())
     CA = pd.read_csv(os.path.join(C.RES, "alleepoch_candidates.csv")); cj = json.load(open(os.path.join(C.DER, "alleepoch_candidates.json")))
     steady = set(CA.source_id[CA.cand_coadd & ~CA.explained & ~CA.source_id.isin(cj["coadd_vetoed_ids"])])   # the k of 18
     K50 = int(L50.source_id[cons].isin(steady).sum())
-    MU = chi2.ppf(0.95, 2 * (K50 + 1)) / 2 if os.path.exists(fa) else MU                # one-sided 95% Poisson, b = 0
+    MU = chi2.ppf(0.95, 2 * (K50 + 1)) / 2                                              # one-sided 95% Poisson, b = 0
     print("steady detections among the", N50, "constraining stars within 50 pc:", K50, "mu95 =", round(MU, 3))
     rows = [dict(survey=f"Price+2020 {k} (narrowband)", band=v["band"], signal_type="<=~3 Hz, |drift|<=4 Hz/s", dwell=v["dwell"],
                  S_lim_Jy_at50pc=CHOZA * v["EIRP"] / A50 / 1e-26, EIRP_lim_W_at50pc=CHOZA * v["EIRP"], EIRP_published_W=v["EIRP"], fraction_UL95=v["frac"], N_stars_constraining=v["N"],

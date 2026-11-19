@@ -1,8 +1,9 @@
 """22 - Per-epoch astrometry of faint steady emitters from the 41" Quick Look cutouts, and a co-motion test.
 
 For a forced detection with too few catalog positions (G 133-48 has one), the position in each epoch is measured
-directly from the cutout: an elliptical Gaussian with the local restoring beam (BMaj/BMin/BPA of the nearest Epoch-1
-catalog component) and free amplitude and centre is fitted to the pixels within 5" of the star. The position error
+directly from the cutout: an elliptical Gaussian with the restoring beam of that epoch's QL image (BMAJ/BMIN/BPA
+from the image header cached by 14 in data/raw/multiepoch_detections; the beam of the nearest Epoch-1 catalog component if
+the header is not cached) and free amplitude and centre is fitted to the pixels within 5" of the star. The position error
 at that signal-to-noise ratio is calibrated empirically: the same Gaussian is injected at the star position of
 INJ random cutouts of the same epoch with similar noise and re-fitted (correlated noise and sidelobes included); a
 per-epoch systematic term (the QL-catalog astrometric scatter from 21, or 0.1" per axis) is added in quadrature.
@@ -14,7 +15,7 @@ Three models for the offsets (radio minus Gaia star position at each image epoch
   at_star    : offset zero in every epoch (emission from the star);
   comoving   : a constant offset (a companion or a source moving with the star);
   stationary : a fixed sky position (a background source); the offsets then follow minus the star's motion.
-Inputs : data/raw/vlass_<tag>_ql_cutouts_41px.npz, data/derived/forced_<tag>.parquet, data/derived/ms_sample_vlass.parquet,
+Inputs : data/raw/vlass_<tag>_ql_cutouts_41px.npz, data/raw/multiepoch_detections/*.fits (headers only), data/derived/forced_<tag>.parquet, data/derived/ms_sample_vlass.parquet,
          data/raw/vlass_e1ql_components.parquet, data/raw/vlass_e1ql_position_offsets.csv, results/vlass_star_matches_classified.csv,
          data/derived/epoch_catalog_crosscheck.json
 Outputs: results/cutout_astrometry.csv (per star-epoch fits), data/derived/cutout_astrometry.json (model chi^2)
@@ -26,6 +27,8 @@ import numpy as np, pandas as pd
 from scipy.optimize import least_squares
 from scipy.spatial import cKDTree
 from scipy.stats import chi2
+import glob
+from astropy.io import fits
 
 TARGETS = {349716170186042880: "G 133-48", 2080884927342950272: "PM J20156+4321", 2071061615589030400: "TYC 3573-1391-1",
            2137474969751117312: "LSPM J1943+5337 (validation)"}
@@ -72,6 +75,10 @@ if __name__ == "__main__":
         pos = pd.Series(np.arange(len(F)), index=F.source_id.values)
         def beam_of(sid):
             _, j = ctree.query(xyz(sv.ra[sid], sv.dec[sid])); return (comp.BMaj.values[j], comp.BMin.values[j], np.deg2rad(comp.BPA.values[j]))
+        def beam_ep(sid, half):     # restoring beam of this epoch's QL image (cached header), else the Epoch-1 catalog beam
+            fs = glob.glob(os.path.join(C.RAW, "multiepoch_detections", f"{sid}_VLASS{half}.ql.*.fits"))
+            if not fs: return beam_of(sid), "E1 catalog"
+            h = fits.getheader(fs[0]); return (h["BMAJ"] * 3600, h["BMIN"] * 3600, np.deg2rad(h["BPA"])), "image header"
         def e1corr(sid):
             if tag != "ep1": return 0.0, 0.0
             s_ = str(sv.subtile[sid]).strip()
@@ -87,7 +94,7 @@ if __name__ == "__main__":
         good = np.where(F.good.values)[0]
         for sid, name in TARGETS.items():
             if sid not in pos.index: continue
-            i = pos[sid]; img = cut[i].astype(float) * 1e3; beam = beam_of(sid); x0, y0 = F.x0.values[i], F.y0.values[i]
+            i = pos[sid]; img = cut[i].astype(float) * 1e3; beam, bsrc = beam_ep(sid, F.half_epoch.values[i]); x0, y0 = F.x0.values[i], F.y0.values[i]
             A, x, y = fit(img, x0, y0, beam); cE, cN = e1corr(sid) if APPLY_E1_CORR else (0.0, 0.0)
             dE, dN = -(x - x0) - cE, (y - y0) - cN
             at_bound = bool(max(abs(x - x0), abs(y - y0)) > 2.9)
@@ -103,7 +110,7 @@ if __name__ == "__main__":
             eE, eN = np.hypot(rs(ex), SYS[tag]), np.hypot(rs(ey), SYS[tag])
             ra_e, de_e = C.propagate(sv.ra[sid], sv.dec[sid], sv.pmra[sid], sv.pmdec[sid], F.ep.values[i], plx=sv.parallax[sid])
             rows.append(dict(source_id=sid, name=name, tag=tag, half_epoch=F.half_epoch.values[i], ep=float(F.ep.values[i]),
-                             snr_fit=A / F.sig_raw.values[i], dE=dE, dN=dN, eE=eE, eN=eN, w_term_dE=cE, w_term_dN=cN, at_bound=at_bound,
+                             snr_fit=A / F.sig_raw.values[i], dE=dE, dN=dN, bmaj=beam[0], bmin=beam[1], bpa=np.rad2deg(beam[2]), beam_src=bsrc, eE=eE, eN=eN, w_term_dE=cE, w_term_dN=cN, at_bound=at_bound,
                              star_ra=float(ra_e), star_dec=float(de_e)))
         del cut, z
         print(tag, "done", flush=True)

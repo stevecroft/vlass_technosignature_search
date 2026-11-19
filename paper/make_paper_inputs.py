@@ -395,7 +395,8 @@ if __name__ == "__main__":
         _ks = int(_Z.source_id.isin(_stz).sum()); _mu = 0.5 * _chi2.ppf(0.95, 2 * (_ks + 1))  # steady test (continuous signal), b = 0
         put("NSolarSteady", str(_ks))
         _actZ = set(pd.read_parquet(os.path.join(DER, "activity_all.parquet")).query("active").source_id)
-        _nin = int((~_Z.source_id.isin(_actZ)).sum())                     # stars without activity evidence (p_i = 1 at this L)
+        _inst = _Z.n.notna() & ~_Z.source_id.isin(_cjz["coadd_vetoed_ids"])   # in the steady test (not vetoed in every epoch or in the coadd)
+        _nin = int((~_Z.source_id.isin(_actZ) & _inst).sum())             # stars without activity evidence in the steady test (p_i = 1 here)
         put("NSolarSingle", com(len(_Z))); put("NSolarNat", str(int((_Z.natural & ~_Z.unexplained_candidate).sum())))
         put("NSolarActive", com(len(_Z) - _nin)); put("NSolarInactive", com(_nin))
         put("NSolarUnexpl", str(_ku)); put("FSolarSingle", sci(_mu / _nin))
@@ -458,6 +459,7 @@ if __name__ == "__main__":
         _COV = pd.read_csv(os.path.join(RES, "alleepoch_stack_coverage.csv"))
         sm_all = json.load(open(os.path.join(DER, "alleepoch_summary.json")))
         _ca = pd.read_csv(os.path.join(RES, "cutout_astrometry.csv")); _g = _ca[_ca.source_id == 349716170186042880]
+        put("NCandSubCoadd", str(int((~pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")).cand_coadd).sum())))
         put("GoteSnrLo", f"{_g.snr_fit.min():.1f}"); put("GoteSnrHi", f"{_g.snr_fit.max():.1f}"); put("GoteNep", str(len(_g)))
         put("CovAFGKmin", f"{_COV[_COV.cls == 'AFGK'].coverage.min():.2f}"); put("CovMmin", f"{_COV[_COV.cls == 'M'].coverage.min():.2f}")
         put("CovNangles", "8")

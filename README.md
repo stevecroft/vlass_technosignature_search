@@ -1,7 +1,8 @@
 # Wideband technosignature search: VLASS 3 GHz × Gaia DR3 nearby main-sequence stars
 
 All code and data for the search are here: the cross-match, background and natural-emitter rejection, per-star
-and population limits on 2–4 GHz emission, the LSPM J1943+5337 follow-up, and image stacking of 208,573 stars.
+and population limits on 2–4 GHz emission, the LSPM J1943+5337 follow-up, and all-epoch forced photometry and stacking
+(208,573 Epoch-1 cutouts; usable forced photometry in at least one epoch for 208,232 stars).
 Built November 2026; every script was re-run end to end from this folder to verify the numbers below.
 
 Archived at Zenodo, doi:[10.5281/zenodo.24326437](https://doi.org/10.5281/zenodo.24326437) (reserved; the record is
@@ -12,29 +13,31 @@ published when the paper is accepted). The Zenodo record also holds the large in
 ```bash
 conda env create -f environment.yml && conda activate vlass-technosig
 cd code
-# Everything below runs offline from data/raw (no network needed):
+# Runs from data/raw without network access, except the steps marked [net]; their outputs are already in results/ and
+# data/derived/, so an offline run can skip them and use the supplied tables.
 python 03_sample_crossmatch.py      # ~1 min
-python 03b_bright_star_check.py     # bright (V<4) nearby dwarfs missing from the Gaia DR3 sample (SIMBAD TAP)
-python 04b_activity_all.py          # activity evidence for every sample star: full 2RXS/eRASS1 (HEASARC TAP, cached) + SIMBAD types
-python 03c_bright_dwarfs_forced.py  # forced photometry of the 03b bright dwarfs at their SIMBAD positions (CADC cutouts, cached)
+python 03b_bright_star_check.py     # [net: SIMBAD TAP] bright (V<4) nearby dwarfs missing from the Gaia DR3 sample
 python 03d_gcns_comparison.py       # completeness and contamination against the Gaia Catalogue of Nearby Stars (cached)
+python 04b_activity_all.py          # activity evidence for every sample star: full 2RXS/eRASS1 (HEASARC TAP, cached) + SIMBAD types
 python 07_classify_and_limits.py    # needs 05/06 outputs only for the LSPM J1943+5337 verdict (already in data/)
 python 10_stack.py                  # ~35 s; holds the 1.3 GB cutout array + float64 shell copies (interactive run peaked at ~17 GB)
 python 11_figures.py
-python 12_compare_breakthrough_listen.py
-python 13_transmitter_rate.py      # transmitter rate vs EIRP; literature points need external/seti_limits_py3 (see below)
-python 14_multiepoch_detections.py # secure associations in every VLASS QL epoch 1.1-4.1 (~5 min; fetches 61x61 px cutouts from CADC)
+python 14_multiepoch_detections.py # [net unless data/raw/multiepoch_detections/ is present] secure associations in every QL epoch 1.1-4.1
 python 15_compare_de2024.py        # overlap with De et al. 2024 (VLASS-Gaia radio stars)
 python 16_compare_srsc.py          # overlap with the Sydney Radio Star Catalogue (Driessen et al. 2024)
 # All-epoch analysis (needs the four cutout arrays, see 'Large files'):
 python 17_forced_photometry.py     # forced photometry, every star x epoch; injection-recovery calibration (~3 min)
-python 18_alleepoch_candidates.py  # forced detections, confusion veto, control background, SIMBAD/X-ray (cached; --offline)
+python 03c_bright_dwarfs_forced.py  # needs 17; forced photometry of the 03b bright dwarfs at their SIMBAD positions (CADC cutouts, cached)
+python 18_alleepoch_candidates.py  # needs 04b; forced detections, confusion veto, control background, SIMBAD/X-ray (cached; --offline)
 python 14_multiepoch_detections.py --candidates   # astrometry of the forced detections without activity evidence
-python 19_alleepoch_limits_stacks.py  # per-star, population and stack limits (~1 min)
+python 19_alleepoch_limits_stacks.py  # per-star, population and stack limits (~3 min)
 python 20_alleepoch_figures.py
+python 12_compare_breakthrough_listen.py   # needs 18 and 19
+python 13_transmitter_rate.py      # needs 19; literature points need external/seti_limits_py3 (see below)
 python 21_epoch_catalog_crosscheck.py --offline   # cross-check against per-epoch QL/SE/median-stack catalogues (~1 min)
-python 22_cutout_astrometry.py     # per-epoch positions of faint steady emitters from the cutouts; co-motion tests (~3 min)
-python 23_cosmos_flux_scale.py     # sub-threshold flux scale on VLA-COSMOS 3 GHz sources (CADC cutouts; per-image results cached)
+python 22_cutout_astrometry.py     # needs 21 and the image headers cached by 14; per-epoch positions and co-motion tests (~3 min)
+python 23_cosmos_flux_scale.py     # needs 17; sub-threshold flux scale on VLA-COSMOS 3 GHz sources (CADC cutouts; per-image results cached)
+cd ../paper && python make_paper_inputs.py && sh build.sh   # macros, tables and figures for the manuscript, then the PDF
 ```
 
 Re-fetching from the archives (only needed to rebuild `data/raw`):
@@ -44,7 +47,8 @@ Re-fetching from the archives (only needed to rebuild `data/raw`):
 `09_download_cutouts.py --epochs 1.1,1.2 --tag ep1` then `--consolidate` (**~8 h** at 4 threads; please keep concurrency low;
 later epochs use `--epochs 2.1,2.2 --tag ep2`, `3.1,3.2 --tag ep3`, `4.1 --tag ep4`).
 
-Run order for a full rebuild: 01 → 02 → 02b → 03 → 04 → 05 → 06 → 07 → 08 → 08b → 09 (ep1–ep4) → 10 → 14 → 15 → 16 → 17 → 18 → 14 --candidates → 19 → 20 → 21 → 11 → 12 → 13.
+Run order for a full rebuild: 01 → 02 → 02b → 03 → 03b → 03d → 04 → 04b → 05 → 06 → 07 → 08 → 08b → 09 (ep1–ep4) → 10 → 11 → 14 → 15 → 16 →
+17 → 03c → 18 → 14 --candidates → 19 → 20 → 12 → 13 → 21 → 22 → 23 → paper/make_paper_inputs.py.
 `21_epoch_catalog_crosscheck.py --reduce` rebuilds its reduced catalogue from the full NRAO lists (see `data/raw` below);
 `02b_e1_astrometry.py` re-derives the Epoch-1 position corrections, `vlass_e1ql_position_offsets.csv` (applied by `common.e1_components`),
 from the Epoch-1 catalogue and the full QL3.1/3.2 lists in `data/raw/ql_catalogs_full/`.
@@ -54,7 +58,7 @@ from the Epoch-1 catalogue and the full QL3.1/3.2 lists in `data/raw/ql_catalogs
 | Path | Contents |
 |---|---|
 | `code/common.py` | Paths, constants (per-half-epoch QL peak/integrated biases from Kimball et al. 2026: 0.85/0.90 for epoch 1.1, 0.92/1.00 later; BP−RP split 1.84, shells, service URLs), shared helpers. Also redirects astropy's config directory into the project. |
-| `code/01–21_*.py` | Pipeline scripts. Each docstring lists its inputs, outputs and expected values. |
+| `code/01–23_*.py` | Pipeline scripts. Each docstring lists its inputs, outputs and expected values. |
 | `data/raw/` | Data exactly as fetched (see below). |
 | `data/derived/` | Intermediate tables written by the scripts (sample, star–component pairs, offset pairs, reliability fit, stacked images, LSPM astrometry JSON, all-epoch forced photometry). `ms_sample_vlass.parquet` (40 MB) is not tracked: script 03 regenerates it bit-for-bit in about a minute. |
 | `results/` | Figures (PNG and vector PDF) and tables. |
@@ -65,8 +69,8 @@ from the Epoch-1 catalogue and the full QL3.1/3.2 lists in `data/raw/ql_catalogs
 | File | Purpose |
 |---|---|
 | `ms.tex` | Manuscript for *The Astronomical Journal*. Every number in the text comes from macros in `numbers.tex`; tables are `\input` from `tables/`. The Zenodo DOI is marked `TODO`. |
-| `make_paper_inputs.py` | Regenerates `numbers.tex` (142 macros), `tables/*.tex` and `figures/` from `results/` and `data/derived/`. Run after any pipeline change. |
-| `build_bib.py` | Builds `refs.bib` from DOIs via CrossRef (36 entries) plus 3 manual arXiv/ASCL entries. Output is pure ASCII: BibTeX is byte-oriented and splits multi-byte UTF-8 initials such as "Ž". It also restores corporate authors (Gaia/Astropy Collaboration), maps journals to AAS abbreviations and drops month fields. `--fix-only` re-cleans an existing file offline. |
+| `make_paper_inputs.py` | Regenerates `numbers.tex` (~600 macros), `tables/*.tex` (seven tables) and `figures/` from `results/` and `data/derived/`. Run after any pipeline change. |
+| `build_bib.py` | Builds `refs.bib` from DOIs via CrossRef (74 entries) plus 7 manual arXiv/ASCL/journal entries. Output is pure ASCII: BibTeX is byte-oriented and splits multi-byte UTF-8 initials such as "Ž". It also restores corporate authors (Gaia/Astropy Collaboration), maps journals to AAS abbreviations and drops month fields. `--fix-only` re-cleans an existing file offline. |
 | `aastex702.cls`, `aasjournalv7.1.bst` | Official AASTeX v7.0.2 files (unmodified; full distribution in `aastex_v702_dist/`). |
 | `aasjournalv7.1_patched.bst` | Copy of the AAS style with a single fix: the original leaves `next.extra = "b"` after the forward pass, which gives the last presorted reference a spurious "a" year suffix (e.g. "Ivezić et al. 2002a"). `ms.tex` uses this copy. |
 | `build.sh` | Local build (pdflatex → bibtex → pdflatex ×2). Overleaf does the same automatically. |
@@ -154,7 +158,8 @@ component parquet holds exactly the same data.
   Each of the 5 in the steady test has a specific explanation: LSPM J1943+5337 and TYC 3573-1391-1 are offset from the star;
   Gaia DR3 2563195186142791552 is 6.8–8.4″ from an extended 22 mJy background source; PM J20156+4321 is a marginal 5.5σ coadd excess;
   G 133-48 is most likely stellar (an over-luminous M dwarf and rapid rotator, P = 0.216 d, v sin i = 47.6 km s⁻¹; L_ν ≈ 4.6×10⁷ W Hz⁻¹), kept in k. The other 7 are single-epoch 5.0–9.1σ events.
-  G 133-48's cutout positions follow the star (χ² = 0.6 for 6 dof at the star; stationary rejected, p = 0.044; 22).
+  G 133-48's cutout positions, fitted with each image's restoring beam, favor emission at the star (χ² = 0.9 for 6 dof at
+  the star; stationary χ² = 9.5 for 4 dof, p = 0.051, so a stationary source is not excluded; 22).
   The chance background is counted only around the 88% of stars without activity evidence (25,882 stars have it;
   04b). A component that would be a secure association of a control position is exempt from its veto, as a star's own is (16);
   the steady test also vetoes in coadd units (5 stars). Steady test (coadd): 5 vs 10.0 ± 1.1
@@ -178,7 +183,8 @@ component parquet holds exactly the same data.
   (182,586 stars at the floor). With the control background subtracted: 1.6×10⁻² / 2.7×10⁻⁴ / 2.6×10⁻⁵.
   Duty cycle, counted per host (independent snapshots): f < 9.3×10⁻⁵ / 1.3×10⁻⁴ / 3.1×10⁻⁴ for δ = 1 / 0.3 / 0.1, f·δ < 2.7×10⁻⁵ as δ → 0
   without background subtraction (4.7×10⁻⁵ / 6.6×10⁻⁵ / 1.5×10⁻⁴ and 1.4×10⁻⁵ background-subtracted).
-  Within 50 pc (19,974 inactive stars, 2 steady detections), common construction (P_det = 0.5, no background): f < 6.3×10⁻⁴, ~9× tighter than
+  Within 50 pc (19,321 inactive stars sensitive to the tabulated 50 pc EIRP, 2 steady detections), common construction
+  (P_det = 0.5, no background): f < 6.5×10⁻⁴, ~9× tighter than
   the 0.60% for the 1,005 GBT S-band targets of Price et al. (2020).
 - **Sample:** 91% of the 229,425 non-WD GCNS objects within 100 pc at δ > −41° (03d); 35 bright dwarfs missing from
   Gaia measured at SIMBAD positions (03c): 3 detected (Algol, θ Aur, ξ Tau), Sirius L_ν < 5.4×10⁵ W Hz⁻¹.
@@ -188,7 +194,7 @@ component parquet holds exactly the same data.
   (4.1σ); median S/σ shift including detected stars 0.084 ± 0.014. Limits use inactive stars only, a per-L_T
   host-S/N ≤ 3 selection and host-sampling variance: f < 1 at L_T ≈ 3.7×10⁵ (AFGK) and 2.2×10⁵ (M) W Hz⁻¹; at 10⁶,
   f < 0.40 / 0.28 with N_eff = 55 / 479 (nearest stars); coverage ≥ 0.88 over L_T = 1.5×10⁵–10⁷ W Hz⁻¹ and f = 0.1–1 (8 noise realizations × 25 host draws; approximate near f = 1).
-  Median stacks (pooled 0–100 pc): f < 0.090 / 0.057 at 10⁷ and 0.016 / 0.010 at 10⁹ W Hz⁻¹.
+  Median stacks (pooled 0–100 pc): f < 0.092 / 0.057 at 10⁷ and 0.016 / 0.011 at 10⁹ W Hz⁻¹.
 - **Versus Breakthrough Listen (Price et al. 2020, with the ×3.3 turboSETI correction of Choza et al. 2024; also applied in Fig. 9 to Enriquez et al. 2017, Price et al. 2020, Garrett & Siemion 2023 and Uno et al. 2023):**
   - VLASS (all epochs) is about 43,100× deeper in flux density (0.54 mJy vs ~23 Jy at 50 pc).
   - For narrowband lines it is about 4.6×10⁴× less sensitive in EIRP (1.5×10⁵× against the published 2.1×10¹² W).
@@ -208,12 +214,17 @@ component parquet holds exactly the same data.
 
 - **Flux and limits:**
   - QL peak fluxes and image noise are divided by b_pk = 0.85 (epoch 1.1) or 0.92 (later); Epoch-1 catalogue integrated fluxes by 0.90 (1.1) or 1.00 (Kimball et al. 2026).
-  - Limits for non-detected stars are (5 + 1.645) × the subtile MeanIslrms.
+  - Limits for non-detected stars are (5 + 1.645) σ: in the Epoch-1 catalogue analysis σ is the subtile MeanIslrms; in the
+    all-epoch analysis it is the calibrated forced-photometry uncertainty (17) of the coadd.
   - EIRP = L_ν × 2 GHz is the total in-band power of a steady signal of any width that survives RFI flagging and imaging.
-- **Duty cycle:** each QL position is observed for only a few seconds, so the fractions are fraction × duty cycle.
+- **Duty cycle:** each QL position is observed for only a few seconds. For a transmitter on in a random fraction δ of snapshots,
+  the all-epoch analysis counts host stars detected at least once, with probability 1 − ∏_e(1 − δ p_ie) (independent
+  snapshots); only as δ → 0 does this reduce to a limit on f × δ. The Epoch-1 single-snapshot limits are on f × δ.
 - **Stack interpretation:**
   - Excluding individually detected stars truncates each shell at a luminosity threshold proportional to d². That is why the M-dwarf mean rises with distance.
-  - Each shell is used only for transmitter powers below its 5th-percentile per-star limit.
+  - Epoch-1 stacks (10): each shell is used only for transmitter powers below its 5th-percentile per-star limit.
+  - All-epoch mean-stack limits (19): for each L_T only stars where the transmitter would have expected coadd S/N ≤ 3 are
+    stacked, and the limits are approximate limits for transmitters of a common luminosity L_T.
   - M-dwarf stack limits are conservative because natural emission is present.
 
 ## Citation of data

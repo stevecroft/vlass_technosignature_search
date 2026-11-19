@@ -256,29 +256,36 @@ if __name__ == "__main__":
                                  Neff_comb=ne, wfrac_within10pc=float(w[d_[sel] < 10].sum() / w.sum())))
     SL = pd.DataFrame(lim_rows)
     # coverage: inject transmitters (fraction f_true, luminosity L_T, hosts chosen at random) into the control-position
-    # measurements of the same stars, apply the clean cut (pseudo-star coadd >= 5 sigma removed) and the same selection,
-    # and count how often f_95 >= f_true (the null then comes from the other 7 angles)
+    # measurements of the same stars, apply the clean cuts of the real stars (pseudo-star removed if its coadd, or any
+    # single unvetoed epoch, reaches 5 sigma after injection) and the same selection, and count how often f_95 >= f_true
+    # (the null then comes from the other 7 angles)
+    Yi = Y[Y.source_id.isin(IN.index)]; ie = IN.index.get_indexer(Yi.source_id); se_ = Yi.sigma_mJy.values
+    lum1_e = lum(1.0, IN.dist_pc.values[ie])                       # W/Hz per mJy at each star-epoch
+    def epoch_max(Lt, j):                                          # max single-epoch control S/N after adding the transmitter
+        z = np.nan_to_num(Yi[f"c{j}"].values + Lt / lum1_e / se_, nan=-np.inf); out = np.full(len(IN), -np.inf)
+        np.maximum.at(out, ie, z); return out
     cov_rows = []
     for cl in ["AFGK", "M"]:
         q = IN[IN.cls == cl]; sL_ = q.sigL.values; C_ = CZ[(IN.cls == cl).values]
         for Lt in [1.5e5, 2.2e5, 3e5, 4e5, 1e6, 1e7]:
             sel0 = Lt <= HOST_SNR * sL_
             if sel0.sum() < 10: continue
+            EM = np.column_stack([epoch_max(Lt, j)[(IN.cls == cl).values] for j in range(N_CTRL)])
             for f_true in [0.1, 0.3, 0.6, 1.0]:
-                ok_n = n_t = 0; ok_j = []
+                ok_n = n_t = 0; ok_j = []; n_epcut = 0
                 for j in range(N_CTRL):
                     ok0 = ok_n
                     zj = C_[:, j]
                     for rep in range(25):
                         host = rng.random(len(zj)) < f_true; zz = zj + host * Lt / sL_
-                        keep = sel0 & np.isfinite(zz) & (zz < THR)
+                        keep = sel0 & np.isfinite(zz) & (zz < THR) & ~(host & (EM[:, j] >= THR)); n_epcut += int((sel0 & host & (EM[:, j] >= THR) & np.isfinite(zz) & (zz < THR)).sum())
                         others = np.delete(C_, j, axis=1)              # the other 7 control angles provide the null
                         Lp = zz * sL_
                         m_, s_m_, ne_, f_, _ = stack_lim(keep, Lp, sL_, others, Lt)
                         n_t += 1; ok_n += int((not np.isfinite(f_)) or (f_ >= f_true))
                     ok_j.append((ok_n - ok0) / 25)
                 cov_rows.append(dict(cls=cl, L_WHz=Lt, f_true=f_true, coverage=ok_n / n_t, n_trials=n_t, n_noise=N_CTRL, n_host_draws=25,
-                                     n_noise_below95=int(np.sum(np.array(ok_j) < 0.95)), n_sel=int(sel0.sum()),
+                                     n_noise_below95=int(np.sum(np.array(ok_j) < 0.95)), n_sel=int(sel0.sum()), mean_epoch_cut=n_epcut / n_t,
                                      fail_angles=";".join(str(j) for j in range(N_CTRL) if ok_j[j] < 0.95),
                                      angle_mean_z=";".join(f"{np.nanmean(C_[sel0, j]):.4f}" for j in range(N_CTRL))))
     COV = pd.DataFrame(cov_rows); COV.to_csv(os.path.join(C.RES, "alleepoch_stack_coverage.csv"), index=False)
