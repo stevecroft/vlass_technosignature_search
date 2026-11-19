@@ -253,7 +253,9 @@ if __name__ == "__main__":
         put("FDutyOneBz", sci(sm["f95_duty1_b0_floor"])); put("FDutyThreeBz", sci(sm["f95_duty0.3_b0_floor"])); put("FDutyTenthBz", sci(sm["f95_duty0.1_b0_floor"]))
         _PP = pd.read_csv(os.path.join(RES, "alleepoch_population_limits.csv")); _okp = np.isfinite(_PP.f95_b0) & (_PP.f95_b0 < 1)
         put("AddDiffPct", f"{100 * ((_PP.f95_b0_add / _PP.f95_b0)[_okp].max() - 1):.2f}")   # S_i + 5 sigma_i rule at candidates vs 5 sigma_i
-        put("ReachIndBz", sci(sm["f95_b0_reach1"], 1))
+        put("ReachIndBz", sci(sm["f95_b0_reach1"], 1)); put("ReachIndEIRP", sci(float(f"{sm['f95_b0_reach1']:.1e}") * 2e9, 1))
+        _Lf = float(_PP.L_WHz[_PP.N_eff >= 0.999 * _PP.N_eff.max()].min())   # all stars without activity evidence contribute
+        put("FloorL", sci(_Lf, 1)); put("FloorEIRP", sci(float(f"{_Lf:.1e}") * 2e9, 1))
         put("FDutyOne", sci(sm["f95_duty1_floor"])); put("FDutyThree", sci(sm["f95_duty0.3_floor"])); put("FDutyTenth", sci(sm["f95_duty0.1_floor"]))
         put("BzFactor", f"{sm['f95_b0_floor'] / sm['f95_floor']:.1f}")
         _xv = json.load(open(os.path.join(DER, "epoch_catalog_crosscheck.json")))["veto_variants"]["own_epoch"]
@@ -700,6 +702,9 @@ if __name__ == "__main__":
         V = X["veto_variants"]
         for tag, k in (("Own", "own_epoch"), ("Union", "union")):
             put(f"Xc{tag}Ks", str(V[k]["k_steady"])); put(f"Xc{tag}Bs", f"{V[k]['b_steady']:.1f}"); put(f"Xc{tag}Mus", f"{V[k]['mu95_steady']:.1f}")
+            if "f95_b0_floor" in V[k]:     # headline construction (no background subtraction) for this veto
+                put(f"Xc{tag}FBz", sci(V[k]["f95_b0_floor"])); put(f"Xc{tag}MuBz", f"{V[k]['mu95_steady_b0']:.1f}")
+                put(f"Xc{tag}FBzPct", f"{100 * (V[k]['f95_b0_floor'] / V['adopted_E1']['f95_b0_floor'] - 1):.0f}")
             put(f"Xc{tag}Ke", str(V[k]["k_snap"])); put(f"Xc{tag}Be", f"{V[k]['b_snap']:.1f}"); put(f"Xc{tag}Mue", f"{V[k]['mu95_snap']:.1f}")
         from scipy.stats import poisson as _pv
         _pp = {(k, t): _pv.sf(V[k][f"k_{t}"] - 1, V[k][f"b_{t}"]) for k in ("own_epoch", "union") for t in ("steady", "snap")}

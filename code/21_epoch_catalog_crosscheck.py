@@ -232,7 +232,7 @@ def tests(LT, CT, veto, cveto, scz, ccz):
     H = pd.concat(hs).groupby(level=0).sum(); rg = np.random.default_rng(3); bb = []
     for _ in range(1000):
         i_ = rg.integers(0, len(H), len(H)); bb.append(H.h.values[i_].sum() / H.t.values[i_].sum() * n_s)
-    return U, dict(n_trials_steady=int(len(COs)), n_trials_snap=int(len(U)), b_steady=b_s, b_snap=b_e, n_vetoed=int(veto.sum()),
+    return U, dict(n_trials_steady=int(len(COs)), n_inactive_steady=n_s, n_trials_snap=int(len(U)), b_steady=b_s, b_snap=b_e, n_vetoed=int(veto.sum()),
                    n_coadd_vetoed=int((CO.cc >= VETO_SNR).sum()), ctrl_hits_steady=co_hits, ctrl_hits_per_angle_steady=per_angle,
                    b_steady_err_poisson=float(np.sqrt(co_hits) / co_tot * n_s), b_steady_err_boot=float(np.std(bb))), \
         set(COs.index[COs.snr >= THR]), set(U.source_id[U.snr >= THR])
@@ -405,6 +405,8 @@ if __name__ == "__main__":
         d.update(n_cand_stars=len(allc), n_cand_coadd=len(cco), n_cand_epoch=len(cep), n_unexplained=len(unexp),
                  n_new_unclassified=len(new), new_unclassified=[int(s) for s in new], k_steady=k_s, k_snap=k_e,
                  mu95_steady=zech_ul(k_s, d["b_steady"]), mu95_snap=zech_ul(k_e, d["b_snap"]),
+                 mu95_steady_b0=float(chi2.ppf(0.95, 2 * (k_s + 1)) / 2),   # no background subtraction (headline construction)
+                 f95_b0_floor=float(chi2.ppf(0.95, 2 * (k_s + 1)) / 2 / d["n_inactive_steady"]),
                  lost_vs_adopted=[int(s) for s in sorted(set(expl160.index) - allc)],
                  lost_unexplained=[int(s) for s in sorted(set(expl160.index[~expl160]) - allc)],
                  added_vs_adopted=[int(s) for s in sorted(allc - set(expl160.index))],
