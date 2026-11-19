@@ -389,7 +389,11 @@ if __name__ == "__main__":
         _G = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "ruwe", "non_single_star", "dMG"])
         _Z = PA.merge(_G, on="source_id")
         _Z = _Z[(_Z.bp_rp >= _BPlo) & (_Z.bp_rp <= _BPhi) & (_Z.ruwe < 1.4) & (_Z.non_single_star == 0) & (_Z.dMG > -0.5)]
-        _ku = int(_Z.unexplained_candidate.sum()); _mu = 0.5 * _chi2.ppf(0.95, 2 * (_ku + 1))     # classical Poisson UL, no background subtracted
+        _ku = int(_Z.unexplained_candidate.sum())                        # forced detections without activity evidence
+        _CAz = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); _cjz = json.load(open(os.path.join(DER, "alleepoch_candidates.json")))
+        _stz = set(_CAz.source_id[_CAz.cand_coadd & ~_CAz.explained & ~_CAz.source_id.isin(_cjz["coadd_vetoed_ids"])])   # the k of 18
+        _ks = int(_Z.source_id.isin(_stz).sum()); _mu = 0.5 * _chi2.ppf(0.95, 2 * (_ks + 1))  # steady test (continuous signal), b = 0
+        put("NSolarSteady", str(_ks))
         _actZ = set(pd.read_parquet(os.path.join(DER, "activity_all.parquet")).query("active").source_id)
         _nin = int((~_Z.source_id.isin(_actZ)).sum())                     # stars without activity evidence (p_i = 1 at this L)
         put("NSolarSingle", com(len(_Z))); put("NSolarNat", str(int((_Z.natural & ~_Z.unexplained_candidate).sum())))
