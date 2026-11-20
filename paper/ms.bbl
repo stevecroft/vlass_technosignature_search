@@ -178,9 +178,9 @@ Enriquez, J.~E., Siemion, A., Foster, G., {et~al.} 2017, \bibinfo{title}{{The
   692 Nearby Stars},} \apj, 849, 104, \dodoi{10.3847/1538-4357/aa8d1b}
 
 % type= article
-\bibitem[{R.~P. Fender {et~al.}(2014)Fender, Anderson, Osten, Staley, Rumsey,
+\bibitem[{R.~P. Fender {et~al.}(2015)Fender, Anderson, Osten, Staley, Rumsey,
   Grainge, \& Saunders}]{Fender2015}
-Fender, R.~P., Anderson, G.~E., Osten, R., {et~al.} 2014, \bibinfo{title}{{A
+Fender, R.~P., Anderson, G.~E., Osten, R., {et~al.} 2015, \bibinfo{title}{{A
   prompt radio transient associated with a gamma-ray superflare from the young
   M dwarf binary DG CVn},} Monthly Notices of the Royal Astronomical Society:
   Letters, 446, L66, \dodoi{10.1093/mnrasl/slu165}
@@ -711,6 +711,14 @@ Newton, E.~R., Irwin, J., Charbonneau, D., {et~al.} 2016, \bibinfo{title}{{THE
 Ochsenbein, F., Bauer, P., \& Marcout, J. 2000, \bibinfo{title}{{The VizieR
   database of astronomical catalogues},} \aaps, 143, 23,
   \dodoi{10.1051/aas:2000169}
+
+% type= article
+\bibitem[{R.~A. Osten {et~al.}(2016)Osten, Kowalski, Drake, Krimm, Page,
+  Gazeas, Kennea, Oates, Page, de~Miguel, Nov{\'a}k, Apeltauer, \&
+  Gehrels}]{Osten2016}
+Osten, R.~A., Kowalski, A., Drake, S.~A., {et~al.} 2016, \bibinfo{title}{{A
+  Very Bright, Very Hot, and Very Long Flaring Event from the M Dwarf Binary
+  System DG CVn},} \apj, 832, 174, \dodoi{10.3847/0004-637x/832/2/174}
 
 % type= article
 \bibitem[{C. Painter {et~al.}(2025)Painter, Croft, Lebofsky, Andersson, Choza,

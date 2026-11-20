@@ -376,10 +376,14 @@ if __name__ == "__main__":
             put(f"NAFGK{_k}", com(_sh.sum())); put(f"NOldEligAFGK{_k}", com((_sh & ~_EL.active).sum()))
             put(f"PctOldEligAFGK{_k}", f"{100 * (_sh & ~_EL.active).sum() / _sh.sum():.0f}")
         # brightest detections (S/N >= 5, unvetoed star-epochs, any epoch): M dwarfs, and any star
-        _LTm = pd.read_parquet(os.path.join(DER, "alleepoch_forced.parquet"), columns=["source_id", "S_mJy", "snr", "veto"])
+        _LTm = pd.read_parquet(os.path.join(DER, "alleepoch_forced.parquet"), columns=["source_id", "S_mJy", "sigma_mJy", "snr", "veto"])
+        _sig_med = _LTm.sigma_mJy[~_LTm.veto].median()          # median noise over all unvetoed star-epochs
         _LTm = _LTm[~_LTm.veto & (_LTm.snr >= 5)].merge(_EL[["source_id", "afgk", "dist_pc", "main_id"]], on="source_id")
         _LTm["L"] = 4 * np.pi * (_LTm.dist_pc * 3.0857e16) ** 2 * _LTm.S_mJy * 1e-29
         put("MaxMdwL", sci(_LTm.L[~_LTm.afgk].max())); put("MaxStarL", sci(_LTm.L.max()))
+        _Mr = _LTm[~_LTm.afgk].sort_values("L", ascending=False)
+        put("MaxMdwSNR", f"{_Mr.snr.iloc[0]:.1f}"); put("MaxMdwSigRatio", f"{_Mr.sigma_mJy.iloc[0] / _sig_med:.0f}")
+        put("NextMdwL", sci(_Mr.L.iloc[1]))
         put("MaxStarName", clean_name(_LTm.loc[_LTm.L.idxmax(), "main_id"], "").strip("{}"))
         # X-ray depth table: AFGK stars outside the known-emitter classes, by distance shell
         _ra = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "ra", "dec"]).set_index("source_id")

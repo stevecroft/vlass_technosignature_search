@@ -61,6 +61,11 @@ def finalize(text):
     # Science record: CrossRef appends the abstract-style subtitle to the title
     text = text.replace("title={{Eavesdropping: The Radio Signature of the Earth: Television leakage from the earth allows detection of our civilization at interstellar distances.}}",
                         "title={{Eavesdropping: The Radio Signature of the Earth}}")
+    # MNRAS Letters 446, L66 is the 2015 issue; CrossRef gives the 2014 online date
+    text = re.sub(r"(@article\{Fender2015,[^\n]*?)year=\{2014\}", r"\1year={2015}", text)
+    # ApJ 2016 record: CrossRef gives the title in capitals
+    text = text.replace("title={{A VERY BRIGHT, VERY HOT, AND VERY LONG FLARING EVENT FROM THE M DWARF BINARY SYSTEM DG CVn}}",
+                        "title={{A Very Bright, Very Hot, and Very Long Flaring Event from the M Dwarf Binary System DG CVn}}")
     # SPIE record: CrossRef gives a lower-case title and the page count instead of the paper number
     text = text.replace("title={{The Karl G. Jansky very large array sky survey (VLASS): data products}}",
                         "title={{The Karl G. Jansky Very Large Array Sky Survey (VLASS). Data Products}}")
@@ -78,6 +83,7 @@ DOIS = {
     "Garrett2022": "10.1093/mnras/stac2607",
     "Fender2015": "10.1093/mnrasl/slu165",
     "Mowlavi2023": "10.1051/0004-6361/202245330",
+    "Osten2016": "10.3847/0004-637X/832/2/174",
     "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378",
     "Zuckerman2026": "10.3847/1538-4357/ae4c38", "Matthews2025": "10.1088/1538-3873/ae1661",
     "Davis2026": "10.3847/1538-4357/ae4a22", "Pritchard2024": "10.1093/mnras/stae127",
