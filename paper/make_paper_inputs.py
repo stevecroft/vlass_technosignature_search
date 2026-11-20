@@ -370,6 +370,43 @@ if __name__ == "__main__":
             put(f"PctEligAFGK{_k}", f"{100 * _EL.eligible[_sh & _EL.afgk].mean():.0f}")
             put(f"PctMultAFGK{_k}", f"{100 * (_EL.mult[_sh & _EL.afgk & ~_EL.excl_class & ~_hot]).mean():.0f}")
         put("LEnv", "10^{10}"); put("LDGCVn", sci(4.5e9))
+        # like-for-like comparison with the earlier rule (every star with activity evidence excluded), AFGK stars only
+        for (_lo, _hi), _k in [((0, 10), "Ten"), ((80, 100), "Hundred")]:
+            _sh = (_EL.dist_pc >= _lo) & (_EL.dist_pc < _hi) & _EL.afgk
+            put(f"NAFGK{_k}", com(_sh.sum())); put(f"NOldEligAFGK{_k}", com((_sh & ~_EL.active).sum()))
+            put(f"PctOldEligAFGK{_k}", f"{100 * (_sh & ~_EL.active).sum() / _sh.sum():.0f}")
+        # brightest detections (S/N >= 5, unvetoed star-epochs, any epoch): M dwarfs, and any star
+        _LTm = pd.read_parquet(os.path.join(DER, "alleepoch_forced.parquet"), columns=["source_id", "S_mJy", "snr", "veto"])
+        _LTm = _LTm[~_LTm.veto & (_LTm.snr >= 5)].merge(_EL[["source_id", "afgk", "dist_pc", "main_id"]], on="source_id")
+        _LTm["L"] = 4 * np.pi * (_LTm.dist_pc * 3.0857e16) ** 2 * _LTm.S_mJy * 1e-29
+        put("MaxMdwL", sci(_LTm.L[~_LTm.afgk].max())); put("MaxStarL", sci(_LTm.L.max()))
+        put("MaxStarName", clean_name(_LTm.loc[_LTm.L.idxmax(), "main_id"], "").strip("{}"))
+        # X-ray depth table: AFGK stars outside the known-emitter classes, by distance shell
+        _ra = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "ra", "dec"]).set_index("source_id")
+        _X = _EL[_EL.afgk & ~_EL.excl_class].copy()
+        _a, _d = np.radians(_ra.ra.reindex(_X.source_id).values), np.radians(_ra.dec.reindex(_X.source_id).values)
+        _Mg = np.array([[-0.0548755604, -0.8734370902, -0.4838350155], [0.4941094279, -0.4448296300, 0.7469822445], [-0.8676661490, -0.1980763734, 0.4559837762]])
+        _v = _Mg @ np.array([np.cos(_d) * np.cos(_a), np.cos(_d) * np.sin(_a), np.sin(_d)]); _l = np.degrees(np.arctan2(_v[1], _v[0])) % 360
+        _era = (_l > 179.944) & (_l < 359.944)                                   # eRASS1 (German) half of the sky
+        _Lb2 = 3.828e33 * 10 ** (-0.4 * (_X.phot_g_mean_mag.values - 5 * np.log10(_X.dist_pc.values / 10) - 4.67))
+        _rmin = np.log10(np.where(_era, 5e-14, 2e-13) * 4 * np.pi * (_X.dist_pc.values * 3.0857e18) ** 2 / _Lb2)
+        _hotX = (_X.log_lx_lbol >= -4.0).fillna(False).values
+        _below = ~_hotX & (_X.log_lx_lbol.notna().values | (_rmin <= -4.0)); _unc = ~_hotX & ~_below
+        _rows = []
+        for _lo, _hi in [(0, 10), (10, 20), (20, 40), (40, 60), (60, 80), (80, 100)]:
+            _m = ((_X.dist_pc >= _lo) & (_X.dist_pc < _hi)).values
+            _rows.append(f"{_lo}--{_hi} & {com(_m.sum())} & {com((_m & _hotX).sum())} & {com((_m & _below).sum())} & {com((_m & _unc).sum())} & {100 * (_m & _unc).sum() / _m.sum():.0f} \\\\")
+        put("PctXUnc", f"{100 * _unc.mean():.0f}"); put("PctXUncHundred", f"{100 * (_unc & (_X.dist_pc >= 80).values).sum() / (_X.dist_pc >= 80).sum():.0f}")
+        open(os.path.join(HERE, "tables", "xray_depth.tex"), "w").write(r"""\begin{deluxetable}{lrrrrr}
+\tablecaption{X-ray constraints on the activity level of the AFGK stars outside the known radio-emitter classes.\label{tab:xray}}
+\tablehead{\colhead{Shell} & \colhead{$N$} & \colhead{$\ge-4$} & \colhead{$<-4$} & \colhead{Unconstrained} & \colhead{Unc.} \\
+\colhead{(pc)} & \colhead{} & \colhead{} & \colhead{} & \colhead{} & \colhead{(\%)}}
+\startdata
+""" + "\n".join(_rows) + r"""
+\enddata
+\tablecomments{Columns give the number of stars with measured $\log L_X/L_{\rm bol}\ge-4$ (excluded), with $\log L_X/L_{\rm bol}<-4$ established (an X-ray counterpart below the threshold, or no counterpart where the survey limit corresponds to $\log L_X/L_{\rm bol}\le-4$), and unconstrained (no counterpart, and a survey limit above the threshold). Survey limits are approximated as $5\times10^{-14}$\,erg\,cm$^{-2}$\,s$^{-1}$ in the eRASS1 half of the sky and $2\times10^{-13}$ (2RXS) elsewhere, with $L_{\rm bol}$ from $M_G$. Unconstrained stars are treated as eligible, so an active star among them would be counted in $k$.}
+\end{deluxetable}
+""")
         # RUWE of the brightest stars: fraction of AFGK stars outside the classes with RUWE > 1.4, G < 6 vs 6-13
         _G3 = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "ruwe"])
         _E3 = _EL.merge(_G3, on="source_id"); _E3 = _E3[_E3.afgk & ~_E3.excl_class]
@@ -387,6 +424,13 @@ if __name__ == "__main__":
         put("NCandM", str(int((_CAe.bp_rp >= 1.84).sum())))
         put("NEligPhot", com(sm["n_eligible_with_photometry"])); put("NEnvPhot", com(sm["n_env_with_photometry"]))
         put("FBzElig", sci(sm["f95_b0_elig_floor"])); put("NeffAboveEnv", com(sm["Neff_max"]))
+        put("FBzAtEnv", sci(sm["f95_b0_1e10"]))
+        put("KMall", str(sm["k_Mall"])); put("KMallSec", str(sm["k_Mall_secure"])); put("NMallCoadd", com(sm["n_Mall_coadd"]))
+        put("MuMall", f"{sm['mu95_Mall']:.1f}")
+        for _e, _k in [(7, "Seven"), (8, "Eight"), (9, "Nine")]:
+            put(f"FMall{_k}", sci(sm[f"f95_b0_Mall_1e{_e}"])); put(f"NeffMall{_k}", com(round(sm[f"Neff_Mall_1e{_e}"])))
+        put("MuWithMult", f"{sm['mu95_withmult']:.1f}"); put("NWithMultSteady", com(sm["Neff_withmult_max"]))
+        put("FBzWithMult", sci(sm["f95_b0_withmult_floor"]))
         put("FAllElig", sci(cj["mu95_steady"] / sm["Neff_elig_max"]))
         put("FBzEnvKZero", sci(3.0 / sm["Neff_max"]))
         _CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); _ex = _CA[_CA.activity_evidence.fillna("") != ""]   # with activity evidence

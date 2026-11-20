@@ -101,7 +101,7 @@ if __name__ == "__main__":
     # technosignature eligibility (04b): eligible stars count at any luminosity, envelope stars only above L_ENV, the
     # others never (p_i = 0; their per-star limits are unaffected). 'active' (presence of activity evidence) is used only
     # for the astrophysical stack split.
-    ACT = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"), columns=["source_id", "active", "eligible", "env"])
+    ACT = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"), columns=["source_id", "active", "eligible", "env", "afgk", "mult"])
     active = set(ACT.source_id[ACT.active]); elig = set(ACT.source_id[ACT.eligible]); envs = set(ACT.source_id[ACT.env])
     # ---------------- per-star limits
     U = LT[~LT.veto]
@@ -127,6 +127,13 @@ if __name__ == "__main__":
     ok = P.n.notna().values
     d = P.dist_pc.values[ok]; sig = P.sig.values[ok]; Sco = P.S.values[ok]; nat = (P.natural | P.candidate).values[ok]
     act = P.index.isin(active)[ok]; el = P.index.isin(elig)[ok]; ev_ = P.index.isin(envs)[ok]
+    # two comparison curves (Section 4.6):
+    #  * M dwarfs, every detection counted: all M dwarfs with a coadd (any class, any activity), k_M = all coadd >= 5 sigma
+    #    detections among them (natural emitters included), no background -- a limit on total emission that needs no
+    #    eligibility decision, valid at any luminosity
+    #  * AFGK without the multiplicity cut: eligible stars plus AFGK multiples outside the classes (18: "withmult")
+    mall = (P.bp_rp >= C.BPRP_SPLIT).values[ok]
+    wm = P.index.isin(elig | set(ACT.source_id[ACT.env & ACT.afgk]))[ok]
     S_env = C.L_ENV / lum(1.0, d)                                              # mJy at L_ENV, per star
     cvet = P.index.isin(cj.get("coadd_vetoed_ids", []))[ok]                   # steady-test (coadd-unit) confusion veto of 18
     # p_i uses the rule that defines k: a star counts when its coadd reaches 5 sigma, so t_i = 5 sigma_i at every star
@@ -134,6 +141,10 @@ if __name__ == "__main__":
     # max(5 sigma_i, S_env,i) at envelope stars. t_add (S_i + 5 sigma_i at the candidates) instead asks whether an
     # additional transmitter would stand out above the measured source (f95_b0_add). p_i = 0 at excluded stars.
     t_co = np.where(cvet | ~(el | ev_), np.inf, np.where(el, THR * sig, np.maximum(THR * sig, S_env)))
+    t_m = np.where(cvet | ~mall, np.inf, THR * sig); t_wm = np.where(cvet | ~wm, np.inf, THR * sig)
+    k_mall = int(((Sco / sig >= THR) & mall & ~cvet).sum()); mu_mall = float(C.poisson_ul95(k_mall))
+    k_mall_sec = int(((Sco / sig >= THR) & mall & ~cvet & P.index.isin(set(LT.source_id[LT.detected]))[ok]).sum())
+    mu_wm = float(C.poisson_ul95(cj["k_steady_withmult"]))
     t_add = np.where(cvet | ~(el | ev_), np.inf, np.where(el, np.where(nat, Sco + THR * sig, THR * sig), np.maximum(np.where(nat, Sco + THR * sig, THR * sig), S_env)))
     # single-epoch route (as k_host counts): eligible stars without natural emission, and envelope stars above L_ENV
     Ue = U[(U.source_id.isin(elig) & ~U.source_id.isin(natural)) | U.source_id.isin(envs)]
@@ -151,7 +162,10 @@ if __name__ == "__main__":
         SLe = Lg / lum(1.0, de); p_e = norm.cdf((SLe - te) / se)
         p = p_co.copy()
         neff, nsnap = p.sum(), p_e.sum()
-        r_ = dict(L_WHz=Lg, N_eff=neff, N_eff_elig=p[el].sum(), N_eff_env=p[ev_].sum(), f95=min(mu95 / neff, np.inf) if neff > 0 else np.inf,
+        n_m = norm.cdf((SL - t_m) / sig).sum(); n_wm = norm.cdf((SL - t_wm) / sig).sum()
+        r_ = dict(L_WHz=Lg, N_eff=neff, N_eff_elig=p[el].sum(), N_eff_env=p[ev_].sum(),
+                  N_eff_Mall=n_m, f95_b0_Mall=mu_mall / n_m if n_m > 0 else np.inf,
+                  N_eff_withmult=n_wm, f95_b0_withmult=mu_wm / n_wm if n_wm > 0 else np.inf, f95=min(mu95 / neff, np.inf) if neff > 0 else np.inf,
                   f95_b0=cj["mu95_steady_b0"] / neff if neff > 0 else np.inf,
                   f95_b0_add=cj["mu95_steady_b0"] / neff_add if neff_add > 0 else np.inf,
                   f95_k0b0=3.0 / neff if neff > 0 else np.inf, N_snap=nsnap,
@@ -340,7 +354,13 @@ if __name__ == "__main__":
                 Neff_elig_max=float(POP.N_eff_elig.max()), Neff_env_1e10=float(np.interp(10, np.log10(POP.L_WHz), POP.N_eff_env)),
                 f95_b0_elig_floor=float((cj["mu95_steady_b0"] / POP.N_eff_elig[POP.L_WHz < C.L_ENV]).min()),
                 f95_b0_1e10=float(np.interp(10, np.log10(POP.L_WHz), POP.f95_b0)), f95_b0_3e10=float(np.interp(np.log10(3e10), np.log10(POP.L_WHz), POP.f95_b0)),
-                f95_1e10=g(1e10), f95_3e10=g(3e10))
+                f95_1e10=g(1e10), f95_3e10=g(3e10),
+                k_Mall=k_mall, k_Mall_secure=k_mall_sec, mu95_Mall=mu_mall, n_Mall_coadd=int((mall & ~cvet).sum()),
+                **{f"f95_b0_Mall_1e{e}": float(np.interp(e, np.log10(POP.L_WHz), POP.f95_b0_Mall)) for e in (7, 8, 9)},
+                **{f"Neff_Mall_1e{e}": float(np.interp(e, np.log10(POP.L_WHz), POP.N_eff_Mall)) for e in (7, 8, 9)},
+                mu95_withmult=mu_wm, Neff_withmult_max=float(POP.N_eff_withmult.max()),
+                f95_b0_withmult_floor=float(POP.f95_b0_withmult.min()),
+                f95_b0_withmult_1e9=float(np.interp(9, np.log10(POP.L_WHz), POP.f95_b0_withmult)))
     json.dump(summ, open(os.path.join(C.DER, "alleepoch_summary.json"), "w"), indent=1)
     print(json.dumps(summ, indent=1))
     print(ST[ST.scope == "all"][["pop", "shell", "cls", "N_all", "N_clean", "meanL", "meanL_err", "meanL_snr", "Neff_w", "top10_wfrac", "dmed_z", "dmed_z_err"]].to_string(index=False, float_format="%.3g"))

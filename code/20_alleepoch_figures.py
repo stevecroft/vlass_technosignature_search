@@ -45,6 +45,8 @@ if __name__ == "__main__":
     d.loglog(POP.L_WHz, clip1(POP.f95), color="k", lw=0.8, ls="-.", label="All epochs, steady (control background)")
     d.loglog(old.Lnu_star_WHz, clip1(old.f_UL95), color="0.55", lw=1.0, ls="--", label="Epoch 1 catalog")
     d.loglog(POP.L_WHz, clip1(POP.fdelta95_b0), color="k", lw=1.0, ls=":", label="$f\\delta$, rare-on limit ($\\delta\\to0$)")
+    if "f95_b0_Mall" in POP:     # comparison: M dwarfs with every coadd detection counted (no eligibility; 19)
+        d.loglog(POP.L_WHz, clip1(POP.f95_b0_Mall), color=COLT["M"], lw=1.1, ls="--", label="M dwarfs, every detection counted")
     for cl in ["AFGK"]:                      # stack limits use the eligible (AFGK) stars only (19)
         s = SL[SL.cls == cl]
         ind = np.interp(np.log10(s.L_WHz), np.log10(POP.L_WHz), POP.f95_b0)     # draw stacks only where they are tighter

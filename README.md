@@ -162,6 +162,8 @@ component parquet holds exactly the same data.
   - only above L_env = 10¹⁰ W Hz⁻¹ at the 174,955 *envelope* stars: 161,290 M dwarfs and 13,665 AFGK stars with multiplicity evidence
     (above the DG CVn superflare, 4.5×10⁹ W Hz⁻¹, Fender et al. 2015, and every stellar detection in VLASS, max 4.5×10⁹);
   - never at the 2,251 stars of the excluded classes or with log L_X/L_bol ≥ −4.
+  Under the presence rule only 5 of 44 AFGK stars within 10 pc were eligible (11%, vs 82% at 80–100 pc); now 64% vs 67%.
+  The X-ray constraint is complete within 20 pc; 44% of AFGK stars at 80–100 pc are unconstrained (paper Table, tables/xray_depth.tex).
   Presence of activity evidence is kept only for the astrophysical stack split. Uncatalogued multiples remain eligible and are counted in k
   (conservative).
 - **Forced detections** (the paper's term; scripts and files still say 'candidates'): 161 stars at ≥ 5σ (coadd or any epoch),
@@ -187,6 +189,10 @@ component parquet holds exactly the same data.
   background subtracted (the 1 steady detection counted, t_i = 5σ_i, or max(5σ_i, S_env,i) at envelope stars): f < 5.3×10⁻² / 1.3×10⁻³ /
   1.5×10⁻⁴ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹ (eligible AFGK; 32,666 stars up to L_env), and f < 2.3×10⁻⁵ above ~1.1×10¹⁰ W Hz⁻¹
   (205,981 stars). With the control background subtracted: 4.5×10⁻² / 1.1×10⁻³ / 1.2×10⁻⁴ and 2.0×10⁻⁵.
+  At L_env itself f < 4.0×10⁻⁵ (envelope stars detected with probability ≈ 0.5). Without the multiplicity criterion
+  (7 detections among 46,206 AFGK stars, μ95 = 13.1): f < 2.8×10⁻⁴ below L_env.
+  M dwarfs with every coadd detection counted (72 of 159,937, 16 of them secure natural associations; no eligibility decision):
+  f < 0.16 / 4.9×10⁻³ / 5.5×10⁻⁴ above 10⁷ / 10⁸ / 10⁹ W Hz⁻¹ (Fig. 7, blue dashed).
   Duty cycle, counted per host (independent snapshots), above L_env: f < 3.8×10⁻⁵ / 5.3×10⁻⁵ / 1.2×10⁻⁴ for δ = 1 / 0.3 / 0.1, f·δ < 1.1×10⁻⁵
   as δ → 0 without background subtraction (2.9×10⁻⁵ / 4.2×10⁻⁵ / 9.7×10⁻⁵ and 8.5×10⁻⁶ background-subtracted).
   Within 50 pc (4,103 eligible stars sensitive to the tabulated 50 pc EIRP, 0 steady detections), common construction
