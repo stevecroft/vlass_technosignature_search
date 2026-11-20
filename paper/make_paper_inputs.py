@@ -404,7 +404,7 @@ if __name__ == "__main__":
 \startdata
 """ + "\n".join(_rows) + r"""
 \enddata
-\tablecomments{Columns give the number of stars with measured $\log L_X/L_{\rm bol}\ge-4$ (excluded), with $\log L_X/L_{\rm bol}<-4$ established (an X-ray counterpart below the threshold, or no counterpart where the survey limit corresponds to $\log L_X/L_{\rm bol}\le-4$), and unconstrained (no counterpart, and a survey limit above the threshold). Survey limits are approximated as $5\times10^{-14}$\,erg\,cm$^{-2}$\,s$^{-1}$ in the eRASS1 half of the sky and $2\times10^{-13}$ (2RXS) elsewhere, with $L_{\rm bol}$ from $M_G$. Unconstrained stars are treated as eligible, so an active star among them would be counted in $k$.}
+\tablecomments{Columns give the number of stars with measured $\log L_X/L_{\rm bol}\ge-4$ (excluded), below the threshold at the adopted survey depth (an X-ray counterpart below it, or no counterpart where the nominal survey limit corresponds to $\log L_X/L_{\rm bol}\le-4$), and unconstrained (no counterpart, and a survey limit above the threshold). Survey limits are approximated as $5\times10^{-14}$\,erg\,cm$^{-2}$\,s$^{-1}$ in the eRASS1 half of the sky and $2\times10^{-13}$ (2RXS) elsewhere, with $L_{\rm bol}$ from $M_G$. Unconstrained stars are treated as eligible, so an active star among them would be counted in $k$.}
 \end{deluxetable}
 """)
         # RUWE of the brightest stars: fraction of AFGK stars outside the classes with RUWE > 1.4, G < 6 vs 6-13
@@ -425,6 +425,14 @@ if __name__ == "__main__":
         put("NEligPhot", com(sm["n_eligible_with_photometry"])); put("NEnvPhot", com(sm["n_env_with_photometry"]))
         put("FBzElig", sci(sm["f95_b0_elig_floor"])); put("NeffAboveEnv", com(sm["Neff_max"]))
         put("FBzAtEnv", sci(sm["f95_b0_1e10"]))
+        put("FAllAtEnv", sci(sm["f95_1e10"])); put("NEnvSteady", com(sm["Neff_max"] - sm["Neff_elig_max"]))
+        _PPm = pd.read_csv(os.path.join(RES, "alleepoch_population_limits.csv")); _i = int(np.argmax((_PPm.f95_b0_Mall < 1).values))
+        _y0, _y1 = _PPm.f95_b0_Mall[_i - 1], _PPm.f95_b0_Mall[_i]; _t = np.log10(_y0) / (np.log10(_y0) - np.log10(_y1))
+        put("ReachMall", sci(10 ** (np.log10(_PPm.L_WHz[_i - 1]) + _t * (np.log10(_PPm.L_WHz[_i]) - np.log10(_PPm.L_WHz[_i - 1]))), 1))
+        # TYC 3573-1391-1: no X-ray counterpart; log L_X/L_bol reachable by 2RXS (it lies outside the eRASS1 half)
+        _ty = _EL.set_index("source_id").loc[2071061615589030400]
+        _Lbt = 3.828e33 * 10 ** (-0.4 * (_ty.phot_g_mean_mag - 5 * np.log10(_ty.dist_pc / 10) - 4.67))
+        put("TycXLim", f"{np.log10(2e-13 * 4 * np.pi * (_ty.dist_pc * 3.0857e18) ** 2 / _Lbt):.1f}"); put("TycDist", f"{_ty.dist_pc:.1f}")
         put("KMall", str(sm["k_Mall"])); put("KMallSec", str(sm["k_Mall_secure"])); put("NMallCoadd", com(sm["n_Mall_coadd"]))
         put("MuMall", f"{sm['mu95_Mall']:.1f}")
         for _e, _k in [(7, "Seven"), (8, "Eight"), (9, "Nine")]:
@@ -732,7 +740,7 @@ if __name__ == "__main__":
         open(os.path.join(HERE, "tables", "unexplained_candidates.tex"), "w").write(r"""{\setlength{\tabcolsep}{3pt}
 \begin{deluxetable*}{lrcrrrr>{\raggedright\arraybackslash}p{2.5cm}r>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{2.0cm}}
 \tabletypesize{\scriptsize}
-\tablecaption{Forced detections (any epoch or the coadd at $\ge5\sigma$) at AFGK stars outside the known radio-emitter classes and with $\log L_X/L_{\rm bol}<-4$.\label{tab:unexplained}}
+\tablecaption{Forced detections (any epoch or the coadd at $\ge5\sigma$) at AFGK stars outside the known radio-emitter classes and without measured evidence for $\log L_X/L_{\rm bol}\ge-4$.\label{tab:unexplained}}
 \tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$k$} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{$L_{\nu,\max}$} & \colhead{Multiplicity} & \colhead{Catalogs} \\
 \colhead{} & \colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{} & \colhead{} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{}}
 \startdata
