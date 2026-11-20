@@ -206,7 +206,7 @@ if __name__ == "__main__":
     CO["cand"] = CO.cand_coadd | CO.cand_epoch
     COs = CO[~CO.veto_coadd]                              # steady-test trials
     n_inact_star, n_inact_ep = int((~COs.index.isin(active_ids)).sum()), int(inact.sum())
-    b_s = rate_co * n_inact_star; b_e = rate_ep * n_inact_ep; b = b_s
+    b_s = rate_co * n_inact_star; b_e = rate_ep * n_inact_ep
     # k and b against threshold (stars without activity evidence; explained secure associations excluded)
     inact_star = ~COs.index.isin(active_ids); thr_rows = []
     for t_ in [3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0, 10.0, 15.0]:
@@ -290,17 +290,31 @@ if __name__ == "__main__":
     S["eligible"] = S.eligible.fillna(False).astype(bool); S["env"] = S.env.fillna(False).astype(bool); S["mult"] = S.mult.fillna(False).astype(bool)
     # a candidate counts as a possible transmitter at an eligible AFGK star, or at an envelope star (M dwarf, or AFGK star
     # with multiplicity evidence, outside the excluded classes) whose coadd or brightest epoch exceeds L_ENV; otherwise it is "explained" (not counted)
-    S["env_counted"] = S.env & ((S.L_coadd >= C.L_ENV) | (S.L_max_epoch >= C.L_ENV))
+    # the envelope test is applied separately to the coadd (steady test) and to each epoch (single-epoch tests): an
+    # envelope star's coadd counts only if the coadd luminosity exceeds L_ENV, and each of its epochs only if that epoch does
+    _Uc = U[U.source_id.isin(cand_ids)]
+    _Le = C.lum(_Uc.S_mJy.values, _Uc.source_id.map(S.set_index("source_id").dist_pc).values)
+    S = S.merge(((_Uc.snr >= THR) & (_Le >= C.L_ENV)).groupby(_Uc.source_id).sum().rename("n_ep_det_env"),
+                left_on="source_id", right_index=True, how="left")
+    S["n_ep_det_env"] = S.n_ep_det_env.fillna(0).astype(int)
+    S["env_steady"] = S.env & S.cand_coadd & (S.L_coadd >= C.L_ENV)
+    S["env_counted"] = S.env_steady | (S.env & (S.n_ep_det_env > 0))
     S["explained"] = ~(S.eligible | S.env_counted)
+    def _counts(el):      # (steady k, single-epoch k, host k) when the stars in boolean mask 'el' are eligible at all L
+        st = (S.cand_coadd & el) | S.env_steady
+        ne = np.where(el, S.n_ep_det.fillna(0), np.where(S.env, S.n_ep_det_env, 0))
+        return int(st.sum()), int(ne.sum()), int((ne > 0).sum())
     for t, E in elig_var.items(): S[f"explained_{t}"] = ~(S.source_id.isin(E) | S.env_counted)
     S[["source_id", "main_id", "dist_pc", "bp_rp", "dMG", "ruwe", "otypes", "multiplicity_evidence", "activity_evidence", "log_lx_lbol", "excl_reason",
        "mult", "eligible", "env", "env_counted", "explained",
        "n_ep", "S_coadd_mJy", "L_coadd", "S_max_epoch_mJy", "L_max_epoch", "sigma_coadd_mJy", "snr_coadd", "epoch_snr", "cand_coadd", "cand_epoch", "n_ep_det"]].sort_values(
         ["explained", "snr_coadd"], ascending=[True, False]).to_csv(os.path.join(C.RES, "alleepoch_candidates.csv"), index=False)
     k = int((~S.explained).sum())
-    k_host = int(((~S.explained) & S.cand_epoch).sum())
-    k_s = int(((~S.explained) & S.cand_coadd).sum()); k_e = int(S.loc[~S.explained, "n_ep_det"].fillna(0).sum())
-    kvar = {t: (int(((~S[f"explained_{t}"]) & S.cand_coadd).sum()), int(S.loc[~S[f"explained_{t}"], "n_ep_det"].fillna(0).sum())) for t in elig_var}
+    k_s, k_e, k_host = _counts(S.eligible)
+    kvar = {t: _counts(S.source_id.isin(E))[:2] for t, E in elig_var.items()}
+    # the reported backgrounds include the envelope stars' control hits above L_ENV (b_*_env; host-level: bounded by
+    # the epoch-level value, since a host counts once however many of its epochs are hit)
+    b_s += b_s_env; b_e += b_e_env; b_host += b_e_env; b = b_s
     res = dict(per_tag=per_tag, n_stars_coadd=int(len(CO)), n_star_epochs_trials=int(len(U)),
                ctrl_rate_coadd_per_star=rate_co, ctrl_rate_per_epoch=rate_ep,
                n_candidate_stars=int(len(S)), n_explained=int(S.explained.sum()),
@@ -313,7 +327,7 @@ if __name__ == "__main__":
                **{f"b_steady_{t}": bvar[t][0] for t in elig_var}, **{f"b_snap_{t}": bvar[t][1] for t in elig_var},
                **{f"mu95_steady_b0_{t}": float(C.poisson_ul95(kvar[t][0])) for t in elig_var},
                **{f"n_eligible_{t}": int(len(elig_var[t])) for t in elig_var},
-               k_steady_env=int((S.env_counted & S.cand_coadd).sum()), b_steady_env=float(b_s_env), b_snap_env=float(b_e_env),
+               k_steady_env=int(S.env_steady.sum()), k_snap_env=int(S.n_ep_det_env[S.env].sum()), b_steady_env=float(b_s_env), b_snap_env=float(b_e_env),
                n_eligible=int(ACT.eligible.sum()), n_env=int(ACT.env.sum()), n_presence_active=int(ACT.active.sum()),
                n_active_sample=int(len(active_ids)), f_active_sample=len(active_ids) / int(len(ACT)),
                n_inactive_stars_coadd=n_inact_star, n_inactive_star_epochs=n_inact_ep,

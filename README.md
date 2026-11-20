@@ -191,6 +191,8 @@ component parquet holds exactly the same data.
   (205,981 stars). With the control background subtracted: 4.5×10⁻² / 1.1×10⁻³ / 1.2×10⁻⁴ and 2.0×10⁻⁵.
   At L_env itself f < 4.0×10⁻⁵ (envelope stars detected with probability ≈ 0.5). Without the multiplicity criterion
   (7 detections among 46,206 AFGK stars, μ95 = 13.1): f < 2.8×10⁻⁴ below L_env.
+  Restricted to the 20,421 eligible stars whose activity is X-ray-constrained below −4 (04b xray_constrained; TYC 3573-1391-1
+  is unconstrained): k = 0, f < 1.47×10⁻⁴ above 10⁹ W Hz⁻¹ (adopted 1.46×10⁻⁴).
   M dwarfs with every coadd detection counted (72 of 159,937, 16 of them secure natural associations; no eligibility decision):
   f < 0.16 / 4.9×10⁻³ / 5.5×10⁻⁴ above 10⁷ / 10⁸ / 10⁹ W Hz⁻¹ (Fig. 7, blue dashed).
   Duty cycle, counted per host (independent snapshots), above L_env: f < 3.8×10⁻⁵ / 5.3×10⁻⁵ / 1.2×10⁻⁴ for δ = 1 / 0.3 / 0.1, f·δ < 1.1×10⁻⁵

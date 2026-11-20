@@ -58,6 +58,7 @@
  "n_eligible_lx45": 31612,
  "n_eligible_withmult": 46650,
  "k_steady_env": 0,
+ "k_snap_env": 0,
  "b_steady_env": 0.0,
  "b_snap_env": 0.0,
  "n_eligible": 32985,

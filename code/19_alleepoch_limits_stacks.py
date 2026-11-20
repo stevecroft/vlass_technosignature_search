@@ -101,7 +101,7 @@ if __name__ == "__main__":
     # technosignature eligibility (04b): eligible stars count at any luminosity, envelope stars only above L_ENV, the
     # others never (p_i = 0; their per-star limits are unaffected). 'active' (presence of activity evidence) is used only
     # for the astrophysical stack split.
-    ACT = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"), columns=["source_id", "active", "eligible", "env", "afgk", "mult"])
+    ACT = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"), columns=["source_id", "active", "eligible", "env", "afgk", "mult", "xray_constrained"])
     active = set(ACT.source_id[ACT.active]); elig = set(ACT.source_id[ACT.eligible]); envs = set(ACT.source_id[ACT.env])
     # ---------------- per-star limits
     U = LT[~LT.veto]
@@ -134,6 +134,9 @@ if __name__ == "__main__":
     #  * AFGK without the multiplicity cut: eligible stars plus AFGK multiples outside the classes (18: "withmult")
     mall = (P.bp_rp >= C.BPRP_SPLIT).values[ok]
     wm = P.index.isin(elig | set(ACT.source_id[ACT.env & ACT.afgk]))[ok]
+    #  * eligible AFGK stars whose activity is constrained below the X-ray threshold (a counterpart, or a nominal survey
+    #    depth reaching log L_X/L_bol = -4; 04b), i.e. excluding the X-ray-unconstrained eligible stars
+    xc = P.index.isin(set(ACT.source_id[ACT.eligible & ACT.xray_constrained]))[ok]
     S_env = C.L_ENV / lum(1.0, d)                                              # mJy at L_ENV, per star
     cvet = P.index.isin(cj.get("coadd_vetoed_ids", []))[ok]                   # steady-test (coadd-unit) confusion veto of 18
     # p_i uses the rule that defines k: a star counts when its coadd reaches 5 sigma, so t_i = 5 sigma_i at every star
@@ -142,6 +145,9 @@ if __name__ == "__main__":
     # additional transmitter would stand out above the measured source (f95_b0_add). p_i = 0 at excluded stars.
     t_co = np.where(cvet | ~(el | ev_), np.inf, np.where(el, THR * sig, np.maximum(THR * sig, S_env)))
     t_m = np.where(cvet | ~mall, np.inf, THR * sig); t_wm = np.where(cvet | ~wm, np.inf, THR * sig)
+    t_xc = np.where(cvet | ~xc, np.inf, THR * sig)
+    _cs = set(CA.source_id[CA.cand_coadd & CA.eligible])                       # counted steady detections at eligible stars
+    k_xc = int(P.index[ok][xc & ~cvet].isin(_cs).sum()); mu_xc = float(C.poisson_ul95(k_xc))
     k_mall = int(((Sco / sig >= THR) & mall & ~cvet).sum()); mu_mall = float(C.poisson_ul95(k_mall))
     k_mall_sec = int(((Sco / sig >= THR) & mall & ~cvet & P.index.isin(set(LT.source_id[LT.detected]))[ok]).sum())
     mu_wm = float(C.poisson_ul95(cj["k_steady_withmult"]))
@@ -162,9 +168,10 @@ if __name__ == "__main__":
         SLe = Lg / lum(1.0, de); p_e = norm.cdf((SLe - te) / se)
         p = p_co.copy()
         neff, nsnap = p.sum(), p_e.sum()
-        n_m = norm.cdf((SL - t_m) / sig).sum(); n_wm = norm.cdf((SL - t_wm) / sig).sum()
+        n_m = norm.cdf((SL - t_m) / sig).sum(); n_wm = norm.cdf((SL - t_wm) / sig).sum(); n_xc = norm.cdf((SL - t_xc) / sig).sum()
         r_ = dict(L_WHz=Lg, N_eff=neff, N_eff_elig=p[el].sum(), N_eff_env=p[ev_].sum(),
                   N_eff_Mall=n_m, f95_b0_Mall=mu_mall / n_m if n_m > 0 else np.inf,
+                  N_eff_xconstr=n_xc, f95_b0_xconstr=mu_xc / n_xc if n_xc > 0 else np.inf,
                   N_eff_withmult=n_wm, f95_b0_withmult=mu_wm / n_wm if n_wm > 0 else np.inf, f95=min(mu95 / neff, np.inf) if neff > 0 else np.inf,
                   f95_b0=cj["mu95_steady_b0"] / neff if neff > 0 else np.inf,
                   f95_b0_add=cj["mu95_steady_b0"] / neff_add if neff_add > 0 else np.inf,
@@ -358,6 +365,9 @@ if __name__ == "__main__":
                 k_Mall=k_mall, k_Mall_secure=k_mall_sec, mu95_Mall=mu_mall, n_Mall_coadd=int((mall & ~cvet).sum()),
                 **{f"f95_b0_Mall_1e{e}": float(np.interp(e, np.log10(POP.L_WHz), POP.f95_b0_Mall)) for e in (7, 8, 9)},
                 **{f"Neff_Mall_1e{e}": float(np.interp(e, np.log10(POP.L_WHz), POP.N_eff_Mall)) for e in (7, 8, 9)},
+                k_xconstr=k_xc, mu95_xconstr=mu_xc, n_xconstr_coadd=int((xc & ~cvet).sum()),
+                Neff_xconstr_1e9=float(np.interp(9, np.log10(POP.L_WHz), POP.N_eff_xconstr)),
+                f95_b0_xconstr_1e9=float(np.interp(9, np.log10(POP.L_WHz), POP.f95_b0_xconstr)),
                 mu95_withmult=mu_wm, Neff_withmult_max=float(POP.N_eff_withmult.max()),
                 f95_b0_withmult_floor=float(POP.f95_b0_withmult.min()),
                 f95_b0_withmult_1e9=float(np.interp(9, np.log10(POP.L_WHz), POP.f95_b0_withmult)))

@@ -11,8 +11,10 @@ Two separate quantities are written for every star:
    possible transmitter; a non-eligible star gets p_i = 0.
    * AFGK stars (BP-RP < 1.84) are eligible unless they belong to a class of known radio emitters or contaminants
      (SIMBAD CV, RS CVn, young, magnetic CP; Gaia DR3 eclipsing binary, which includes Algols) or have a saturated or
-     near-saturated corona, log L_X/L_bol >= LXLBOL_MAX = -4. The ROSAT and eRASS1 surveys reach this activity level
-     for AFGK stars throughout 100 pc, so the cut does not depend on distance, unlike the presence of an X-ray detection.
+     near-saturated corona, log L_X/L_bol >= LXLBOL_MAX = -4. The threshold is a property of the star, but the surveys
+     do not reach it everywhere: at nominal limits of 2e-13 (2RXS) and 5e-14 (eRASS1 half of the sky) erg cm^-2 s^-1,
+     log L_X/L_bol = -4 is reachable for about half of the AFGK stars with 2RXS (column xray_lim: the nominal limit at
+     the star; xray_constrained: a counterpart, or xray_lim <= -4). Unconstrained stars stay eligible.
      L_X uses the eRASS1 0.2-2.3 keV flux where available, else the 2RXS count rate x 6e-12 erg cm^-2 per count (07);
      L_bol uses M_G with a bolometric correction of zero (|BC_G| < 0.5 mag for these stars, ample for a threshold
      applied at the 1-dex level).
@@ -29,13 +31,15 @@ Inputs : data/derived/ms_sample_vlass.parquet, HEASARC TAP (cached), SIMBAD TAP 
 Outputs: data/raw/xray_{2rxs,erass1}_flux.parquet (full catalogs: position and flux), data/raw/simbad_otypes_all.parquet,
          data/raw/gaia_dr3_eclipsing_binaries_100pc.parquet,
          data/derived/activity_all.parquet (source_id, rxs_r, era_r, fX, log_lx_lbol, main_id, otypes, activity_evidence,
-         active, excl_class, excl_reason, afgk, mult, eligible, env)
+         active, excl_class, excl_reason, afgk, mult, eligible, env, xray_lim, xray_constrained)
 """
 import os, sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # PYTHONSAFEPATH-safe
 import common as C
 import time, importlib
 import numpy as np, pandas as pd, pyvo
 from scipy.spatial import cKDTree
+from astropy.coordinates import SkyCoord
+import astropy.units as u
 
 P07 = importlib.import_module("07_classify_and_limits")
 HEASARC_TAP = "https://heasarc.gsfc.nasa.gov/xamin/vo/tap"   # same catalogs as VizieR J/A+A/588/A103 and J/A+A/682/A34
@@ -148,11 +152,19 @@ if __name__ == "__main__":
     A["excl_class"] = pd.Series(reason, index=A.index).str.len() > 0
     hot = (A.log_lx_lbol >= C.LXLBOL_MAX).fillna(False)
     A["afgk"] = A.bp_rp < C.BPRP_SPLIT
-    A["excl_reason"] = [", ".join([x for x in (rs, f"log Lx/Lbol = {lx:.1f}" if h else "") if x]) for rs, lx, h in zip(reason, A.log_lx_lbol, hot)]
+    # the X-ray criterion applies to AFGK stars only (M dwarfs are envelope stars whatever their corona), so only there
+    # is it recorded as an exclusion reason
+    A["excl_reason"] = [", ".join([x for x in (rs, f"log Lx/Lbol = {lx:.1f}" if (h and af) else "") if x])
+                        for rs, lx, h, af in zip(reason, A.log_lx_lbol, hot, A.bp_rp < C.BPRP_SPLIT)]
+    # nominal X-ray depth at the star (eRASS1 in its half of the sky, else 2RXS), as log L_X/L_bol
+    _l = SkyCoord(ra=A.ra.values * u.deg, dec=A.dec.values * u.deg).galactic.l.deg
+    _flim = np.where((_l > 179.944) & (_l < 359.944), 5e-14, 2e-13)
+    A["xray_lim"] = np.log10(_flim * 4 * np.pi * (A.dist_pc * C.PC_M * 100) ** 2 / Lbol)
+    A["xray_constrained"] = A.log_lx_lbol.notna() | (A.xray_lim <= C.LXLBOL_MAX)
     A["mult"] = (A.ruwe > C.MULT_RUWE) | (A.non_single_star > 0) | (A.dMG < C.MULT_DMG)
     A["eligible"] = A.afgk & ~A.excl_class & ~hot & ~A.mult
     A["env"] = ~A.excl_class & (~A.afgk | (A.mult & ~hot))
-    A[["source_id", "rxs_r", "era_r", "fX", "log_lx_lbol", "main_id", "otypes", "activity_evidence", "active", "excl_class", "excl_reason", "afgk", "mult", "eligible", "env"]].to_parquet(
+    A[["source_id", "rxs_r", "era_r", "fX", "log_lx_lbol", "main_id", "otypes", "activity_evidence", "active", "excl_class", "excl_reason", "afgk", "mult", "eligible", "env", "xray_lim", "xray_constrained"]].to_parquet(
         os.path.join(C.DER, "activity_all.parquet"), index=False, compression="zstd")
     print("stars:", len(A), "| with activity evidence:", int(A.active.sum()), f"({100 * A.active.mean():.2f}%)",
           "| X-ray:", int(A.LX.notna().sum()), "| SIMBAD type only:", int((A.active & A.LX.isna()).sum()))

@@ -439,6 +439,8 @@ if __name__ == "__main__":
             put(f"FMall{_k}", sci(sm[f"f95_b0_Mall_1e{_e}"])); put(f"NeffMall{_k}", com(round(sm[f"Neff_Mall_1e{_e}"])))
         put("MuWithMult", f"{sm['mu95_withmult']:.1f}"); put("NWithMultSteady", com(sm["Neff_withmult_max"]))
         put("FBzWithMult", sci(sm["f95_b0_withmult_floor"]))
+        put("KXc", str(sm["k_xconstr"])); put("NXc", com(sm["n_xconstr_coadd"])); put("NeffXcNine", com(round(sm["Neff_xconstr_1e9"])))
+        put("FXcNine", sci(sm["f95_b0_xconstr_1e9"], 2)); put("FBzNineTwo", sci(sm["f95_b0_1e9"], 2))
         put("FAllElig", sci(cj["mu95_steady"] / sm["Neff_elig_max"]))
         put("FBzEnvKZero", sci(3.0 / sm["Neff_max"]))
         _CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); _ex = _CA[_CA.activity_evidence.fillna("") != ""]   # with activity evidence
