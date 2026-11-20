@@ -112,6 +112,13 @@ if __name__ == "__main__":
         T.loc[m, "class"] = "background (multi-epoch astrometry)"
         T.loc[m, "note"] = f"radio source not coincident with the star in VLASS 1.2/2.2/3.2; chi2(at star, N) = {aj['tgt_N_chi2_at_star']:.1f} for 3 dof"
     T["group"] = T.apply(group, axis=1)
+    # technosignature eligibility (04b): a secure association counts as a possible transmitter at an eligible AFGK star,
+    # or at an M dwarf outside the excluded classes if its luminosity exceeds L_ENV
+    fa = os.path.join(C.DER, "activity_all.parquet")
+    EL = pd.read_parquet(fa, columns=["source_id", "eligible", "env", "excl_reason"]) if os.path.exists(fa) else pd.DataFrame(columns=["source_id", "eligible", "env", "excl_reason"])
+    T = T.merge(EL, on="source_id", how="left")
+    T["eligible"] = T.eligible.fillna(False).astype(bool); T["env"] = T.env.fillna(False).astype(bool)
+    T["counted"] = T.secure & ~T["class"].str.startswith("background") & (T.eligible | (T.env & (T.Lnu_R_WHz >= C.L_ENV)))
     T.sort_values("rel", ascending=False).to_csv(os.path.join(C.RES, "vlass_star_matches_classified.csv"), index=False)
     print("secure matches:", int(T.secure.sum()))
     print(T[T.secure]["class"].value_counts().to_string())
@@ -130,7 +137,7 @@ if __name__ == "__main__":
     # secure associations whose emission is explained by a natural stellar mechanism. Unexplained secure associations and
     # sources shown not to be at the star (background) are tested like any other star in the forced-detection test (18, 19):
     # the control-position background b counts such chance coincidences, so removing the demonstrable ones would bias k low.
-    L["explained_detection"] = L.source_id.isin(T.source_id[T.secure & (T["class"] != "UNEXPLAINED") & ~T["class"].str.startswith("background")])
+    L["explained_detection"] = L.source_id.isin(T.source_id[T.secure & ~T.counted & ~T["class"].str.startswith("background")])
     L.loc[det.istar.values, "S_lim_mJy"] = (det.Ftot.values + C.Z95 * det.e_Ftot.values) / C.int_bias(det.half.values)
     L["Lnu_lim_WHz"] = C.lum(L.S_lim_mJy, L.dist_pc); L["EIRP_lim_W_2GHz"] = L.Lnu_lim_WHz * C.BAND_HZ
     # stars with any non-secure catalogued component within 10" (excluded from stacking in script 10)
@@ -140,12 +147,13 @@ if __name__ == "__main__":
     print("S_lim mJy 5/50/95%:", np.percentile(L.S_lim_mJy, [5, 50, 95]).round(2), " Lnu_lim median: %.3g W/Hz" % np.median(L.Lnu_lim_WHz))
 
     # ---------------- population limit (no unexplained detections remain)
-    k_unexpl = int(((T["class"] == "UNEXPLAINED") & T.secure).sum())
-    # stars with activity evidence (04b) would be classified as natural emitters whatever the origin of their emission,
-    # so they cannot yield an unexplained detection and are left out of N_eff (their per-star limits are unaffected)
-    fa = os.path.join(C.DER, "activity_all.parquet")
-    act = set(pd.read_parquet(fa).query("active").source_id) if os.path.exists(fa) else set()
-    Lgrid = np.logspace(5, 10.5, 300); Neff = np.searchsorted(np.sort(L.Lnu_lim_WHz[~L.source_id.isin(act)].values), Lgrid)
+    k_unexpl = int(T.counted.sum())
+    # only eligible stars (04b) can yield a counted detection; M dwarfs outside the excluded classes count above L_ENV
+    # (their per-star limits are unaffected)
+    elig = set(EL.source_id[EL.eligible.astype(bool)]); env = set(EL.source_id[EL.env.astype(bool)])
+    Lgrid = np.logspace(5, 10.5, 300)
+    Neff = (np.searchsorted(np.sort(L.Lnu_lim_WHz[L.source_id.isin(elig)].values), Lgrid)
+            + np.where(Lgrid >= C.L_ENV, np.searchsorted(np.sort(L.Lnu_lim_WHz[L.source_id.isin(env)].values), Lgrid), 0))
     fUL = np.where(Neff > 0, C.poisson_ul95(k_unexpl) / np.maximum(Neff, 1), np.nan)
     pd.DataFrame({"Lnu_star_WHz": Lgrid, "EIRP_2GHz_W": Lgrid * C.BAND_HZ, "N_eff": Neff, "k_unexplained": k_unexpl, "f_UL95": fUL}).to_csv(
         os.path.join(C.RES, "vlass_population_limit_curve.csv"), index=False)

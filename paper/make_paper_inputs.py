@@ -247,7 +247,7 @@ if __name__ == "__main__":
         _bf = [_cd["by_G"][k] for k in ["15-17", "17-30"]]; _bb = [_cd["by_G"][k] for k in ["0-13", "13-15"]]
         put("CatFaintStar", str(sum(x[0] for x in _bf))); put("CatFaintCtrl", f"{sum(x[1] for x in _bf):.1f}")
         put("CatBrightStar", str(sum(x[0] for x in _bb))); put("CatBrightCtrl", f"{sum(x[1] for x in _bb):.1f}")
-        put("NCoaddStars", com(sm["n_with_coadd"])); put("NInactPhot", com(sm["n_inactive_with_photometry"]))
+        put("NCoaddStars", com(sm["n_with_coadd"])); put("NInactPhot", com(sm["n_eligible_with_photometry"]))
         for _x, _k in [(1e7, "Seven"), (1e8, "Eight"), (1e9, "Nine")]: put(f"FBz{_k}", sci(sm[f"f95_b0_1e{int(np.log10(_x))}"]))
         put("FBzFloor", sci(sm["f95_b0_floor"])); put("FDeltaFloorBz", sci(sm["fdelta95_b0_floor"])); put("FDeltaEpochCount", sci(sm["fdelta95_epochcount_floor"]))
         put("FDutyOneBz", sci(sm["f95_duty1_b0_floor"])); put("FDutyThreeBz", sci(sm["f95_duty0.3_b0_floor"])); put("FDutyTenthBz", sci(sm["f95_duty0.1_b0_floor"]))
@@ -300,8 +300,9 @@ if __name__ == "__main__":
         from scipy.spatial import cKDTree as _KD
         _xyz = np.c_[np.cos(np.deg2rad(_sv.dec)) * np.cos(np.deg2rad(_sv.ra)), np.cos(np.deg2rad(_sv.dec)) * np.sin(np.deg2rad(_sv.ra)), np.sin(np.deg2rad(_sv.dec))]
         _pr = _KD(_xyz).query_pairs(2 * np.sin(np.deg2rad(2.5 / 3600) / 2)); put("NPairsBeam", com(len(_pr))); put("NStarsPairs", com(len({i for q in _pr for i in q})))
-        _co = pd.read_csv(os.path.join(RES, "epoch_catalog_only_stars.csv")).merge(pd.read_parquet(os.path.join(DER, "activity_all.parquet"), columns=["source_id", "active"]), on="source_id", how="left")
+        _co = pd.read_csv(os.path.join(RES, "epoch_catalog_only_stars.csv")).merge(pd.read_parquet(os.path.join(DER, "activity_all.parquet"), columns=["source_id", "active", "eligible"]), on="source_id", how="left")
         _c1 = _co[_co.n_epochs == 1]; put("NCatOnlySingle", str(len(_c1))); put("NCatOnlySingleAct", str(int(_c1.active.astype(bool).sum())))
+        put("NCatOnlySingleElig", str(int(_c1.eligible.fillna(False).astype(bool).sum())))
         _KB = pd.read_csv(os.path.join(RES, "alleepoch_k_b_threshold.csv")).set_index("threshold")
         put("KCoFour", str(int(_KB.k_steady[4.0]))); put("BCoFour", f"{_KB.b_steady[4.0]:.1f}")
         put("KCoSeven", str(int(_KB.k_steady[7.0]))); put("BCoSeven", f"{_KB.b_steady[7.0]:.1f}")
@@ -318,14 +319,15 @@ if __name__ == "__main__":
         put("SCRctrlAbove", str(int(sum(x.sum() for x in _h)))); put("SCRctrlTot", str(int(sum(x.sum() for x in _h5))))
         _bm = os.path.join(RES, "bright_dwarfs_missing.csv")
         if os.path.exists(_bm): put("NBrightMissing", str(len(pd.read_csv(_bm))))
-        put("PctInactive", f"{100 * (1 - cj['f_active_sample']):.0f}")
+        put("PctInactive", f"{100 * (1 - cj['f_active_sample']):.0f}")                 # (fraction of stars that are eligible)
         # chance probability of an unrelated X-ray source within the match radius, from the full-catalog source densities
         for _nm, _r, _area, _key in [("2rxs", 40.0, 4 * np.pi, "PChanceRxs"), ("erass1", 20.0, 2 * np.pi, "PChanceEra")]:
-            _f = os.path.join(RAW, f"xray_{_nm}_positions.parquet")
+            _f = os.path.join(RAW, f"xray_{_nm}_flux.parquet")
             if os.path.exists(_f):
                 _dens = len(pd.read_parquet(_f)) / _area                       # per steradian (eRASS1: half the sky)
                 put(_key, sci(1 - np.exp(-_dens * np.pi * np.radians(_r / 3600) ** 2), 0))
-        put("NActive", com(cj["n_active_sample"])); put("PctActive", f"{100 * cj['f_active_sample']:.1f}")
+        put("NActive", com(cj["n_presence_active"])); put("PctActive", f"{100 * cj['n_presence_active'] / cnt['n_in_vlass']:.1f}")   # presence of activity evidence (04b)
+
         put("BSteadyErr", f"{cj['b_steady_err']:.1f}"); put("BSnapErr", f"{cj['b_snap_err']:.1f}")
         put("NCtrlSteady", str(cj["ctrl_hits_steady"])); put("NCtrlSnap", str(cj["ctrl_hits_snap"]))
         put("MuSteadyMarg", f"{cj['mu95_steady_marg']:.1f}"); put("MuSnapMarg", f"{cj['mu95_snap_marg']:.1f}")
@@ -333,12 +335,65 @@ if __name__ == "__main__":
         put("BSteadyNoEmit", f"{cj['b_steady_noemit']:.1f}"); put("BSnapNoEmit", f"{cj['b_snap_noemit']:.1f}")
         put("PSteadyLowAll", f"{_po.cdf(cj['k_steady'], cj['b_steady_unfiltered']):.3f}")
         put("PSteadyLow", f"{_po.cdf(cj['k_steady'], cj['b_steady']):.3f}"); put("PSnapLow", f"{_po.cdf(cj['k_snap'], cj['b_snap']):.2f}"); put("PSnapHigh", f"{_po.sf(cj['k_snap'] - 1, cj['b_snap']):.2f}")
-        put("KSteadyStrict", str(cj["k_steady_strict"])); put("MuSteadyStrict", f"{cj['mu95_steady_strict']:.1f}")
-        put("KSnapStrict", str(cj["k_snap_strict"])); put("MuSnapStrict", f"{cj['mu95_snap_strict']:.1f}")
-        put("NCandExplStrict", str(cj["n_explained_strict"])); put("NCandExplWeak", str(cj["n_explained"] - cj["n_explained_strict"]))
-        put("StrictPct", f"{100 * (cj['mu95_steady_strict'] / cj['mu95_steady'] - 1):.0f}")
-        put("StrictSnapPct", f"{100 * (cj['mu95_snap_strict'] / cj['mu95_snap'] - 1):.0f}")
-        _CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); _ex = _CA[_CA.explained]
+        # eligibility variants (18): X-ray threshold -3.5 (LxA) / -4.5 (LxB), and AFGK multiples eligible at all L (WithMult)
+        for _t, _k in [("lx35", "LxA"), ("lx45", "LxB"), ("withmult", "WithMult")]:
+            _ks, _bs, _ke, _be = cj[f"k_steady_{_t}"], cj[f"b_steady_{_t}"], cj[f"k_snap_{_t}"], cj[f"b_snap_{_t}"]
+            put(f"KSteady{_k}", str(_ks)); put(f"BSteady{_k}", f"{_bs:.1f}"); put(f"KSnap{_k}", str(_ke)); put(f"BSnap{_k}", f"{_be:.1f}")
+            put(f"PSteady{_k}", sci(_po.sf(_ks - 1, _bs), 0) if _po.sf(_ks - 1, _bs) < 0.01 else f"{_po.sf(_ks - 1, _bs):.2f}")
+            put(f"PSnap{_k}", sci(_po.sf(_ke - 1, _be), 0) if _po.sf(_ke - 1, _be) < 0.01 else f"{_po.sf(_ke - 1, _be):.2f}")
+            put(f"NElig{_k}", com(cj[f"n_eligible_{_t}"]))
+        # ---- technosignature eligibility (04b)
+        _EL = pd.read_parquet(os.path.join(DER, "activity_all.parquet"))
+        _sv2 = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "dist_pc", "phot_g_mean_mag"])
+        _EL = _EL.merge(_sv2, on="source_id", how="left")
+        _hot = (_EL.log_lx_lbol >= -4.0).fillna(False)
+        put("NAFGK", com(_EL.afgk.sum())); put("NMdw", com((~_EL.afgk).sum())); put("NElig", com(_EL.eligible.sum()))
+        put("PctElig", f"{100 * _EL.eligible.mean():.0f}")
+        put("NExclClassAFGK", com((_EL.afgk & _EL.excl_class).sum())); put("NExclHot", com((_EL.afgk & ~_EL.excl_class & _hot).sum()))
+        put("NAFGKMult", com((_EL.afgk & ~_EL.excl_class & ~_hot & _EL.mult).sum()))
+        put("PctAFGKMult", f"{100 * (_EL.afgk & ~_EL.excl_class & ~_hot & _EL.mult).sum() / (_EL.afgk & ~_EL.excl_class & ~_hot).sum():.0f}")
+        put("NEnv", com(_EL.env.sum())); put("NEnvM", com((_EL.env & ~_EL.afgk).sum()))
+        put("NExclM", com((~_EL.afgk & _EL.excl_class).sum())); put("NExclAll", com((~_EL.eligible & ~_EL.env).sum()))
+        put("NAboveEnv", com((_EL.eligible | _EL.env).sum()))
+        put("NEBall", com(_EL.excl_reason.fillna("").str.contains("eclipsing binary").sum()))
+        put("NEBafgk", com((_EL.afgk & _EL.excl_reason.fillna("").str.contains("eclipsing binary")).sum()))
+        # completeness of the X-ray cut: lowest detectable log L_X/L_bol for 2RXS-like (2e-13) and eRASS1-like (5e-14
+        # erg cm^-2 s^-1) flux limits at each AFGK star (L_bol from M_G with BC_G = 0, as in 04b)
+        _Lb = 3.828e33 * 10 ** (-0.4 * (_EL.phot_g_mean_mag - 5 * np.log10(_EL.dist_pc / 10) - 4.67))
+        _a4 = 4 * np.pi * (_EL.dist_pc * 3.0857e18) ** 2
+        for _fl, _k in [(2e-13, "Rxs"), (5e-14, "Era")]:
+            _rm = np.log10(_fl * _a4 / _Lb)[_EL.afgk]
+            put(f"XLim{_k}Med", f"{_rm.median():.1f}"); put(f"XLim{_k}Hi", f"{_rm.quantile(0.99):.1f}")
+            put(f"XLim{_k}PctFour", f"{100 * (_rm <= -4.0).mean():.0f}")
+        for (_lo, _hi), _k in [((0, 10), "Ten"), ((80, 100), "Hundred")]:
+            _sh = (_EL.dist_pc >= _lo) & (_EL.dist_pc < _hi)
+            put(f"PctEligAFGK{_k}", f"{100 * _EL.eligible[_sh & _EL.afgk].mean():.0f}")
+            put(f"PctMultAFGK{_k}", f"{100 * (_EL.mult[_sh & _EL.afgk & ~_EL.excl_class & ~_hot]).mean():.0f}")
+        put("LEnv", "10^{10}"); put("LDGCVn", sci(4.5e9))
+        # RUWE of the brightest stars: fraction of AFGK stars outside the classes with RUWE > 1.4, G < 6 vs 6-13
+        _G3 = pd.read_parquet(os.path.join(DER, "ms_sample_vlass.parquet"), columns=["source_id", "ruwe"])
+        _E3 = _EL.merge(_G3, on="source_id"); _E3 = _E3[_E3.afgk & ~_E3.excl_class]
+        put("PctRuweBright", f"{100 * (_E3.ruwe[_E3.phot_g_mean_mag < 6] > 1.4).mean():.0f}")
+        put("PctRuweFaint", f"{100 * (_E3.ruwe[(_E3.phot_g_mean_mag >= 6) & (_E3.phot_g_mean_mag < 13)] > 1.4).mean():.0f}")
+        put("EpsEriRUWE", f"{_E3.set_index('source_id').ruwe[5164707970261890560]:.1f}")
+        _CAe = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv"))
+        _Tse = pd.read_csv(os.path.join(RES, "vlass_star_matches_classified.csv")); _Tse = _Tse[_Tse.secure]
+        put("MaxNatL", sci(max(_CAe.L_max_epoch.max(), _Tse.Lnu_R_WHz.max())))
+        put("MaxForcedML", sci(_CAe[_CAe.bp_rp >= 1.84].L_max_epoch.max()))
+        _afc = _CAe[_CAe.eligible | (_CAe.env & (_CAe.bp_rp < 1.84))]
+        put("NAFGKCand", str(len(_afc))); put("NAFGKCandMult", str(int(_afc.mult.sum())))
+        put("NAFGKCandSteady", str(int((_afc.cand_coadd).sum())))
+        put("NCandAFGKExcl", str(int(((_CAe.bp_rp < 1.84) & ~_CAe.eligible & ~_CAe.env).sum())))
+        put("NCandM", str(int((_CAe.bp_rp >= 1.84).sum())))
+        put("NEligPhot", com(sm["n_eligible_with_photometry"])); put("NEnvPhot", com(sm["n_env_with_photometry"]))
+        put("FBzElig", sci(sm["f95_b0_elig_floor"])); put("NeffAboveEnv", com(sm["Neff_max"]))
+        put("FAllElig", sci(cj["mu95_steady"] / sm["Neff_elig_max"]))
+        put("FBzEnvKZero", sci(3.0 / sm["Neff_max"]))
+        _CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); _ex = _CA[_CA.activity_evidence.fillna("") != ""]   # with activity evidence
+        put("NCandActEv", str(len(_ex))); put("NCandNoActEv", str(int((_CA.activity_evidence.fillna("") == "").sum())))
+        put("PSteadyHigh", f"{_po.sf(cj['k_steady'] - 1, cj['b_steady']):.2f}")
+        put("TycSNR", f"{_CA.set_index('source_id').snr_coadd[2071061615589030400]:.1f}")
+        put("NEligSteady", com(sm["Neff_elig_max"]))
         _ev = _ex.activity_evidence.fillna("").str.split("; "); _tc = _ev.explode().value_counts()
         _xc = _ev.apply(lambda L: "X-ray" in L)
         put("NCandXcat", str(int(_xc.sum()))); put("NCandSimbadOnly", str(int((~_xc).sum())))
@@ -394,7 +449,8 @@ if __name__ == "__main__":
         _stz = set(_CAz.source_id[_CAz.cand_coadd & ~_CAz.explained & ~_CAz.source_id.isin(_cjz["coadd_vetoed_ids"])])   # the k of 18
         _ks = int(_Z.source_id.isin(_stz).sum()); _mu = 0.5 * _chi2.ppf(0.95, 2 * (_ks + 1))  # steady test (continuous signal), b = 0
         put("NSolarSteady", str(_ks))
-        _actZ = set(pd.read_parquet(os.path.join(DER, "activity_all.parquet")).query("active").source_id)
+        assert _Lz > 1e10        # far above L_ENV: eligible and envelope stars both count (04b)
+        _actZ = set(pd.read_parquet(os.path.join(DER, "activity_all.parquet")).query("~eligible & ~env").source_id)
         _inst = _Z.n.notna() & ~_Z.source_id.isin(_cjz["coadd_vetoed_ids"])   # in the steady test (not vetoed in every epoch or in the coadd)
         _nin = int((~_Z.source_id.isin(_actZ) & _inst).sum())             # stars without activity evidence in the steady test (p_i = 1 here)
         put("NSolarSingle", com(len(_Z))); put("NSolarNat", str(int((_Z.natural & ~_Z.unexplained_candidate).sum())))
@@ -442,7 +498,7 @@ if __name__ == "__main__":
             y0 = s.f95_mean_nosamp[i - 1]; y1 = s.f95_mean[i]
             t = np.log10(y0) / (np.log10(y0) - np.log10(y1)) if y0 > 1 > y1 else 1.0
             return 10 ** (np.log10(s.L_WHz[i - 1]) + t * (np.log10(s.L_WHz[i]) - np.log10(s.L_WHz[i - 1])))
-        for t in ["AFGK", "M"]:
+        for t in ["AFGK"]:                       # stack limits: eligible (AFGK) stars only (19)
             s = SLm[SLm.cls == t].reset_index(drop=True)
             put(f"ReachAll{t}", sci(_cross(s), 1))
             fm = lambda L0: float(np.interp(np.log10(L0), np.log10(s.L_WHz), s.f95_mean))
@@ -452,7 +508,7 @@ if __name__ == "__main__":
             put(f"NeffBrat{t}", com(round(nm_(4e5, "Neff_comb")))); put(f"WtenBrat{t}", f"{100 * nm_(4e5, 'wfrac_within10pc'):.0f}")
             md = s.set_index("L_WHz").f95_median
             put(f"FMedSix{t}", f"{md.get(1e6, np.nan):.2f}"); put(f"FMedSeven{t}", f"{md.get(1e7, np.nan):.3f}"); put(f"FMedNine{t}", f"{md.get(1e9, np.nan):.3f}")
-        reach = [_cross(SLm[SLm.cls == t].reset_index(drop=True)) for t in ["AFGK", "M"]]
+        reach = [_cross(SLm[SLm.cls == t].reset_index(drop=True)) for t in ["AFGK"]]
         for t in ["AFGK", "M"]:   # nearest shell alone, for comparison with Table 5 (not used for the limits)
             r0 = SA[(SA.cls == t) & (SA.dmin == 0)].iloc[0]; put(f"NearShell{t}", sci(max(r0.meanL, 0) + 1.645 * r0.meanL_err, 1))
         put("ReachEIRPAll", sci(float(f"{min(reach):.1e}") * 2e9))
@@ -461,11 +517,11 @@ if __name__ == "__main__":
         _ca = pd.read_csv(os.path.join(RES, "cutout_astrometry.csv")); _g = _ca[_ca.source_id == 349716170186042880]
         put("NCandSubCoadd", str(int((~pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")).cand_coadd).sum())))
         put("GoteSnrLo", f"{_g.snr_fit.min():.1f}"); put("GoteSnrHi", f"{_g.snr_fit.max():.1f}"); put("GoteNep", str(len(_g)))
-        put("CovAFGKmin", f"{_COV[_COV.cls == 'AFGK'].coverage.min():.2f}"); put("CovMmin", f"{_COV[_COV.cls == 'M'].coverage.min():.2f}")
+        put("CovAFGKmin", f"{_COV[_COV.cls == 'AFGK'].coverage.min():.2f}"); put("NCovTrials", str(int(_COV.n_trials.iloc[0])))
         put("CovNangles", "8")
-        _rl = {t: float(f"{L0:.1e}") for t, L0 in zip(["AFGK", "M"], reach)}
-        put("ReachRatioAFGK", f"{sm_all['f95_b0_reach1'] / _rl['AFGK']:.0f}"); put("ReachRatioM", f"{sm_all['f95_b0_reach1'] / _rl['M']:.0f}")
-        for t, L0 in zip(["AFGK", "M"], reach):   # EIRP from the *displayed* (rounded) L so the abstract is self-consistent
+        _rl = {t: float(f"{L0:.1e}") for t, L0 in zip(["AFGK"], reach)}
+        put("ReachRatioAFGK", f"{sm_all['f95_b0_reach1'] / _rl['AFGK']:.0f}")
+        for t, L0 in zip(["AFGK"], reach):   # EIRP from the *displayed* (rounded) L so the abstract is self-consistent
             put(f"ReachEIRPAll{t}", sci(float(f"{L0:.1e}") * 2e9))
         ALL = dict(SA=SA, ST=ST[ST.scope == "all"])
 
@@ -525,21 +581,24 @@ if __name__ == "__main__":
 """)
     if ALL is not None:      # all-epoch steady limits for the same stars
         nearA = near.merge(PA[["source_id", "n", "S", "sig", "S_lim_steady", "L_lim_steady"]], on="source_id", how="left")
-        _act = set(pd.read_parquet(os.path.join(DER, "activity_all.parquet")).query("active").source_id)
+        _ELn = pd.read_parquet(os.path.join(DER, "activity_all.parquet")).set_index("source_id")
+        def _elig(sid):   # E = eligible at any luminosity; L = eligible only above L_env (M dwarf / AFGK multiple); X = excluded
+            return "E" if _ELn.eligible.get(sid, False) else ("L" if _ELn.env.get(sid, False) else "X")
+        def _actf(sid): return "A" if _ELn.active.get(sid, False) else chr(92) + "nodata"
         FAMILIAR = {"G 272-61B": "UV Cet", "G 272-61A": "BL Cet", "HD 95735": "Lalande 21185", "CD-23 14742": "Ross 154", "HD 217987": "Lacaille 9352"}
         def _nm(r):
             n_ = clean_name(r.main_id, r.source_id).strip("{}"); return "{" + FAMILIAR.get(n_, n_) + "}"
-        rows = [f"{_nm(r)} & {'A' if r.source_id in _act else chr(92) + 'nodata'} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & "
+        rows = [f"{_nm(r)} & {_actf(r.source_id)} & {_elig(r.source_id)} & {r.dist_pc:.2f} & {r.bp_rp:.2f} & {r.S_lim_mJy:.2f} & ${sci(r.Lnu_lim_WHz)}$ & "
                 f"{int(r.n) if np.isfinite(r.n) else 0} & ${r.S:+.2f}\\pm{r.sig:.2f}$ & {r.S_lim_steady:.2f} & ${sci(r.L_lim_steady)}$ & ${sci(r.L_lim_steady * 2e9)}$ \\\\" for _, r in nearA.iterrows()]
-        open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable*}{lcrrrrrrrrr}
+        open(os.path.join(HERE, "tables", "nearest_limits.tex"), "w").write(r"""\begin{deluxetable*}{lccrrrrrrrrr}
 \tabletypesize{\footnotesize}
 \tablecaption{95\% limits on steady 2--4\,GHz emission at the positions of the twelve nearest stars in the sample (completeness thresholds, or upper confidence bounds for stars with emission; Section~\ref{sec:limits_method}).\label{tab:nearest}}
-\tablehead{\colhead{Star} & \colhead{Act.} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm lim}^{\rm E1}$} & \colhead{$L_{\nu,\rm lim}^{\rm E1}$} & \colhead{$N_{\rm ep}$} & \colhead{$S_{\rm coadd}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
-\colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(mJy)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
+\tablehead{\colhead{Star} & \colhead{Act.} & \colhead{Elig.} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm lim}^{\rm E1}$} & \colhead{$L_{\nu,\rm lim}^{\rm E1}$} & \colhead{$N_{\rm ep}$} & \colhead{$S_{\rm coadd}$} & \colhead{$S_{\rm lim}$} & \colhead{$L_{\nu,\rm lim}$} & \colhead{EIRP$_{\rm lim}$} \\
+\colhead{} & \colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{(mJy)} & \colhead{(mJy)} & \colhead{(W\,Hz$^{-1}$)} & \colhead{(W)}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{Act.: A = activity evidence (Section~\ref{sec:candidates}); such a star cannot contribute to the population limits, but its limit still constrains the flux density at its position. E1: Epoch-1 catalog analysis. $N_{\rm ep}$, $S_{\rm coadd}$ (measured coadd flux density and its error), $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star; 1\arcsec\ corresponds to $d$\,au projected, and a transmitter on a planet at a wider separation would lie outside the measured position.}
+\tablecomments{Act.: A = activity evidence (an X-ray counterpart or a SIMBAD activity type; Section~\ref{sec:candidates}), which at these distances is found for almost every star and is not used to select technosignature hosts. Elig.: technosignature eligibility (Section~\ref{sec:candidates}); E = eligible at any luminosity, L = eligible only above $L_{\rm env}=10^{10}\,\WHz$ (M dwarfs, and AFGK stars with Gaia multiplicity evidence), X = excluded (known radio-emitter class or $\log L_X/L_{\rm bol}\ge-4$). Every limit bounds the total emission at the star's position, natural or artificial, whatever its eligibility. E1: Epoch-1 catalog analysis. $N_{\rm ep}$, $S_{\rm coadd}$ (measured coadd flux density and its error), $S_{\rm lim}$, $L_{\nu,\rm lim}$: all-epoch coadded forced photometry. EIRP$_{\rm lim}=L_{\nu,\rm lim}\times2$\,GHz (steady, band-filling signal). The limits apply to emission within about one beam radius of the star; 1\arcsec\ corresponds to $d$\,au projected, and a transmitter on a planet at a wider separation would lie outside the measured position.}
 \end{deluxetable*}
 """)
     else:
@@ -600,7 +659,10 @@ if __name__ == "__main__":
 \tablecomments{$\langle L_\nu\rangle$: inverse-variance-weighted mean spectral luminosity of clean stars (no secure association, no forced detection, no epoch with predicted catalog contamination $\ge0.5\sigma$), after subtracting the mean at the control positions; the error is the larger of the formal error and the scatter among the eight control positions. $N_{\rm eff,w}=(\sum w)^2/\sum w^2$; Top 10: weight fraction carried by the ten highest-weight stars. $\langle L_\nu\rangle_{\rm act}$ and $\langle L_\nu\rangle_{\rm no\,act}$: the same mean for the clean stars with and without activity evidence (Section~\ref{sec:candidates}); \nodata: fewer than ten stars. The control positions are subject to the same clean cuts as the stars. $\Delta\,{\rm med}(S/\sigma)$: median $S/\sigma$ of all unvetoed stars in the shell, including detected stars, minus the median at control positions; bootstrap error.}
 \end{deluxetable*}
 """)
-        CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv")); U = CA[~CA.explained].sort_values("dist_pc")
+        CA = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv"))
+        # Table 3: forced detections at AFGK stars outside the excluded classes, i.e. the counted ones (eligible) and those
+        # at AFGK stars with Gaia multiplicity evidence (eligible only above L_env, which none reaches)
+        U = CA[CA.eligible | (CA.env & (CA.bp_rp < 1.84))].sort_values(["eligible", "dist_pc"], ascending=[False, True])
         # per-epoch catalog detections (21): "cat:sep"/flux/snr" entries, plus the QL median stack
         catd = {}
         fe, fm = os.path.join(RES, "epoch_catalog_candidates.csv"), os.path.join(RES, "medstack_star_matches.csv")
@@ -622,17 +684,17 @@ if __name__ == "__main__":
             mult = re.sub(r"over-luminous \((-?[0-9.]+) mag\)", lambda q: "$\\Delta M_G=" + q.group(1) + "$", mult)
             mult = re.sub(r"SIMBAD [^;]+", "SIMBAD", mult)
             eps = (r.epoch_snr if isinstance(r.epoch_snr, str) else "").replace(";", ", ")
-            rows.append(f"{nm} & {r.source_id} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & ${r.S_coadd_mJy:.2f}\\pm{r.sigma_coadd_mJy:.2f}$ & {r.snr_coadd:.1f} & {eps} & {mult} & {catd.get(r.source_id, '---')} \\\\")
+            rows.append(f"{nm} & {r.source_id} & {'Y' if r.eligible else 'N'} & {r.dist_pc:.1f} & {r.bp_rp:.2f} & ${r.S_coadd_mJy:.2f}\\pm{r.sigma_coadd_mJy:.2f}$ & {r.snr_coadd:.1f} & {eps} & ${sci(r.L_max_epoch)}$ & {mult} & {catd.get(r.source_id, '---')} \\\\")
         open(os.path.join(HERE, "tables", "unexplained_candidates.tex"), "w").write(r"""{\setlength{\tabcolsep}{3pt}
-\begin{deluxetable*}{lrrrrr>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.4cm}}
+\begin{deluxetable*}{lrcrrrr>{\raggedright\arraybackslash}p{2.5cm}r>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{2.0cm}}
 \tabletypesize{\scriptsize}
-\tablecaption{Forced detections without activity evidence (any epoch or the coadd at $\ge5\sigma$).\label{tab:unexplained}}
-\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{Multiplicity} & \colhead{Catalogs} \\
-\colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{} & \colhead{} & \colhead{} & \colhead{}}
+\tablecaption{Forced detections (any epoch or the coadd at $\ge5\sigma$) at AFGK stars outside the known radio-emitter classes and with $\log L_X/L_{\rm bol}<-4$.\label{tab:unexplained}}
+\tablehead{\colhead{Name} & \colhead{Gaia DR3} & \colhead{$k$} & \colhead{$d$} & \colhead{$G_{BP}-G_{RP}$} & \colhead{$S_{\rm coadd}$} & \colhead{SNR} & \colhead{Half-epoch:\,SNR} & \colhead{$L_{\nu,\max}$} & \colhead{Multiplicity} & \colhead{Catalogs} \\
+\colhead{} & \colhead{} & \colhead{} & \colhead{(pc)} & \colhead{(mag)} & \colhead{(mJy)} & \colhead{} & \colhead{} & \colhead{(W\,Hz$^{-1}$)} & \colhead{} & \colhead{}}
 \startdata
 """ + "\n".join(rows) + r"""
 \enddata
-\tablecomments{$S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) these \KSteady\ forced detections compare with \BSteady\ expected at blank control positions under the same selection and veto; in the single-epoch test \KSnap\ star-epochs compare with \BSnap\ (Section~\ref{sec:candidates}). Multiplicity: SIMBAD binary type, RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge. Catalogs: independent per-epoch component catalogs with a $\ge5\sigma$ component within 4\arcsec\ of the star's position at that epoch, and the separation (E1: Epoch-1 QL; QL: NRAO QL lists; SE: Single Epoch lists; Med: QL median stack; Section~\ref{sec:catcheck}).}
+\tablecomments{$k$: Y = eligible star, counted in $k$; N = Gaia multiplicity evidence (RUWE\,$>1.4$, a non-single-star solution, or $\Delta M_G<-0.5$), so eligible only above $L_{\rm env}=10^{10}\,\WHz$, which none reaches (Section~\ref{sec:candidates}). $S_{\rm coadd}$, SNR: inverse-variance coadd over unvetoed epochs. In the steady test (coadd SNR\,$\ge5$) the counted forced detections give $k=\KSteady$ against $b=\BSteady$ expected at blank control positions under the same selection and veto; in the single-epoch test $k=\KSnap$ star-epochs against $b=\BSnap$. $L_{\nu,\max}$: spectral luminosity in the brightest epoch. Multiplicity: SIMBAD binary type, Gaia non-single-star solution (NSS), RUWE, and over-luminosity $\Delta M_G$ (mag) relative to the main-sequence ridge. Catalogs: independent per-epoch component catalogs with a $\ge5\sigma$ component within 4\arcsec\ of the star's position at that epoch, and the separation (E1: Epoch-1 QL; QL: NRAO QL lists; SE: Single Epoch lists; Med: QL median stack; Section~\ref{sec:catcheck}).}
 \end{deluxetable*}
 }
 """)
@@ -646,10 +708,10 @@ if __name__ == "__main__":
                           [-0.8676661490, -0.1980763734, 0.4559837762]])
             x = M @ np.array([np.cos(d) * np.cos(a), np.cos(d) * np.sin(a), np.sin(d)])
             return np.degrees(np.arctan2(x[1], x[0])) % 360, np.degrees(np.arcsin(x[2]))
-        Us, Ue = U[U.cand_coadd], U[~U.cand_coadd]
-        _IDS = {2137474969751117312, 349716170186042880, 2071061615589030400, 2563195186142791552, 2080884927342950272}
-        if set(Us.source_id) != _IDS:
-            print("WARNING: steady-test forced detections changed:", sorted(set(Us.source_id) ^ _IDS), "- revise ms.tex Section 4.4")
+        Uk = U[U.eligible]; Us, Ue = Uk[Uk.cand_coadd], Uk[~Uk.cand_coadd]       # counted (eligible) forced detections
+        _IDS = {2071061615589030400}; _IDE = {1249218214732128640, 6180509689006780672}
+        if set(Us.source_id) != _IDS or set(Ue.source_id) != _IDE:
+            print("WARNING: counted forced detections changed:", sorted((set(Us.source_id) ^ _IDS) | (set(Ue.source_id) ^ _IDE)), "- revise ms.tex Section 4.4")
         _lb = [_gal(_SA.ra[i], _SA.dec[i]) for i in Us.source_id]
         put("NSteadyU", str(len(Us))); put("NSnapOnlyU", str(len(Ue)))
         put("NSteadyNoErass", str(sum(not (179.944 < l < 359.944) for l, b in _lb)))   # eRASS1 = German half, 179.944 < l < 359.944
@@ -657,7 +719,7 @@ if __name__ == "__main__":
         _mx = [max(float(e.split(":")[1]) for e in str(t).split(";")) for t in Ue.epoch_snr]
         put("SnapOnlyLo", f"{min(_mx):.1f}"); put("SnapOnlyHi", f"{max(_mx):.1f}")
         put("NSnapOnlyMult", str(int(sum(isinstance(m, str) and m != "" for m in Ue.multiplicity_evidence))))
-        _g = Us.set_index("source_id")
+        _g = CA.set_index("source_id")          # named M-dwarf forced detections discussed in Section 4.4
         _r = _g.loc[349716170186042880]; _L = 4 * np.pi * (_r.dist_pc * 3.0857e16) ** 2 * _r.S_coadd_mJy * 1e-29
         put("GOTEL", sci(_L)); put("GOTELcgs", sci(_L * 1e7)); put("GOTEd", f"{_r.dist_pc:.0f}"); put("GOTEdMG", f"{-_r.dMG:.1f}")
         _r = _g.loc[2080884927342950272]

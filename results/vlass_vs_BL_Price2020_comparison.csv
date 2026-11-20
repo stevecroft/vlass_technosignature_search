@@ -1,4 +1,4 @@
 survey,band,signal_type,dwell,S_lim_Jy_at50pc,EIRP_lim_W_at50pc,EIRP_published_W,fraction_UL95,N_stars_constraining,f95_common,k_det,mu95
 Price+2020 GBT (narrowband),1.80-2.80 GHz,"<=~3 Hz, |drift|<=4 Hz/s",3x5 min ON,23.16732872036047,6930000000000.0,2100000000000.0,<0.37% [paper]; <0.60% [3/(0.5 N)],1005,0.005970149253731343,,
 Price+2020 Parkes (narrowband),2.60-3.45 GHz,"<=~3 Hz, |drift|<=4 Hz/s",multi-epoch,100.39175778822869,30030000000000.0,9100000000000.0,<2.0% [paper]; <3.2% [3/(0.5 N)],189,0.031746031746031744,,
-This work VLASS QL 1.1-4.1 (continuum),2-4 GHz,total in-band power of a steady signal,~5 s snapshots,0.0005375666031127365,3.2160259860233894e+17,,<3.3e-04 (P_det=1); <6.5e-04 (P_det=0.5),19321,0.0006517047380437854,2.0,6.295793621871988
+This work VLASS QL 1.1-4.1 (continuum),2-4 GHz,total in-band power of a steady signal,~5 s snapshots,0.0005375666031127365,3.2160259860233894e+17,,<7.3e-04 (P_det=1); <1.5e-03 (P_det=0.5),4103,0.0014602643302724786,0.0,2.99573227355399

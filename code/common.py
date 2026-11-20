@@ -40,6 +40,10 @@ Z95 = 1.645               # one-sided 95%
 DET_SIGMA = 5.0           # PyBDSF detection threshold (sigma)
 BAND_HZ = 2e9             # VLASS 2-4 GHz: EIRP = L_nu * 2 GHz for a flat band-filling signal
 BPRP_SPLIT = 1.84         # ~K7/M0 boundary in Gaia BP-RP
+LXLBOL_MAX = -4.0         # 04b: AFGK stars with log L_X/L_bol >= this are not eligible technosignature hosts
+L_ENV = 1e10              # W/Hz: M dwarfs and AFGK stars with multiplicity evidence are eligible hosts only above this
+                          # natural-emission envelope (04b, 07, 18, 19)
+MULT_RUWE, MULT_DMG = 1.4, -0.5  # 04b: Gaia multiplicity evidence (RUWE >, or dMG <, these; or a non-single-star solution)
 SHELLS = [(0, 10), (10, 20), (20, 40), (40, 60), (60, 80), (80, 100)]
 OFFSET_ARCMIN = 3.0       # background-control offsets
 N_OFFSETS = 10

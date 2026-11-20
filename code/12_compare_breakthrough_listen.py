@@ -34,8 +34,10 @@ if __name__ == "__main__":
     S50 = np.median(L.S_lim_mJy[(L.dist_pc > 45) & (L.dist_pc <= 50)])
     E50 = A50 * S50 * 1e-29 * C.BAND_HZ
     L50 = L[L.dist_pc <= 50]; Lstar = E50 / C.BAND_HZ       # the representative 50 pc threshold quoted in the table (EIRP E50)
-    act = set(pd.read_parquet(os.path.join(C.DER, "activity_all.parquet")).query("active").source_id)   # 04b; p_i = 0 there
-    # constraining stars: within 50 pc, no activity evidence, and a noise-only detection threshold (5 + 1.645) sigma below
+    # 04b: only eligible stars count at this luminosity (Lstar << L_ENV, so the envelope stars do not); p_i = 0 elsewhere
+    act = set(pd.read_parquet(os.path.join(C.DER, "activity_all.parquet")).query("~eligible").source_id)
+    assert Lstar < C.L_ENV
+    # constraining stars: within 50 pc, eligible, and a noise-only detection threshold (5 + 1.645) sigma below
     # that same threshold, E50 (so that the detected stars, whose limits include their measured flux, are not dropped)
     Lnoise = (5 + 1.645) * L50.sig * 1e-29 * 4 * np.pi * (L50.dist_pc * C.PC_M) ** 2
     cons = (Lnoise < Lstar) & ~L50.source_id.isin(act)

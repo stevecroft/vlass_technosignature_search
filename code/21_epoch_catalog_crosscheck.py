@@ -200,10 +200,11 @@ _ACTIVE = None
 
 
 def active_ids():
-    """Stars with activity evidence (04b); as in 18, the background is counted only around stars without it."""
+    """Stars that are not eligible technosignature hosts (04b); as in 18, the background is counted only around eligible
+    stars (the envelope stars contribute no background above L_ENV, 18)."""
     global _ACTIVE
     if _ACTIVE is None:
-        _ACTIVE = set(pd.read_parquet(os.path.join(C.DER, "activity_all.parquet")).query("active").source_id)
+        _ACTIVE = set(pd.read_parquet(os.path.join(C.DER, "activity_all.parquet")).query("~eligible").source_id)
     return _ACTIVE
 
 
@@ -386,7 +387,11 @@ if __name__ == "__main__":
         S = svf[svf.source_id.isin(extra)].merge(xr, on="source_id", how="left").merge(sb[["source_id", "main_id", "otype", "otypes"]], on="source_id", how="left")
         S["LX"] = np.where(S.era_F.notna() | S.rxs_crate.notna(), 1.0, np.nan)
         ev = S.apply(P07.evidence, axis=1); S["multiplicity_evidence"] = [e[0] for e in ev]; S["activity_evidence"] = [e[1] for e in ev]
-        S["explained"] = S.activity_evidence.str.len() > 0
+        # as in 18: counted at eligible stars, and at envelope stars only above L_ENV (brightest catalogue peak)
+        EL = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"), columns=["source_id", "eligible", "env"])
+        S = S.merge(EL, on="source_id", how="left")
+        pk = catonly.peaks.apply(lambda x: max(float(v) for v in x.split(","))).reindex(S.source_id).values
+        S["explained"] = ~(S.eligible.fillna(False).astype(bool) | (S.env.fillna(False).astype(bool) & (C.lum(pk, S.dist_pc.values) >= C.L_ENV)))
         expl_all = pd.concat([expl, S.set_index("source_id").explained])
         X0 = S.set_index("source_id")[["main_id", "dist_pc", "otypes", "multiplicity_evidence", "activity_evidence", "explained"]]
         catonly = catonly.join(X0, how="left")

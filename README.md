@@ -18,7 +18,7 @@ cd code
 python 03_sample_crossmatch.py      # ~1 min
 python 03b_bright_star_check.py     # [net: SIMBAD TAP] bright (V<4) nearby dwarfs missing from the Gaia DR3 sample
 python 03d_gcns_comparison.py       # completeness and contamination against the Gaia Catalogue of Nearby Stars (cached)
-python 04b_activity_all.py          # activity evidence for every sample star: full 2RXS/eRASS1 (HEASARC TAP, cached) + SIMBAD types
+python 04b_activity_all.py          # activity evidence and technosignature eligibility for every star: 2RXS/eRASS1 (HEASARC TAP), SIMBAD types, Gaia DR3 EBs (cached)
 python 07_classify_and_limits.py    # needs 05/06 outputs only for the LSPM J1943+5337 verdict (already in data/)
 python 10_stack.py                  # ~35 s; holds the 1.3 GB cutout array + float64 shell copies (interactive run peaked at ~17 GB)
 python 11_figures.py
@@ -29,7 +29,7 @@ python 16_compare_srsc.py          # overlap with the Sydney Radio Star Catalogu
 python 17_forced_photometry.py     # forced photometry, every star x epoch; injection-recovery calibration (~3 min)
 python 03c_bright_dwarfs_forced.py  # needs 17; forced photometry of the 03b bright dwarfs at their SIMBAD positions (CADC cutouts, cached)
 python 18_alleepoch_candidates.py  # needs 04b; forced detections, confusion veto, control background, SIMBAD/X-ray (cached; --offline)
-python 14_multiepoch_detections.py --candidates   # astrometry of the forced detections without activity evidence
+python 14_multiepoch_detections.py --candidates   # astrometry of the forced detections
 python 19_alleepoch_limits_stacks.py  # per-star, population and stack limits (~3 min)
 python 20_alleepoch_figures.py
 python 12_compare_breakthrough_listen.py   # needs 18 and 19
@@ -117,7 +117,8 @@ component parquet holds exactly the same data.
 | `srsc/` | Sydney Radio Star Catalogue (Driessen et al. 2024; radiostars.org): ReadMe, stars.dat, radio.dat | 1.3 MB |
 | `xray_counterparts.csv` | ROSAT 2RXS (40″) and eRASS1 (20″) nearest counterparts for the 77 stars that had an Epoch-1 component within 2.5″ before the w-term astrometric correction (75 after it; the paper uses those 75) (VizieR mirror) | — |
 | `simbad_candidates.csv`, `simbad_nearest.csv` | SIMBAD (CfA mirror) identifications and object types | — |
-| `xray_2rxs_positions.parquet`, `xray_erass1_positions.parquet` | Positions of all 135,118 2RXS and 930,203 eRASS1 Main sources (HEASARC TAP `rass2rxs`, `erass1main`), for the activity lookup of every star (04b) | 2.7 + 15 MB |
+| `xray_2rxs_flux.parquet`, `xray_erass1_flux.parquet` | Positions and fluxes of all 135,118 2RXS (count rate) and 930,203 eRASS1 Main (0.2–2.3 keV flux) sources (HEASARC TAP `rass2rxs`, `erass1main`), matched at the survey epochs for the activity evidence and log L_X/L_bol of every star (04b) | see MANIFEST |
+| `gaia_dr3_eclipsing_binaries_100pc.parquet` | Gaia DR3 `vari_eclipsing_binary` sources with parallax > 10 mas (Mowlavi et al. 2023), an excluded class in the eligibility (04b) | see MANIFEST |
 | `simbad_otypes_all.parquet` | SIMBAD activity object types (X, Er\*, Fl\*, BY\*, RS\*, TT\*, Y\*O, CV\*, a2\*, Em\*) of all objects with a Gaia DR3 identifier and parallax > 9 mas (04b) | 0.5 MB |
 | `gcns_dec41.parquet` | Gaia Catalogue of Nearby Stars (Smart et al. 2021; Gaia archive `external.gaiaedr3_gcns_main_1`), δ > −41°, for the completeness check (03d) | 13 MB |
 | `bright_dwarfs_simbad_pm.csv`, `bright_dwarfs_cutouts.npz` | SIMBAD positions, proper motions and parallaxes of the 03b bright dwarfs, and their 41″ QL cutouts from CADC (03c) | 0.8 MB |
@@ -144,8 +145,8 @@ component parquet holds exactly the same data.
   - 9 flare stars, 6 RS CVn, 6 BY Dra, 4 young stars, 2 CVs, 1 magnetic CP star;
   - 21 X-ray-active stars without a more specific type (19 with multiplicity evidence);
   - 1 emission-line star: 2MASS J17022950+1341015 (M dwarf, 30.5 pc; Epoch 1 only, forced S/N 4.9 then <2: a flare);
-  - 1 radio source not coincident with its star (LSPM J1943+5337); in the all-epoch tests it is counted among the
-    forced detections without activity evidence like any other star, since the control-position background counts such coincidences.
+  - 1 radio source not coincident with its star (LSPM J1943+5337); in the all-epoch tests it is treated like any other star
+    (an M dwarf below L_env, so not counted), since the control-position background counts such coincidences.
   - 30 of the 51 are in the Sydney Radio Star Catalogue (11 circularly polarized); 41 are in De et al. (2024).
 - **Multi-epoch (VLASS 1.1–4.1, 177 independent images):** 44/51 variable; 21 co-moving with their star, 17 inconclusive, 12 single-epoch, none stationary.
 - **LSPM J1943+5337:** the radio emission is not at the star: χ² = 77.9 for 3 dof in declination, 104 for 6 dof in RA+Dec
@@ -153,48 +154,52 @@ component parquet holds exactly the same data.
   scatter beyond their errors (source extended E–W). Archival plates show no optical counterpart (POSS-I g ≳ 20.4, r ≳ 19.7–19.9; POSS-II B_J ≳ 21.1, R_F ≳ 20.9; at the corrected Epoch-1 position).
 - **Forced photometry, all epochs (720,108 star-epochs; median 3 per star):** peak-loss factor κ = 0.861 from injection–recovery
   (catalogue cross-check 0.899 ± 0.010, a 4% systematic); injected sources are recovered at 5σ in 51% of cases, as Φ(S/σ − 5) predicts.
+- **Technosignature eligibility (04b; replaces the earlier exclusion of every star with activity evidence, which removed
+  73% of the stars within 10 pc but 9% at 80–100 pc):** a detection counts as a possible transmitter
+  - at any luminosity at the 32,985 *eligible* stars: AFGK (BP−RP < 1.84), not a SIMBAD CV/RS CVn/young/magnetic CP star or a Gaia DR3
+    eclipsing binary (133 in the sample), log L_X/L_bol < −4 (eRASS1 flux, else 2RXS count rate × 6e-12; L_bol from M_G), and no Gaia
+    multiplicity evidence (RUWE > 1.4, NSS solution, ΔM_G < −0.5);
+  - only above L_env = 10¹⁰ W Hz⁻¹ at the 174,955 *envelope* stars: 161,290 M dwarfs and 13,665 AFGK stars with multiplicity evidence
+    (above the DG CVn superflare, 4.5×10⁹ W Hz⁻¹, Fender et al. 2015, and every stellar detection in VLASS, max 4.5×10⁹);
+  - never at the 2,251 stars of the excluded classes or with log L_X/L_bol ≥ −4.
+  Presence of activity evidence is kept only for the astrophysical stack split. Uncatalogued multiples remain eligible and are counted in k
+  (conservative).
 - **Forced detections** (the paper's term; scripts and files still say 'candidates'): 161 stars at ≥ 5σ (coadd or any epoch),
-  149 with activity evidence (137 with a 2RXS/eRASS1 counterpart, 12 by SIMBAD types alone), 12 without activity evidence (including LSPM J1943+5337).
-  Each of the 5 in the steady test has a specific explanation: LSPM J1943+5337 and TYC 3573-1391-1 are offset from the star;
-  Gaia DR3 2563195186142791552 is 6.8–8.4″ from an extended 22 mJy background source; PM J20156+4321 is a marginal 5.5σ coadd excess;
-  G 133-48 is most likely stellar (an over-luminous M dwarf and rapid rotator, P = 0.216 d, v sin i = 47.6 km s⁻¹; L_ν ≈ 4.6×10⁷ W Hz⁻¹), kept in k. The other 7 are single-epoch 5.0–9.1σ events.
-  G 133-48's cutout positions, fitted with each image's restoring beam, favor emission at the star (χ² = 0.9 for 6 dof at
-  the star; stationary χ² = 9.5 for 4 dof, p = 0.051, so a stationary source is not excluded; 22).
-  The chance background is counted only around the 88% of stars without activity evidence (25,882 stars have it;
-  04b). A component that would be a secure association of a control position is exempt from its veto, as a star's own is (16);
-  the steady test also vetoes in coadd units (5 stars). Steady test (coadd): 5 vs 10.0 ± 1.1
-  (bootstrap ± 1.1; per control angle 5–13) → μ95 = 4.7, or 10.5 without
-  background subtraction (adopted). Single-epoch test: 13 vs 12.3 → μ95 = 9.4 (P(n ≥ k) = 0.45); host-level
-  (duty cycle): 10 stars vs 9.3 → μ95 = 8.5. The steady shortfall (P = 0.067) is confined to 4.5–6σ
-  (33 vs 27.4 at ≥ 4σ) and is also seen in the Epoch-1 catalogue itself (15 vs 19.9 components at
-  1–2.5″ around inactive stars, no magnitude trend): a background fluctuation, so the headline limits subtract no background.
-  Apart from LSPM J1943+5337, the one forced detection bright enough for per-epoch astrometry (TYC 3573-1391-1) lies 1.8″ from its star.
+  149 with activity evidence (137 with a 2RXS/eRASS1 counterpart, 12 by SIMBAD types alone). 90 are M dwarfs (all below L_env;
+  e.g. G 133-48, a rapid rotator with steady L_ν ≈ 4.6×10⁷ W Hz⁻¹ and cutout positions favoring the star), 60 are AFGK stars of the
+  excluded classes or with saturated coronae, and 11 are at AFGK stars outside them (Table 3): 8 with Gaia multiplicity evidence
+  (12 Sco B, V335 Peg, HD 114993, δ Cap, 71 Tau, 109 Vir, HD 317101A, V2082 Cyg; none reaches L_env) and 3 at eligible stars, counted in k:
+  TYC 3573-1391-1 (steady, 7.8σ; emission 1.7–1.8″ off the star), 1 Boo and TYC 7253-259-1 (single-epoch, 5.0–5.5σ).
+  Steady test (coadd): k = 1 vs b = 1.3 (bootstrap ± 0.4; per control angle 0–3) → μ95 = 4.0, or 4.7 without background
+  subtraction (adopted). Single-epoch test: 3 vs 2.3 (P(n ≥ k) = 0.39) → μ95 = 5.8; host-level (duty cycle): 3 stars vs 1.9 → μ95 = 6.1.
+  With the AFGK multiples eligible at all luminosities: 7 vs 1.6 (P = 1×10⁻³) and 10 vs 2.8 (P = 6×10⁻⁴), the excess that motivated the
+  multiplicity criterion. X-ray threshold −3.5: 2 vs 1.3 / 4 vs 2.3; −4.5: 1 vs 1.3 / 3 vs 2.1.
 - **Cross-check with per-epoch catalogues (21):** κ from the QL3.1–4.1 lists 0.83–0.87 (adopted 0.861). Our bias-corrected fluxes are
   1.13 ± 0.01 × the Single Epoch peaks (1.07–1.16 by epoch), and SE/QL = 0.975 ± 0.006 for the same Epoch-3 sources: faint compact QL
-  peaks are less biased than the calibrator-based 0.92, so later-epoch fluxes and limits may be ≈13% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. Of the 12
-  forced detections without activity evidence, G 133-48 is detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in
-  four catalogues; LSPM J1943+5337 is in two. An own-epoch confusion veto gives 5→8 vs b 10.0→19.8 (steady; P = 0.0024, per angle 15–24);
-  the union of both vetoes: 4 vs 9.3 (steady) and 13 vs 11.3 (single-epoch, P = 0.34). The median stack
+  peaks are less biased than the calibrator-based 0.92, so later-epoch fluxes and limits may be ≈13% conservative. 90% (SE) / 67% (QL) of forced ≥5σ star-epochs have a catalogue match. G 133-48 is
+  detected at the star in an independent catalogue; TYC 3573-1391-1 sits 1.7–1.8″ off in four catalogues; LSPM J1943+5337 is in two.
+  An own-epoch confusion veto gives 1→2 vs b 1.3→3.0 (steady; P(n ≤ k) = 0.42, per angle 0–5); the union of both vetoes:
+  1 vs 1.3 (steady) and 3 vs 2.1 (single-epoch, P = 0.36). The median stack
   (152,511 low-motion stars) finds no steady emitters missed by the coadd (9 unclassified matches, all 1.9–2.3″ off; 22 chance).
 - **Per-star limits (95%, all epochs, steady):** median 0.54 mJy, L_ν < 4.0×10⁸ W Hz⁻¹; Barnard's star L_ν < 2.3×10⁵ W Hz⁻¹
   (Epoch-1 catalogue analysis: median 1.09 mJy; Barnard 5.1×10⁵).
-- **Population (steady; stars without activity evidence, p_i = 0 at the active stars):** headline, no background subtracted
-  (no allowance for chance background; all 5 coadd detections counted, with t_i = 5σ_i in p_i as in k): f < 3.6×10⁻² / 6.1×10⁻⁴ / 5.8×10⁻⁵ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹
-  (182,586 stars at the floor). With the control background subtracted: 1.6×10⁻² / 2.7×10⁻⁴ / 2.6×10⁻⁵.
-  Duty cycle, counted per host (independent snapshots): f < 9.3×10⁻⁵ / 1.3×10⁻⁴ / 3.1×10⁻⁴ for δ = 1 / 0.3 / 0.1, f·δ < 2.7×10⁻⁵ as δ → 0
-  without background subtraction (4.7×10⁻⁵ / 6.6×10⁻⁵ / 1.5×10⁻⁴ and 1.4×10⁻⁵ background-subtracted).
-  Within 50 pc (19,321 inactive stars sensitive to the tabulated 50 pc EIRP, 2 steady detections), common construction
-  (P_det = 0.5, no background): f < 6.5×10⁻⁴, ~9× tighter than
-  the 0.60% for the 1,005 GBT S-band targets of Price et al. (2020).
+- **Population (steady; eligible stars, plus envelope stars above L_env; p_i = 0 at the excluded stars):** headline, no
+  background subtracted (the 1 steady detection counted, t_i = 5σ_i, or max(5σ_i, S_env,i) at envelope stars): f < 5.3×10⁻² / 1.3×10⁻³ /
+  1.5×10⁻⁴ above L_ν = 10⁷ / 10⁸ / 10⁹ W Hz⁻¹ (eligible AFGK; 32,666 stars up to L_env), and f < 2.3×10⁻⁵ above ~1.1×10¹⁰ W Hz⁻¹
+  (205,981 stars). With the control background subtracted: 4.5×10⁻² / 1.1×10⁻³ / 1.2×10⁻⁴ and 2.0×10⁻⁵.
+  Duty cycle, counted per host (independent snapshots), above L_env: f < 3.8×10⁻⁵ / 5.3×10⁻⁵ / 1.2×10⁻⁴ for δ = 1 / 0.3 / 0.1, f·δ < 1.1×10⁻⁵
+  as δ → 0 without background subtraction (2.9×10⁻⁵ / 4.2×10⁻⁵ / 9.7×10⁻⁵ and 8.5×10⁻⁶ background-subtracted).
+  Within 50 pc (4,103 eligible stars sensitive to the tabulated 50 pc EIRP, 0 steady detections), common construction
+  (P_det = 0.5, no background): f < 1.5×10⁻³, ~4× tighter than the 0.60% for the 1,005 GBT S-band targets of Price et al. (2020).
 - **Sample:** 91% of the 229,425 non-WD GCNS objects within 100 pc at δ > −41° (03d); 35 bright dwarfs missing from
   Gaia measured at SIMBAD positions (03c): 3 detected (Algol, θ Aur, ξ Tau), Sirius L_ν < 5.4×10⁵ W Hz⁻¹.
   Activity evidence: 73% of stars within 10 pc, 27% at 20–40 pc, 9% at 80–100 pc.
 - **Stacks (all epochs):** M-dwarf mean > 4σ in 4 of 6 shells, 20–40 pc: (8.1×10⁵ ± 9.2×10⁴) W Hz⁻¹ (8.8σ),
   of which the stars with activity evidence give (1.9×10⁶ ± 1.7×10⁵) (11.3σ) and those without (4.3×10⁵ ± 1.1×10⁵)
-  (4.1σ); median S/σ shift including detected stars 0.084 ± 0.014. Limits use inactive stars only, a per-L_T
-  host-S/N ≤ 3 selection and host-sampling variance: f < 1 at L_T ≈ 3.7×10⁵ (AFGK) and 2.2×10⁵ (M) W Hz⁻¹; at 10⁶,
-  f < 0.40 / 0.28 with N_eff = 55 / 479 (nearest stars); coverage ≥ 0.88 over L_T = 1.5×10⁵–10⁷ W Hz⁻¹ and f = 0.1–1 (8 noise realizations × 25 host draws; approximate near f = 1).
-  Median stacks (pooled 0–100 pc): f < 0.092 / 0.057 at 10⁷ and 0.016 / 0.011 at 10⁹ W Hz⁻¹.
+  (4.1σ); median S/σ shift including detected stars 0.084 ± 0.014. Stack limits use the eligible AFGK stars only (no M-dwarf
+  transmitter limits below L_env), a per-L_T host-S/N ≤ 3 selection and host-sampling variance: f < 1 at L_T ≈ 1.4×10⁵ W Hz⁻¹; at 10⁶,
+  f < 0.30 with N_eff = 77 (nearest stars); coverage ≥ 0.88 over L_T = 1.5×10⁵–10⁷ W Hz⁻¹ and f = 0.1–1 (8 noise realizations × 25 host
+  draws; approximate near f = 1). Median stack (pooled 0–100 pc): f < 0.084 at 10⁷ and 0.016 at 10⁹ W Hz⁻¹.
 - **Versus Breakthrough Listen (Price et al. 2020, with the ×3.3 turboSETI correction of Choza et al. 2024; also applied in Fig. 9 to Enriquez et al. 2017, Price et al. 2020, Garrett & Siemion 2023 and Uno et al. 2023):**
   - VLASS (all epochs) is about 43,100× deeper in flux density (0.54 mJy vs ~23 Jy at 50 pc).
   - For narrowband lines it is about 4.6×10⁴× less sensitive in EIRP (1.5×10⁵× against the published 2.1×10¹² W).

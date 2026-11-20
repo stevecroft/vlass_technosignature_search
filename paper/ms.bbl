@@ -178,6 +178,14 @@ Enriquez, J.~E., Siemion, A., Foster, G., {et~al.} 2017, \bibinfo{title}{{The
   692 Nearby Stars},} \apj, 849, 104, \dodoi{10.3847/1538-4357/aa8d1b}
 
 % type= article
+\bibitem[{R.~P. Fender {et~al.}(2014)Fender, Anderson, Osten, Staley, Rumsey,
+  Grainge, \& Saunders}]{Fender2015}
+Fender, R.~P., Anderson, G.~E., Osten, R., {et~al.} 2014, \bibinfo{title}{{A
+  prompt radio transient associated with a gamma-ray superflare from the young
+  M dwarf binary DG CVn},} Monthly Notices of the Royal Astronomical Society:
+  Letters, 446, L66, \dodoi{10.1093/mnrasl/slu165}
+
+% type= article
 \bibitem[{H.~A. Flewelling {et~al.}(2020)Flewelling, Magnier, Chambers,
   Heasley, Holmberg, Huber, Sweeney, Waters, Calamida, Casertano, Chen, Farrow,
   Hasinger, Henderson, Long, Metcalfe, Narayan, Nieto-Santisteban, Norberg,
@@ -680,6 +688,15 @@ Merloni, A., Lamer, G., Liu, T., {et~al.} 2024, \bibinfo{title}{{The
 {Mohan}, N., \& {Rafferty}, D. 2015, \bibinfo{title}{{PyBDSF: Python Blob
   Detection and Source Finder},} Astrophysics Source Code Library, record
   ascl:1502.007
+
+% type= article
+\bibitem[{N. Mowlavi {et~al.}(2023)Mowlavi, Holl, Lecoeur-Ta{\"\i}bi, Barblan,
+  Kochoska, Pr{\v s}a, Mazeh, Rimoldini, Gavras, Audard, Jevardat~de Fombelle,
+  Nienartowicz, Garc{\'\i}a-Lario, \& Eyer}]{Mowlavi2023}
+Mowlavi, N., Holl, B., Lecoeur-Ta{\"\i}bi, I., {et~al.} 2023,
+  \bibinfo{title}{{Gaia Data Release 3: The first Gaia catalogue of
+  eclipsing-binary candidates},} \aap, 674, A16,
+  \dodoi{10.1051/0004-6361/202245330}
 
 % type= article
 \bibitem[{E.~R. Newton {et~al.}(2016)Newton, Irwin, Charbonneau,

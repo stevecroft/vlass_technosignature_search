@@ -45,14 +45,16 @@ if __name__ == "__main__":
     d.loglog(POP.L_WHz, clip1(POP.f95), color="k", lw=0.8, ls="-.", label="All epochs, steady (control background)")
     d.loglog(old.Lnu_star_WHz, clip1(old.f_UL95), color="0.55", lw=1.0, ls="--", label="Epoch 1 catalog")
     d.loglog(POP.L_WHz, clip1(POP.fdelta95_b0), color="k", lw=1.0, ls=":", label="$f\\delta$, rare-on limit ($\\delta\\to0$)")
-    for cl in ["AFGK", "M"]:
+    for cl in ["AFGK"]:                      # stack limits use the eligible (AFGK) stars only (19)
         s = SL[SL.cls == cl]
         ind = np.interp(np.log10(s.L_WHz), np.log10(POP.L_WHz), POP.f95_b0)     # draw stacks only where they are tighter
         fm = clip1(s.f95_mean); fm[~(fm < ind)] = np.nan
-        d.loglog(s.L_WHz, fm, color=COLT[cl], lw=1.3, label=f"{cl} mean stack")
+        d.loglog(s.L_WHz, fm, color=COLT[cl], lw=1.3, label=f"{cl} mean stack (eligible stars)")
         m = s[s.f95_median.notna()]
         d.scatter(m.L_WHz, m.f95_median, s=14, marker="s", facecolor="white", edgecolor=COLT[cl], lw=1, zorder=3,
-                  label=f"{cl} median stack")
+                  label=f"{cl} median stack (eligible stars)")
+    d.axvline(C.L_ENV, color="0.6", lw=0.6, ls=(0, (2, 2)), zorder=0)
+    d.text(C.L_ENV / 1.15, 3e-1, "$L_{\\rm env}$: M dwarfs and\nAFGK multiples\neligible above", fontsize=5, ha="right", va="top", color="0.35")
     d.set_xlim(1e5, 3e10); d.set_ylim(1e-5, 1)
     d.set_xlabel("Transmitter $L_\\nu$ at 3 GHz (W Hz$^{-1}$)"); d.set_ylabel("Fraction of stars hosting one (95% UL)")
     d2 = d.secondary_xaxis("top", functions=(lambda x: x * C.BAND_HZ, lambda x: x / C.BAND_HZ)); d2.set_xlabel("EIRP, 2 GHz-wide (W)")
@@ -63,17 +65,18 @@ if __name__ == "__main__":
     fig, c = plt.subplots(figsize=(3.6, 3.0))
     far = P.dist_pc >= 10
     c.hexbin(P.dist_pc[far], P.L_lim_steady[far], xscale="log", yscale="log", gridsize=60, bins="log", cmap="Greys", mincnt=1,
-             linewidths=0, extent=(1, 2, 5.0, 10.3))
+             linewidths=0, extent=(1, 2, 5.0, 10.5))
     c.scatter(P.dist_pc[~far], P.L_lim_steady[~far], s=2, c="0.45", lw=0, zorder=2)
     c.scatter(Ts.dist_pc, Ts.Lnu_R_WHz, s=12, c="#3b6ea8", edgecolor="k", lw=0.3, zorder=3, label="Secure associations (Epoch 1)")
-    for ex, col, lab in [(True, "#e0a030", "Forced detections, activity evidence"), (False, "#c0392b", "Forced detections, no activity evidence")]:
+    for ex, col, lab in [(True, "#e0a030", "Forced detections, not counted (ineligible host)"), (False, "#c0392b", "Forced detections at eligible stars (counted)")]:
         x = CA[CA.explained == ex]
         c.scatter(x.dist_pc, C.lum(x.S_coadd_mJy.clip(lower=1e-3), x.dist_pc), s=14, marker="D" if ex else "x", c=col, lw=0.8 if not ex else 0.3,
                   edgecolor="k" if ex else None, zorder=4, label=lab)
-    c.set_xscale("log"); c.set_yscale("log"); c.set_xlim(1.5, 120); c.set_ylim(1e5, 1e10)
+    c.set_xscale("log"); c.set_yscale("log"); c.set_xlim(1.5, 120); c.set_ylim(1e5, 3e10)
+    c.axhline(C.L_ENV, color="0.4", lw=0.7, ls="--", zorder=1); c.text(1.7, C.L_ENV * 1.25, "$L_{\\rm env}$", fontsize=6, color="0.3")
     c.set_xlabel("Distance (pc)"); c.set_ylabel("$L_\\nu$ at 3 GHz (W Hz$^{-1}$)")
     c2 = c.secondary_yaxis("right", functions=(lambda y: y * C.BAND_HZ, lambda y: y / C.BAND_HZ)); c2.set_ylabel("EIRP, 2 GHz-wide (W)")
-    c.legend(frameon=False, fontsize=5.5, loc="upper left"); fig.tight_layout(); save(fig, "alleepoch_perstar_limits"); plt.close(fig)
+    c.legend(frameon=False, fontsize=5.5, loc="lower right"); fig.tight_layout(); save(fig, "alleepoch_perstar_limits"); plt.close(fig)
 
     # ---- stacks
     fig = plt.figure(figsize=(7.2, 5.4)); gs = fig.add_gridspec(2, 2)

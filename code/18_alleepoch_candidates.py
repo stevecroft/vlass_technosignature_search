@@ -9,17 +9,18 @@ A star-epoch is a candidate if its forced S/N (17) is >= 5 and the star is not a
     declination where the QL beam is elongated. Vetoed stars are confusion-limited and reported separately.
     For the steady test the veto is also applied in coadd units: the predicted contamination, coadded over the unvetoed
     epochs like the flux, must stay below half the coadd threshold.
-  * Classification of the remaining candidate stars with the same evidence as for the secure associations (07):
-    SIMBAD object types (CfA TAP mirror) and ROSAT 2RXS / eRASS1 X-ray counterparts (CfA VizieR mirror). A candidate
-    is "explained" if it has activity evidence (X-ray counterpart or SIMBAD X-ray type; flare/BY Dra/RS CVn/young/CV/
-    magnetic CP/emission-line type). The *_strict values repeat the tests without the emission-line and SIMBAD X-ray types. Stars with
-    only multiplicity evidence are listed separately and counted as unexplained (conservative).
+  * Classification of the remaining candidate stars by technosignature eligibility (04b): a candidate counts as a possible
+    transmitter ("unexplained") if its star is an eligible AFGK star (not a CV, RS CVn, young, magnetic-CP or eclipsing
+    binary, and log L_X/L_bol < -4), or an M dwarf outside those classes whose coadd or brightest epoch exceeds L_ENV.
+    Activity evidence (X-ray counterparts, SIMBAD types) is still recorded for description. The *_lx35 / *_lx45 values
+    repeat the tests with the L_X/L_bol threshold at -3.5 and -4.5.
   * Chance background: the same estimator and the same veto at 8 control positions 14" from each star. A component that
     would be a secure (R > 0.5) association of a control position, evaluated at the Epoch-1 epoch with the reliability
     model of 03 (assoc_radius), is exempt from that control's veto, exactly as a star's own secure component is, so that
     b counts chance coincidences such as LSPM J1943+5337 that enter k.
-    b = (control rate) x (number of unvetoed, non-secure star-epochs), both counted only around stars without activity
-    evidence (04b), because a detection at a star with activity evidence is classified as natural whatever its origin. Control positions carry no stellar emission,
+    b = (control rate) x (number of unvetoed, non-secure star-epochs), both counted only around eligible stars (04b),
+    because a detection at a non-eligible star is not counted whatever its origin (M dwarfs: only control hits above
+    L_ENV count, b_*_env). Control positions carry no stellar emission,
     so b counts sidelobes and unrelated sources only, matching the unexplained candidates.
   * Upper limit on the number of transmitter detections hidden among the k unexplained candidates, given background b:
     the conditional (Zech 1989) 95% limit, P(n<=k | mu+b) / P(n<=k | b) = 0.05; and, without background subtraction,
@@ -163,10 +164,15 @@ if __name__ == "__main__":
     # natural emitter and removed from k, whatever its origin, so chance detections around such stars must also be
     # removed from the background: b is the control-position rate around stars without activity evidence, times the
     # number of trials at those stars.
-    ACT = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"), columns=["source_id", "active", "activity_evidence"])
-    active_ids = set(ACT.source_id[ACT.active])
-    _wk = {"emission-line", "X-ray (SIMBAD)"}                    # robustness variant without these two types (k_*_strict)
-    active_strict = set(ACT.source_id[ACT.activity_evidence.apply(lambda e: any(x and x not in _wk for x in e.split("; ")))])
+    ACT = pd.read_parquet(os.path.join(C.DER, "activity_all.parquet"),
+                          columns=["source_id", "active", "activity_evidence", "eligible", "env", "afgk", "mult", "excl_class", "log_lx_lbol", "excl_reason"])
+    # 'active_ids' is the set of stars that are NOT eligible technosignature hosts (04b): k, b and N_eff use eligible stars only
+    active_ids = set(ACT.source_id[~ACT.eligible])
+    env_ids = set(ACT.source_id[ACT.env])
+    # robustness variants of the AFGK eligibility: X-ray threshold -3.5 / -4.5 (multiples still excluded), and the -4 rule
+    # with AFGK multiples eligible at all luminosities ("withmult")
+    elig_var = {t: set(ACT.source_id[ACT.afgk & ~ACT.excl_class & ~(ACT.log_lx_lbol >= v).fillna(False) & (~ACT.mult | inc)])
+                for t, v, inc in (("lx35", -3.5, False), ("lx45", -4.5, False), ("withmult", C.LXLBOL_MAX, True))}
     def ctrl_tables(keep):
         """Per control angle: coadd S/N and coadd-veto flag per star, and single-epoch S/N, over the star-epochs in 'keep'."""
         out = []
@@ -233,9 +239,21 @@ if __name__ == "__main__":
     emit = CO.index[CO.cand].union(pd.Index(LT.source_id[LT.detected].unique()))
     h1, t1_, e1, et1 = ctrl_counts(inact & ~U.source_id.isin(emit).values)
     b_s_noemit, b_e_noemit = h1 / t1_ * n_inact_star, e1 / et1 * n_inact_ep
-    inact0 = ~U.source_id.isin(active_strict).values
-    h2, t2_, e2, et2 = ctrl_counts(inact0)
-    b_s_strict, b_e_strict = h2 / t2_ * int((~COs.index.isin(active_strict)).sum()), e2 / et2 * int(inact0.sum())
+    bvar = {}
+    for t, E in elig_var.items():
+        m_ = U.source_id.isin(E).values; h2, t2_, e2, et2 = ctrl_counts(m_)
+        bvar[t] = (h2 / t2_ * int(COs.index.isin(E).sum()), e2 / et2 * int(m_.sum()))
+    # envelope stars above L_ENV: control coadd hits (and single-epoch hits) bright enough to exceed L_ENV at the star's distance
+    dist_ = sv.set_index("source_id").dist_pc
+    lum_e = C.lum(1.0, dist_.reindex(U.source_id.values).values)          # W/Hz per mJy, per star-epoch
+    mm_ = U.source_id.isin(env_ids).values; CT_m = ctrl_tables(mm_)
+    sig_co = CO.sig
+    b_s_env = sum(int(((z >= THR) & (z * sig_co.reindex(z.index).values * C.lum(1.0, dist_.reindex(z.index).values) >= C.L_ENV)).sum())
+                   for z, _, _ in CT_m) / N_CTRL
+    b_e_env = 0.0
+    for j in range(N_CTRL):
+        cj_ = U[f"c{j}"].values; ok_ = mm_ & ~U[f"cv{j}"].values.astype(bool) & np.isfinite(cj_)
+        b_e_env += int(((cj_ >= THR) & (cj_ * U.sigma_mJy.values * lum_e >= C.L_ENV) & ok_).sum()) / N_CTRL
     for tag in LT.tag.unique():
         x = LT[LT.tag == tag]; per_tag[tag] = dict(n_star_epochs=int(len(x)), n_veto=int(x.veto.sum()), n_ge5=int(((x.snr >= THR) & ~x.detected).sum()))
     cand_ids = CO.index[CO.cand].values
@@ -258,9 +276,7 @@ if __name__ == "__main__":
         sb[["source_id", "main_id", "otype", "otypes"]], on="source_id", how="left")
     S["LX"] = np.where(S.era_F.notna() | S.rxs_crate.notna(), 1.0, np.nan)
     ev = S.apply(P07.evidence, axis=1); S["multiplicity_evidence"] = [e[0] for e in ev]; S["activity_evidence"] = [e[1] for e in ev]
-    S["explained"] = S.activity_evidence.str.len() > 0
-    _weak = {"emission-line", "X-ray (SIMBAD)"}                  # robustness: criteria without these two types
-    S["explained_strict"] = S.activity_evidence.apply(lambda e: len([x for x in e.split("; ") if x and x not in _weak]) > 0)
+    S = S.merge(ACT[["source_id", "eligible", "env", "mult", "log_lx_lbol", "excl_reason"]], on="source_id", how="left")
     S = S.merge(CO[["n_ep", "S", "sig", "snr", "cand_coadd", "cand_epoch"]].rename(columns={"S": "S_coadd_mJy", "sig": "sigma_coadd_mJy", "snr": "snr_coadd"}),
                 left_on="source_id", right_index=True)
     n_ep_det = (U[U.source_id.isin(cand_ids)].snr >= THR).groupby(U.source_id[U.source_id.isin(cand_ids)]).sum().rename("n_ep_det")
@@ -268,13 +284,23 @@ if __name__ == "__main__":
     ep_info = U[U.source_id.isin(cand_ids)].groupby("source_id").apply(
         lambda d: ";".join(f"{h}:{z:.1f}" for h, z in zip(d.half_epoch, d.snr)), include_groups=False).rename("epoch_snr")
     S = S.merge(ep_info, left_on="source_id", right_index=True, how="left")
-    S[["source_id", "main_id", "dist_pc", "bp_rp", "dMG", "ruwe", "otypes", "multiplicity_evidence", "activity_evidence", "explained",
-       "n_ep", "S_coadd_mJy", "sigma_coadd_mJy", "snr_coadd", "epoch_snr", "cand_coadd", "cand_epoch", "n_ep_det"]].sort_values(
+    smax = U[U.source_id.isin(cand_ids)].groupby("source_id").S_mJy.max().rename("S_max_epoch_mJy")
+    S = S.merge(smax, left_on="source_id", right_index=True, how="left")
+    S["L_coadd"] = C.lum(S.S_coadd_mJy.values, S.dist_pc.values); S["L_max_epoch"] = C.lum(S.S_max_epoch_mJy.values, S.dist_pc.values)
+    S["eligible"] = S.eligible.fillna(False).astype(bool); S["env"] = S.env.fillna(False).astype(bool); S["mult"] = S.mult.fillna(False).astype(bool)
+    # a candidate counts as a possible transmitter at an eligible AFGK star, or at an envelope star (M dwarf, or AFGK star
+    # with multiplicity evidence, outside the excluded classes) whose coadd or brightest epoch exceeds L_ENV; otherwise it is "explained" (not counted)
+    S["env_counted"] = S.env & ((S.L_coadd >= C.L_ENV) | (S.L_max_epoch >= C.L_ENV))
+    S["explained"] = ~(S.eligible | S.env_counted)
+    for t, E in elig_var.items(): S[f"explained_{t}"] = ~(S.source_id.isin(E) | S.env_counted)
+    S[["source_id", "main_id", "dist_pc", "bp_rp", "dMG", "ruwe", "otypes", "multiplicity_evidence", "activity_evidence", "log_lx_lbol", "excl_reason",
+       "mult", "eligible", "env", "env_counted", "explained",
+       "n_ep", "S_coadd_mJy", "L_coadd", "S_max_epoch_mJy", "L_max_epoch", "sigma_coadd_mJy", "snr_coadd", "epoch_snr", "cand_coadd", "cand_epoch", "n_ep_det"]].sort_values(
         ["explained", "snr_coadd"], ascending=[True, False]).to_csv(os.path.join(C.RES, "alleepoch_candidates.csv"), index=False)
     k = int((~S.explained).sum())
     k_host = int(((~S.explained) & S.cand_epoch).sum())
     k_s = int(((~S.explained) & S.cand_coadd).sum()); k_e = int(S.loc[~S.explained, "n_ep_det"].fillna(0).sum())
-    k_s0 = int(((~S.explained_strict) & S.cand_coadd).sum()); k_e0 = int(S.loc[~S.explained_strict, "n_ep_det"].fillna(0).sum())
+    kvar = {t: (int(((~S[f"explained_{t}"]) & S.cand_coadd).sum()), int(S.loc[~S[f"explained_{t}"], "n_ep_det"].fillna(0).sum())) for t in elig_var}
     res = dict(per_tag=per_tag, n_stars_coadd=int(len(CO)), n_star_epochs_trials=int(len(U)),
                ctrl_rate_coadd_per_star=rate_co, ctrl_rate_per_epoch=rate_ep,
                n_candidate_stars=int(len(S)), n_explained=int(S.explained.sum()),
@@ -283,9 +309,12 @@ if __name__ == "__main__":
                k_steady=k_s, b_steady=b_s, mu95_steady=zech_ul(k_s, b_s),
                k_snap=k_e, b_snap=b_e, mu95_snap=zech_ul(k_e, b_e),
                k_unexplained=k, b_expected=b_s, mu95_hidden=zech_ul(k_s, b_s),
-               k_steady_strict=k_s0, mu95_steady_strict=zech_ul(k_s0, b_s_strict), k_snap_strict=k_e0, mu95_snap_strict=zech_ul(k_e0, b_e_strict),
-               b_steady_strict=b_s_strict, b_snap_strict=b_e_strict,
-               n_explained_strict=int(S.explained_strict.sum()),
+               **{f"k_steady_{t}": kvar[t][0] for t in elig_var}, **{f"k_snap_{t}": kvar[t][1] for t in elig_var},
+               **{f"b_steady_{t}": bvar[t][0] for t in elig_var}, **{f"b_snap_{t}": bvar[t][1] for t in elig_var},
+               **{f"mu95_steady_b0_{t}": float(C.poisson_ul95(kvar[t][0])) for t in elig_var},
+               **{f"n_eligible_{t}": int(len(elig_var[t])) for t in elig_var},
+               k_steady_env=int((S.env_counted & S.cand_coadd).sum()), b_steady_env=float(b_s_env), b_snap_env=float(b_e_env),
+               n_eligible=int(ACT.eligible.sum()), n_env=int(ACT.env.sum()), n_presence_active=int(ACT.active.sum()),
                n_active_sample=int(len(active_ids)), f_active_sample=len(active_ids) / int(len(ACT)),
                n_inactive_stars_coadd=n_inact_star, n_inactive_star_epochs=n_inact_ep,
                ctrl_hits_steady=co_hits, ctrl_trials_steady=co_tot, ctrl_hits_snap=ep_hits, ctrl_trials_snap=ep_tot,
