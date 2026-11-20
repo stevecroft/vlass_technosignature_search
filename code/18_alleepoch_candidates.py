@@ -243,17 +243,33 @@ if __name__ == "__main__":
     for t, E in elig_var.items():
         m_ = U.source_id.isin(E).values; h2, t2_, e2, et2 = ctrl_counts(m_)
         bvar[t] = (h2 / t2_ * int(COs.index.isin(E).sum()), e2 / et2 * int(m_.sum()))
-    # envelope stars above L_ENV: control coadd hits (and single-epoch hits) bright enough to exceed L_ENV at the star's distance
+    # envelope stars above L_ENV. The envelope test applies to every envelope star, including the secure (Epoch-1) natural
+    # emitters that the candidate search above leaves out: their later epochs (and coadd) count if they exceed L_ENV.
     dist_ = sv.set_index("source_id").dist_pc
-    lum_e = C.lum(1.0, dist_.reindex(U.source_id.values).values)          # W/Hz per mJy, per star-epoch
-    mm_ = U.source_id.isin(env_ids).values; CT_m = ctrl_tables(mm_)
-    sig_co = CO.sig
-    b_s_env = sum(int(((z >= THR) & (z * sig_co.reindex(z.index).values * C.lum(1.0, dist_.reindex(z.index).values) >= C.L_ENV)).sum())
-                   for z, _, _ in CT_m) / N_CTRL
-    b_e_env = 0.0
+    UD = LT[LT.detected & ~LT.veto & LT.source_id.isin(env_ids)]
+    Uenv = pd.concat([U[U.source_id.isin(env_ids)], UD])
+    lum1 = C.lum(1.0, dist_.reindex(Uenv.source_id.values).values)        # W/Hz per mJy, per star-epoch
+    # background: control hits above L_ENV, per star-epoch (b_e_env), per distinct host (b_h_env; a host counts once per
+    # control angle however many of its epochs are hit) and in the coadd (b_s_env, with the coadd-unit veto)
+    b_s_env = b_e_env = b_h_env = 0.0
     for j in range(N_CTRL):
-        cj_ = U[f"c{j}"].values; ok_ = mm_ & ~U[f"cv{j}"].values.astype(bool) & np.isfinite(cj_)
-        b_e_env += int(((cj_ >= THR) & (cj_ * U.sigma_mJy.values * lum_e >= C.L_ENV) & ok_).sum()) / N_CTRL
+        okj = ~Uenv[f"cv{j}"].values.astype(bool) & np.isfinite(Uenv[f"c{j}"].values)
+        X = Uenv[okj]; cj_ = X[f"c{j}"].values; s_ = X.sigma_mJy.values; sid_ = X.source_id.values
+        hit = (cj_ >= THR) & (cj_ * s_ * lum1[okj] >= C.L_ENV)
+        b_e_env += hit.sum() / N_CTRL; b_h_env += pd.Series(sid_[hit]).nunique() / N_CTRL
+        den = np.sqrt(pd.Series(1 / s_ ** 2).groupby(sid_).sum())
+        zc = pd.Series(cj_ / s_).groupby(sid_).sum() / den
+        cc_ = pd.Series(X[f"cz{j}"].values.astype(float) / s_).groupby(sid_).sum() / den
+        b_s_env += int(((zc >= THR) & (cc_ < VETO_FRAC * THR) & (zc / den * C.lum(1.0, dist_.reindex(zc.index).values) >= C.L_ENV)).sum()) / N_CTRL
+    # stars: secure envelope stars' epochs and coadds above L_ENV (the candidates' own are counted below)
+    LD = C.lum(UD.S_mJy.values, dist_.reindex(UD.source_id.values).values)
+    hitD = (UD.snr.values >= THR) & (LD >= C.L_ENV)
+    k_e_sec, k_h_sec = int(hitD.sum()), int(UD.source_id[hitD].nunique())
+    wD = 1 / UD.sigma_mJy ** 2; SD = (UD.S_mJy * wD).groupby(UD.source_id).sum() / wD.groupby(UD.source_id).sum(); sD = wD.groupby(UD.source_id).sum() ** -0.5
+    k_s_sec = int(((SD / sD >= THR) & (C.lum(SD.values, dist_.reindex(SD.index).values) >= C.L_ENV)).sum())
+    L_max_sec_env = float(LD[UD.snr.values >= THR].max()) if (UD.snr.values >= THR).any() else 0.0
+    # no secure association is at an eligible star (07); if one were, its later epochs would also have to be counted here
+    assert not LT.source_id[LT.detected].isin(set(ACT.source_id[ACT.eligible])).any(), "secure association at an eligible star"
     for tag in LT.tag.unique():
         x = LT[LT.tag == tag]; per_tag[tag] = dict(n_star_epochs=int(len(x)), n_veto=int(x.veto.sum()), n_ge5=int(((x.snr >= THR) & ~x.detected).sum()))
     cand_ids = CO.index[CO.cand].values
@@ -311,10 +327,11 @@ if __name__ == "__main__":
         ["explained", "snr_coadd"], ascending=[True, False]).to_csv(os.path.join(C.RES, "alleepoch_candidates.csv"), index=False)
     k = int((~S.explained).sum())
     k_s, k_e, k_host = _counts(S.eligible)
+    k_s += k_s_sec; k_e += k_e_sec; k_host += k_h_sec
     kvar = {t: _counts(S.source_id.isin(E))[:2] for t, E in elig_var.items()}
     # the reported backgrounds include the envelope stars' control hits above L_ENV (b_*_env; host-level: bounded by
     # the epoch-level value, since a host counts once however many of its epochs are hit)
-    b_s += b_s_env; b_e += b_e_env; b_host += b_e_env; b = b_s
+    b_s += b_s_env; b_e += b_e_env; b_host += b_h_env; b = b_s
     res = dict(per_tag=per_tag, n_stars_coadd=int(len(CO)), n_star_epochs_trials=int(len(U)),
                ctrl_rate_coadd_per_star=rate_co, ctrl_rate_per_epoch=rate_ep,
                n_candidate_stars=int(len(S)), n_explained=int(S.explained.sum()),
@@ -327,7 +344,9 @@ if __name__ == "__main__":
                **{f"b_steady_{t}": bvar[t][0] for t in elig_var}, **{f"b_snap_{t}": bvar[t][1] for t in elig_var},
                **{f"mu95_steady_b0_{t}": float(C.poisson_ul95(kvar[t][0])) for t in elig_var},
                **{f"n_eligible_{t}": int(len(elig_var[t])) for t in elig_var},
-               k_steady_env=int(S.env_steady.sum()), k_snap_env=int(S.n_ep_det_env[S.env].sum()), b_steady_env=float(b_s_env), b_snap_env=float(b_e_env),
+               k_steady_env=int(S.env_steady.sum()) + k_s_sec, k_snap_env=int(S.n_ep_det_env[S.env].sum()) + k_e_sec,
+               n_secure_env_stars=int(UD.source_id.nunique()), n_secure_env_star_epochs=int(len(UD)), L_max_secure_env_epoch=L_max_sec_env,
+               k_steady_secure_env=k_s_sec, k_snap_secure_env=k_e_sec, k_host_secure_env=k_h_sec, b_host_env=float(b_h_env), b_steady_env=float(b_s_env), b_snap_env=float(b_e_env),
                n_eligible=int(ACT.eligible.sum()), n_env=int(ACT.env.sum()), n_presence_active=int(ACT.active.sum()),
                n_active_sample=int(len(active_ids)), f_active_sample=len(active_ids) / int(len(ACT)),
                n_inactive_stars_coadd=n_inact_star, n_inactive_star_epochs=n_inact_ep,
