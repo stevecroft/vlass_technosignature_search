@@ -574,6 +574,15 @@ if __name__ == "__main__":
             put(f"NeffBrat{t}", com(round(nm_(4e5, "Neff_comb")))); put(f"WtenBrat{t}", f"{100 * nm_(4e5, 'wfrac_within10pc'):.0f}")
             md = s.set_index("L_WHz").f95_median
             put(f"FMedSix{t}", f"{md.get(1e6, np.nan):.2f}"); put(f"FMedSeven{t}", f"{md.get(1e7, np.nan):.3f}"); put(f"FMedNine{t}", f"{md.get(1e9, np.nan):.3f}")
+            # luminosity above which the individual limit (no background subtracted) beats the mean stack (log interpolation)
+            _PI = pd.read_csv(os.path.join(RES, "alleepoch_population_limits.csv"))
+            _gi = np.interp(np.log10(s.L_WHz), np.log10(_PI.L_WHz), np.log10(_PI.f95_b0))
+            _d = np.log10(s.f95_mean.values) - _gi; _ok = np.isfinite(_d)
+            _Lg, _d = np.log10(s.L_WHz.values)[_ok], _d[_ok]
+            _j = int(np.argmax(_d > 0)); assert _j > 0 and _d[_j - 1] <= 0 and (_d[_j:] > 0).all(), "stack/individual crossing not unique"
+            _Lx = 10 ** (_Lg[_j - 1] + (_Lg[_j] - _Lg[_j - 1]) * (-_d[_j - 1]) / (_d[_j] - _d[_j - 1]))
+            put(f"StackCross{t}", sci(_Lx, 1))
+            assert md.get(1e7) > 10 ** float(np.interp(7.0, np.log10(_PI.L_WHz), np.log10(_PI.f95_b0))), "median stack beats individual limit at 1e7"
         reach = [_cross(SLm[SLm.cls == t].reset_index(drop=True)) for t in ["AFGK"]]
         for t in ["AFGK", "M"]:   # nearest shell alone, for comparison with Table 5 (not used for the limits)
             r0 = SA[(SA.cls == t) & (SA.dmin == 0)].iloc[0]; put(f"NearShell{t}", sci(max(r0.meanL, 0) + 1.645 * r0.meanL_err, 1))
