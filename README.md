@@ -37,6 +37,7 @@ python 13_transmitter_rate.py      # needs 19; literature points need external/s
 python 21_epoch_catalog_crosscheck.py --offline   # cross-check against per-epoch QL/SE/median-stack catalogues (~1 min)
 python 22_cutout_astrometry.py     # needs 21 and the image headers cached by 14; per-epoch positions and co-motion tests (~3 min)
 python 23_cosmos_flux_scale.py     # needs 17; sub-threshold flux scale on VLA-COSMOS 3 GHz sources (CADC cutouts; per-image results cached)
+python 24_tyc3573_field.py        # needs 18, 21; SIMBAD/NVSS/Gaia cone searches at the radio position offset from TYC 3573-1391-1 (cached)
 cd ../paper && python make_paper_inputs.py && sh build.sh   # macros, tables and figures for the manuscript, then the PDF
 ```
 

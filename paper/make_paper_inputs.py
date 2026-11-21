@@ -452,6 +452,13 @@ if __name__ == "__main__":
         put("NCandActEv", str(len(_ex))); put("NCandNoActEv", str(int((_CA.activity_evidence.fillna("") == "").sum())))
         put("PSteadyHigh", f"{_po.sf(cj['k_steady'] - 1, cj['b_steady']):.2f}")
         put("TycSNR", f"{_CA.set_index('source_id').snr_coadd[2071061615589030400]:.1f}")
+        _tf = json.load(open(os.path.join(DER, "tyc3573_field.json")))   # 24: positional context of the offset emission
+        put("TycFieldSimR", f"{_tf['simbad_radius_arcsec'] / 60:.0f}"); put("TycFieldSimN", str(_tf["simbad_n_other"]))
+        put("TycFieldSimNear", f"{_tf['simbad_nearest_other_arcsec']:.0f}"); put("TycFieldGaiaNear", f"{_tf['gaia_nearest_other_arcsec']:.1f}")
+        put("TycNvssName", _tf["nvss_name"].replace("+", "$+$")); put("TycNvssSep", f"{_tf['nvss_sep_arcsec']:.0f}")
+        put("TycNvssS", f"{_tf['nvss_S_mJy']:.1f}"); put("TycNvssES", f"{_tf['nvss_eS_mJy']:.1f}")
+        put("TycNvssSig", f"{_tf['nvss_offset_sigma']:.1f}"); put("TycProjAU", f"{round(_tf['proj_sep_au'], -1):.0f}")
+        put("TycFieldB", f"{_tf['radio_b']:.0f}"); put("TycG", f"{_tf['star_G']:.0f}")
         put("NEligSteady", com(sm["Neff_elig_max"]))
         _ev = _ex.activity_evidence.fillna("").str.split("; "); _tc = _ev.explode().value_counts()
         _xc = _ev.apply(lambda L: "X-ray" in L)

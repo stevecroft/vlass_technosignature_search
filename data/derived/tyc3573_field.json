@@ -1,0 +1,29 @@
+{
+ "radio_ra": 307.4181001405399,
+ "radio_dec": 46.00899829316949,
+ "radio_l": 83.6364916100374,
+ "radio_b": 4.079720197206555,
+ "n_catalog_positions": 5,
+ "position_scatter_arcsec": [
+  0.22,
+  0.379,
+  0.222,
+  0.193,
+  0.193
+ ],
+ "mean_epoch": 2022.0847077841602,
+ "sep_star_arcsec": 1.7921081399629784,
+ "proj_sep_au": 167.52503106560442,
+ "simbad_radius_arcsec": 60.0,
+ "simbad_n_other": 2,
+ "simbad_nearest_other_arcsec": 25.719872362949882,
+ "simbad_nearest_other": "Gaia DR3 2071061615589030272",
+ "gaia_nearest_other_arcsec": 6.492,
+ "gaia_star_arcsec": 1.621,
+ "star_G": 11.057912826538086,
+ "nvss_name": "NVSS J202939+460047",
+ "nvss_sep_arcsec": 17.41,
+ "nvss_S_mJy": 2.5,
+ "nvss_eS_mJy": 0.5,
+ "nvss_offset_sigma": 2.553221985678382
+}
