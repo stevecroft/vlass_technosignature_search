@@ -395,20 +395,36 @@ if __name__ == "__main__":
         _Lb2 = 3.828e33 * 10 ** (-0.4 * (_X.phot_g_mean_mag.values - 5 * np.log10(_X.dist_pc.values / 10) - 4.67))
         _rmin = np.log10(np.where(_era, 5e-14, 2e-13) * 4 * np.pi * (_X.dist_pc.values * 3.0857e18) ** 2 / _Lb2)
         _hotX = (_X.log_lx_lbol >= -4.0).fillna(False).values
-        _below = ~_hotX & (_X.log_lx_lbol.notna().values | (_rmin <= -4.0)); _unc = ~_hotX & ~_below
+        _meas = ~_hotX & _X.log_lx_lbol.notna().values                          # counterpart, measured below the threshold
+        _depth = ~_hotX & _X.log_lx_lbol.isna().values & (_rmin <= -4.0)       # no counterpart; nominal depth reaches it
+        _below = _meas | _depth; _unc = ~_hotX & ~_below
         _rows = []
         for _lo, _hi in [(0, 10), (10, 20), (20, 40), (40, 60), (60, 80), (80, 100)]:
             _m = ((_X.dist_pc >= _lo) & (_X.dist_pc < _hi)).values
-            _rows.append(f"{_lo}--{_hi} & {com(_m.sum())} & {com((_m & _hotX).sum())} & {com((_m & _below).sum())} & {com((_m & _unc).sum())} & {100 * (_m & _unc).sum() / _m.sum():.0f} \\\\")
+            _rows.append(f"{_lo}--{_hi} & {com(_m.sum())} & {com((_m & _hotX).sum())} & {com((_m & _meas).sum())} & {com((_m & _depth).sum())} & {com((_m & _unc).sum())} & {100 * (_m & _unc).sum() / _m.sum():.0f} \\\\")
+        # ROSAT count-to-flux conversion: the adopted 6e-12 is the Schmitt et al. (1995) coronal factor (8.31 + 5.30 HR1)e-12
+        # at HR1 = -0.44; harder coronae would raise L_X. Eligible stars whose L_X rests on 2RXS alone that would cross -4.
+        _AA = pd.read_parquet(os.path.join(DER, "activity_all.parquet"), columns=["source_id", "rxs_r", "era_r", "log_lx_lbol", "eligible"])
+        _ro = _AA.eligible & _AA.rxs_r.notna() & _AA.era_r.isna()
+        put("EcfHR", f"{(6.0 - 8.31) / 5.30:.2f}"); put("NEligRxsOnly", com(int(_ro.sum())))
+        for _hr, _k in [(0.0, "Zero"), (0.3, "Hard")]:
+            put(f"NEcf{_k}", com(int((_ro & (_AA.log_lx_lbol >= -4.0 - np.log10((8.31 + 5.30 * _hr) / 6.0))).sum())))
+        _CAx = pd.read_csv(os.path.join(RES, "alleepoch_candidates.csv"))
+        assert not (_ro & (_AA.log_lx_lbol >= -4.0 - np.log10((8.31 + 5.30 * 0.3) / 6.0)) & _AA.source_id.isin(
+            _CAx.source_id[_CAx.eligible & (_CAx.cand_coadd | _CAx.cand_epoch)])).any(), "a counted detection would cross the X-ray threshold"
+        _rc = pd.read_parquet(os.path.join(RAW, "xray_2rxs_flux.parquet"), columns=["count_rate"]).count_rate
+        put("RxsDepthCR", f"{2e-13 / 6e-12:.3f}"); put("RxsMedCR", f"{_rc.median():.3f}")
+        _fe = pd.read_parquet(os.path.join(RAW, "xray_erass1_flux.parquet"), columns=["b1_flux"]).b1_flux
+        put("EraMedFlux", sci(_fe.median(), 1))
         put("PctXUnc", f"{100 * _unc.mean():.0f}"); put("PctXUncHundred", f"{100 * (_unc & (_X.dist_pc >= 80).values).sum() / (_X.dist_pc >= 80).sum():.0f}")
-        open(os.path.join(HERE, "tables", "xray_depth.tex"), "w").write(r"""\begin{deluxetable}{lrrrrr}
+        open(os.path.join(HERE, "tables", "xray_depth.tex"), "w").write(r"""\begin{deluxetable}{lrrrrrr}
 \tablecaption{X-ray constraints on the activity level of the AFGK stars outside the known radio-emitter classes.\label{tab:xray}}
-\tablehead{\colhead{Shell} & \colhead{$N$} & \colhead{$\ge-4$} & \colhead{$<-4$} & \colhead{Unconstrained} & \colhead{Unc.} \\
-\colhead{(pc)} & \colhead{} & \colhead{} & \colhead{} & \colhead{} & \colhead{(\%)}}
+\tablehead{\colhead{Shell} & \colhead{$N$} & \colhead{Measured} & \colhead{Measured} & \colhead{Depth} & \colhead{Unconstrained} & \colhead{Unc.} \\
+\colhead{(pc)} & \colhead{} & \colhead{$\ge-4$} & \colhead{$<-4$} & \colhead{reaches $-4$} & \colhead{} & \colhead{(\%)}}
 \startdata
 """ + "\n".join(_rows) + r"""
 \enddata
-\tablecomments{Columns give the number of stars with measured $\log L_X/L_{\rm bol}\ge-4$ (excluded), below the threshold at the adopted survey depth (an X-ray counterpart below it, or no counterpart where the nominal survey limit corresponds to $\log L_X/L_{\rm bol}\le-4$), and unconstrained (no counterpart, and a survey limit above the threshold). Survey limits are approximated as $5\times10^{-14}$\,erg\,cm$^{-2}$\,s$^{-1}$ in the eRASS1 half of the sky and $2\times10^{-13}$ (2RXS) elsewhere, with $L_{\rm bol}$ from $M_G$. Unconstrained stars are treated as eligible, so an active star among them would be counted in $k$.}
+\tablecomments{Columns give the number of stars with a measured $\log L_X/L_{\rm bol}\ge-4$ (excluded) or $<-4$ (an X-ray counterpart below the threshold), with no counterpart where the nominal survey depth reaches the threshold, and with no counterpart where it does not (unconstrained). Nominal depths are $5\times10^{-14}$\,erg\,cm$^{-2}$\,s$^{-1}$ in the eRASS1 half of the sky (the hemisphere-median 0.5--2\,keV flux at 50\% completeness; \citealt{Merloni2024}), compared without a band correction with the 0.2--2.3\,keV fluxes, and $2\times10^{-13}$\,erg\,cm$^{-2}$\,s$^{-1}$ (0.1--2.4\,keV; 2RXS) elsewhere; survey exposure varies across the sky, so the depth columns are approximate. $L_{\rm bol}$ is from $M_G$. Only measured activity excludes a star: stars in the last three columns are eligible, so an active star among them would be counted in $k$.}
 \end{deluxetable}
 """)
         # RUWE of the brightest stars: fraction of AFGK stars outside the classes with RUWE > 1.4, G < 6 vs 6-13
