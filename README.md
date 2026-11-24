@@ -48,7 +48,7 @@ Re-fetching from the archives (only needed to rebuild `data/raw`):
 later epochs use `--epochs 2.1,2.2 --tag ep2`, `3.1,3.2 --tag ep3`, `4.1 --tag ep4`).
 
 Run order for a full rebuild: 01 → 02 → 02b → 03 → 03b → 03d → 04 → 04b → 05 → 06 → 07 → 08 → 08b → 09 (ep1–ep4) → 10 → 11 → 14 → 15 → 16 →
-17 → 03c → 18 → 14 --candidates → 19 → 20 → 12 → 13 → 21 → 22 → 23 → paper/make_paper_inputs.py.
+17 → 03c → 18 → 14 --candidates → 19 → 20 → 12 → 13 → 21 → 22 → 23 → 24 → paper/make_paper_inputs.py.
 `21_epoch_catalog_crosscheck.py --reduce` rebuilds its reduced catalogue from the full NRAO lists (see `data/raw` below);
 `02b_e1_astrometry.py` re-derives the Epoch-1 position corrections, `vlass_e1ql_position_offsets.csv` (applied by `common.e1_components`),
 from the Epoch-1 catalogue and the full QL3.1/3.2 lists in `data/raw/ql_catalogs_full/`.
@@ -58,7 +58,7 @@ from the Epoch-1 catalogue and the full QL3.1/3.2 lists in `data/raw/ql_catalogs
 | Path | Contents |
 |---|---|
 | `code/common.py` | Paths, constants (per-half-epoch QL peak/integrated biases from Kimball et al. 2026: 0.85/0.90 for epoch 1.1, 0.92/1.00 later; BP−RP split 1.84, shells, service URLs), shared helpers. Also redirects astropy's config directory into the project. |
-| `code/01–23_*.py` | Pipeline scripts. Each docstring lists its inputs, outputs and expected values. |
+| `code/01–24_*.py` | Pipeline scripts. Each docstring lists its inputs, outputs and expected values. |
 | `data/raw/` | Data exactly as fetched (see below). |
 | `data/derived/` | Intermediate tables written by the scripts (sample, star–component pairs, offset pairs, reliability fit, stacked images, LSPM astrometry JSON, all-epoch forced photometry). `ms_sample_vlass.parquet` (40 MB) is not tracked: script 03 regenerates it bit-for-bit in about a minute. |
 | `results/` | Figures (PNG and vector PDF) and tables. |
@@ -68,9 +68,9 @@ from the Epoch-1 catalogue and the full QL3.1/3.2 lists in `data/raw/ql_catalogs
 
 | File | Purpose |
 |---|---|
-| `ms.tex` | Manuscript for *The Astronomical Journal*. Every number in the text comes from macros in `numbers.tex`; tables are `\input` from `tables/`. The Zenodo DOI is marked `TODO`. |
-| `make_paper_inputs.py` | Regenerates `numbers.tex` (~600 macros), `tables/*.tex` (seven tables) and `figures/` from `results/` and `data/derived/`. Run after any pipeline change. |
-| `build_bib.py` | Builds `refs.bib` from DOIs via CrossRef (74 entries) plus 7 manual arXiv/ASCL/journal entries. Output is pure ASCII: BibTeX is byte-oriented and splits multi-byte UTF-8 initials such as "Ž". It also restores corporate authors (Gaia/Astropy Collaboration), maps journals to AAS abbreviations and drops month fields. `--fix-only` re-cleans an existing file offline. |
+| `ms.tex` | Manuscript for *The Astronomical Journal*. Every number in the text comes from macros in `numbers.tex`; tables are `\input` from `tables/`. |
+| `make_paper_inputs.py` | Regenerates `numbers.tex` (~720 macros), `tables/*.tex` (eight tables) and `figures/` from `results/` and `data/derived/`. Run after any pipeline change. |
+| `build_bib.py` | Builds `refs.bib` from DOIs via CrossRef (81 entries) plus 9 manual arXiv/ASCL/journal entries. Output is pure ASCII: BibTeX is byte-oriented and splits multi-byte UTF-8 initials such as "Ž". It also restores corporate authors (Gaia/Astropy Collaboration), maps journals to AAS abbreviations and drops month fields. `--fix-only` re-cleans an existing file offline. |
 | `aastex702.cls`, `aasjournalv7.1.bst` | Official AASTeX v7.0.2 files (unmodified; full distribution in `aastex_v702_dist/`). |
 | `aasjournalv7.1_patched.bst` | Copy of the AAS style with a single fix: the original leaves `next.extra = "b"` after the forward pass, which gives the last presorted reference a spurious "a" year suffix (e.g. "Ivezić et al. 2002a"). `ms.tex` uses this copy. |
 | `build.sh` | Local build (pdflatex → bibtex → pdflatex ×2). Overleaf does the same automatically. |
@@ -86,8 +86,8 @@ from the Epoch-1 catalogue and the full QL3.1/3.2 lists in `data/raw/ql_catalogs
 
 Every tracked file is kept below ~30 MB. Overleaf's GitHub sync rejects files over 50 MB and, through GitHub's blob API, fails above ~40 MiB.
 
-GitHub limits files to 100 MB, so two inputs are attached to the repository's GitHub release (tag `v1.0-data`)
-instead of being committed. After cloning, download them into `data/raw/` and check them with
+GitHub limits files to 100 MB, so the five large inputs below are attached to the repository's GitHub release (tag `v1.0-data`)
+and deposited at Zenodo instead of being committed. After cloning, download them into `data/raw/` and check them with
 `shasum -a 256 -c MANIFEST.sha256`:
 
 | File | Size | Rebuild from the archives with |
@@ -157,13 +157,15 @@ component parquet holds exactly the same data.
 - **Technosignature eligibility (04b; replaces the earlier exclusion of every star with activity evidence, which removed
   73% of the stars within 10 pc but 9% at 80–100 pc):** a detection counts as a possible transmitter
   - at any luminosity at the 32,985 *eligible* stars: AFGK (BP−RP < 1.84), not a SIMBAD CV/RS CVn/young/magnetic CP star or a Gaia DR3
-    eclipsing binary (133 in the sample), log L_X/L_bol < −4 (eRASS1 flux, else 2RXS count rate × 6e-12; L_bol from M_G), and no Gaia
+    eclipsing binary (133 in the sample), log L_X/L_bol < −4 (eRASS1 flux, else 2RXS count rate × 6e-12, the Schmitt et al. 1995 coronal factor for HR1 = −0.44; L_bol from M_G), and no Gaia
     multiplicity evidence (RUWE > 1.4, NSS solution, ΔM_G < −0.5);
   - only above L_env = 10¹⁰ W Hz⁻¹ at the 174,955 *envelope* stars: 161,290 M dwarfs and 13,665 AFGK stars with multiplicity evidence
-    (above the DG CVn superflare, 4.5×10⁹ W Hz⁻¹, Fender et al. 2015, and every stellar detection in VLASS, max 4.5×10⁹);
+    (above the luminous 15 GHz incoherent flare of DG CVn, 4.5×10⁹ W Hz⁻¹, Fender et al. 2015, and every M-dwarf detection in VLASS,
+    max 4.5×10⁹, a single 6.3σ measurement; the most luminous stellar detection of any type, 5.9×10⁹, is the CV AE Aqr, an excluded class);
   - never at the 2,251 stars of the excluded classes or with log L_X/L_bol ≥ −4.
   Under the presence rule only 5 of 44 AFGK stars within 10 pc were eligible (11%, vs 82% at 80–100 pc); now 64% vs 67%.
-  The X-ray constraint is complete within 20 pc; 44% of AFGK stars at 80–100 pc are unconstrained (paper Table, tables/xray_depth.tex).
+  Within 20 pc every AFGK star's activity is measured or within the nominal X-ray survey depth; 44% of AFGK stars at 80–100 pc
+  are unconstrained (paper Table 1, tables/xray_depth.tex). Only measured activity excludes a star.
   Presence of activity evidence is kept only for the astrophysical stack split. Uncatalogued multiples remain eligible and are counted in k
   (conservative).
 - **Forced detections** (the paper's term; scripts and files still say 'candidates'): 161 stars at ≥ 5σ (coadd or any epoch),
@@ -239,6 +241,21 @@ component parquet holds exactly the same data.
   - All-epoch mean-stack limits (19): for each L_T only stars where the transmitter would have expected coadd S/N ≤ 3 are
     stacked, and the limits are approximate limits for transmitters of a common luminosity L_T.
   - M-dwarf stack limits are conservative because natural emission is present.
+
+## License
+
+- **Code** (`code/`, `paper/*.py`, `paper/build.sh`): BSD 3-Clause License, see `LICENSE`.
+- **Derived data and results** (`data/derived/`, `results/`): CC BY 4.0.
+- **Manuscript** (`paper/ms.tex`, `numbers.tex`, `tables/`, `figures/`, `ms.pdf`): not covered by the licenses above; copyright
+  remains with the author. The paper is distributed by arXiv under its non-exclusive license and, on publication in AJ, under CC BY 4.0.
+- **Third-party files:** the AASTeX class and style files (`paper/aastex702.cls`, `paper/aasjournalv7.1*.bst`, `paper/aastex_v702_dist/`)
+  are the AAS's and carry their own terms; `data/raw/` holds copies of public archive data, subject to the archives' terms and
+  acknowledgment requests (see below).
+
+## Citation
+
+If you use this code or data, please cite the paper (S. Croft, submitted to AJ) and the Zenodo record,
+doi:[10.5281/zenodo.24326437](https://doi.org/10.5281/zenodo.24326437).
 
 ## Citation of data
 
