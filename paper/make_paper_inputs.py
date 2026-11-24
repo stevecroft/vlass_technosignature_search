@@ -872,8 +872,9 @@ if __name__ == "__main__":
         put("XcUnionPe", f"{_pp[('union', 'snap')]:.2f}")
         put("XcOwnAdded", str(len(V["own_epoch"]["added_vs_adopted"]))); put("XcOwnAddedUnexpl", str(len(V["own_epoch"]["added_unexplained"])))
         put("XcOwnNotEOne", str(X["star_epochs_veto"]["own_not_E1"]))
-        put("XcMuSnapChange", f"{100 * (V['union']['mu95_snap'] / V['adopted_E1']['mu95_snap'] - 1):+.0f}")
-        put("XcMuSteadyChange", f"{100 * (V['union']['mu95_steady'] / V['adopted_E1']['mu95_steady'] - 1):+.0f}")
+        _pct = lambda x: "{<}1" if abs(x) < 0.5 else f"{x:+.0f}"    # avoid printing "-0" or "+0" for a negligible change
+        put("XcMuSnapChange", _pct(100 * (V['union']['mu95_snap'] / V['adopted_E1']['mu95_snap'] - 1)))
+        put("XcMuSteadyChange", _pct(100 * (V['union']['mu95_steady'] / V['adopted_E1']['mu95_steady'] - 1)))
         co = X["catalogue_only"]; put("XcCatOnlyN", str(co["n_stars_any"])); put("XcCatOnlyMulti", str(co["n_stars_ge2_epochs"]))
         M = X["medstack"]; put("XcMedN", com(M["n_stars_tested"])); put("XcMedDet", str(M["n_det"]))
         for s in ["secure", "explained", "unexplained", "catonly", "none"]:
