@@ -61,6 +61,12 @@ def finalize(text):
     # Science record: CrossRef appends the abstract-style subtitle to the title
     text = text.replace("title={{Eavesdropping: The Radio Signature of the Earth: Television leakage from the earth allows detection of our civilization at interstellar distances.}}",
                         "title={{Eavesdropping: The Radio Signature of the Earth}}")
+    # AJ 139, 96 is the 2010 volume (CrossRef gives the 2009 online date) and its title is in capitals
+    text = re.sub(r"(@article\{Lazio2010,[^\n]*?)year=\{2009\}", r"\1year={2010}", text)
+    text = text.replace("title={{A BLIND SEARCH FOR MAGNETOSPHERIC EMISSIONS FROM PLANETARY COMPANIONS TO NEARBY SOLAR-TYPE STARS}}",
+                        "title={{A Blind Search for Magnetospheric Emissions from Planetary Companions to Nearby Solar-type Stars}}")
+    # ApJ 926, 228: CrossRef splits T. Joseph W. Lazio as given name W., family Lazio, T. Joseph
+    text = text.replace("Johns-Krull, Christopher and W. Lazio, T. Joseph}", "Johns-Krull, Christopher and Lazio, T. Joseph W.}")
     # MNRAS Letters 446, L66 is the 2015 issue; CrossRef gives the 2014 online date
     text = re.sub(r"(@article\{Fender2015,[^\n]*?)year=\{2014\}", r"\1year={2015}", text)
     # ApJ 2016 record: CrossRef gives the title in capitals
@@ -85,6 +91,9 @@ DOIS = {
     "Mowlavi2023": "10.1051/0004-6361/202245330",
     "Osten2016": "10.3847/0004-637X/832/2/174",
     "Schmitt1995": "10.1086/176149",
+    "Lazio2010": "10.1088/0004-6256/139/1/96",
+    "Ling2022": "10.3847/1538-4357/ac4514",
+    "Rahman2025": "10.3847/1538-4357/ad9f37",
     "Garrett2026": "10.1093/mnras/stag991", "Saide2023": "10.1093/mnras/stad378",
     "Zuckerman2026": "10.3847/1538-4357/ae4c38", "Matthews2025": "10.1088/1538-3873/ae1661",
     "Davis2026": "10.3847/1538-4357/ae4a22", "Pritchard2024": "10.1093/mnras/stae127",
@@ -110,6 +119,11 @@ DOIS = {
     "Kimball2026": "10.1117/12.3105474",
 }
 MANUAL = r"""
+@ARTICLE{Rao2026,
+  author = {{Rao}, S.~S. and {Sivakoff}, G.~R. and {Heinke}, C.~O. and others},
+  title = "{Systematic Search for Cataclysmic Variables in Radio Surveys: First Radio Detection of IX Velorum}",
+  journal = {arXiv e-prints}, year = 2026, eid = {arXiv:2611.07448},
+  eprint = {2611.07448}, archivePrefix = {arXiv}, primaryClass = {astro-ph.SR}}
 @article{Kardashev1964, author={{Kardashev}, N. S.}, title={{Transmission of Information by Extraterrestrial Civilizations}}, journal={Soviet Astronomy}, year={1964}, volume={8}, pages={217}, adsurl={https://ui.adsabs.harvard.edu/abs/1964SvA.....8..217K}}
 
 @ARTICLE{Chambers2016,

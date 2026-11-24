@@ -593,6 +593,13 @@ Lacy, M., Baum, S.~A., Chandler, C.~J., {et~al.} 2020, \bibinfo{title}{{The
   Design},} \pasp, 132, 035001, \dodoi{10.1088/1538-3873/ab63eb}
 
 % type= article
+\bibitem[{T.~J.~W. Lazio {et~al.}(2010)Lazio, Carmichael, Clark, Elkins,
+  Gudmundsen, Mott, Szwajkowski, \& Hennig}]{Lazio2010}
+Lazio, T. J.~W., Carmichael, S., Clark, J., {et~al.} 2010, \bibinfo{title}{{A
+  Blind Search for Magnetospheric Emissions from Planetary Companions to Nearby
+  Solar-type Stars},} \aj, 139, 96, \dodoi{10.1088/0004-6256/139/1/96}
+
+% type= article
 \bibitem[{J. Lehtinen {et~al.}(2012)Lehtinen, Jetsu, Hackman, Kajatkari, \&
   Henry}]{Lehtinen2012}
 Lehtinen, J., Jetsu, L., Hackman, T., Kajatkari, P., \& Henry, G.~W. 2012,
@@ -618,6 +625,13 @@ Lehtinen, J., Jetsu, L., Hackman, T., Kajatkari, P., \& Henry, G.~W. 2012,
 Lindegren, L., Klioner, S.~A., Hern{\'a}ndez, J., {et~al.} 2021,
   \bibinfo{title}{{Gaia Early Data Release 3: The astrometric solution},} \aap,
   649, A2, \dodoi{10.1051/0004-6361/202039709}
+
+% type= article
+\bibitem[{J. Ling {et~al.}(2022)Ling, Isella, Johns-Krull, \& Lazio}]{Ling2022}
+Ling, J., Isella, A., Johns-Krull, C., \& Lazio, T. J.~W. 2022,
+  \bibinfo{title}{{Searching for Stellar and Planetary Emission in Large
+  Field-of-view Radio Sky Surveys},} \apj, 926, 228,
+  \dodoi{10.3847/1538-4357/ac4514}
 
 % type= article
 \bibitem[{A. Loeb {\&} M. Zaldarriaga(2007)Loeb \&
@@ -748,6 +762,22 @@ Price, D.~C., Enriquez, J.~E., Brzycki, B., {et~al.} 2020, \bibinfo{title}{{The
 Pritchard, J., Murphy, T., Heald, G., {et~al.} 2024,
   \bibinfo{title}{{Multi-epoch sampling of the radio star population with the
   Australian SKA Pathfinder},} \mnras, 529, 1258, \dodoi{10.1093/mnras/stae127}
+
+% type= article
+\bibitem[{R.~A. Rahman {et~al.}(2025)Rahman, Lovell, Koch, Wilner, Andrews,
+  Monsch, \& Ha}]{Rahman2025}
+Rahman, R.~A., Lovell, J.~B., Koch, E.~W., {et~al.} 2025, \bibinfo{title}{{The
+  Radiowave Hunt for Young Stellar Object Emission and Demographics
+  (RADIOHEAD): A Radio Luminosity--Spectral Type Dependence in Taurus--Auriga
+  YSOs},} \apj, 981, 68, \dodoi{10.3847/1538-4357/ad9f37}
+
+% type= article
+\bibitem[{S.~S. {Rao} {et~al.}(2026){Rao}, {Sivakoff}, {Heinke},
+  {et~al.}}]{Rao2026}
+{Rao}, S.~S., {Sivakoff}, G.~R., {Heinke}, C.~O., {et~al.} 2026,
+  \bibinfo{title}{{Systematic Search for Cataclysmic Variables in Radio
+  Surveys: First Radio Detection of IX Velorum},} arXiv e-prints.
+\newblock \doarXiv{2611.07448}
 
 % type= article
 \bibitem[{R.~C. Saide {et~al.}(2023)Saide, Garrett, \&
