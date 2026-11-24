@@ -5,8 +5,7 @@ and population limits on 2–4 GHz emission, the LSPM J1943+5337 follow-up, and 
 (208,573 Epoch-1 cutouts; usable forced photometry in at least one epoch for 208,232 stars).
 Built November 2026; every script was re-run end to end from this folder to verify the numbers below.
 
-Archived at Zenodo, doi:[10.5281/zenodo.24326437](https://doi.org/10.5281/zenodo.24326437) (reserved; the record is
-published when the paper is accepted). The Zenodo record also holds the large inputs from the `v1.0-data` release.
+Archived at Zenodo, doi:[10.5281/zenodo.24326437](https://doi.org/10.5281/zenodo.24326437). The Zenodo record also holds the large inputs from the `v1.0-data` release.
 
 ## Quick start
 
