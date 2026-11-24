@@ -119,6 +119,12 @@ DOIS = {
     "Kimball2026": "10.1117/12.3105474",
 }
 MANUAL = r"""
+@ARTICLE{GarrettIono2026,
+  author = {Garrett, Michael A.},
+  title = "{The Ionospheric Cut-off as a Potential Radio Technosignature}",
+  journal = {arXiv e-prints}, year = 2026, eid = {arXiv:2611.26025},
+  eprint = {2611.26025}, archivePrefix = {arXiv}, primaryClass = {astro-ph.EP},
+  adsurl = {https://ui.adsabs.harvard.edu/abs/2026arXiv261126025G}}
 @ARTICLE{Rao2026,
   author = {{Rao}, S.~S. and {Sivakoff}, G.~R. and {Heinke}, C.~O. and others},
   title = "{Systematic Search for Cataclysmic Variables in Radio Surveys: First Radio Detection of IX Velorum}",

@@ -438,10 +438,16 @@ Garrett, M.~A. 2015, \bibinfo{title}{{Application of the mid-IR radio
   civilisations},} \aap, 581, L5, \dodoi{10.1051/0004-6361/201526687}
 
 % type= article
-\bibitem[{M.~A. Garrett(2026)Garrett}]{Garrett2026}
-Garrett, M.~A. 2026, \bibinfo{title}{{Isolating broad-band radio
+\bibitem[{M.~A. Garrett(2026{\natexlab{a}})Garrett}]{Garrett2026}
+Garrett, M.~A. 2026{\natexlab{a}}, \bibinfo{title}{{Isolating broad-band radio
   technosignatures (BRaTs): a framework for detecting planetary-scale
   leakage},} \mnras, 549, stag991, \dodoi{10.1093/mnras/stag991}
+
+% type= article
+\bibitem[{M.~A. Garrett(2026{\natexlab{b}})Garrett}]{GarrettIono2026}
+Garrett, M.~A. 2026{\natexlab{b}}, \bibinfo{title}{{The Ionospheric Cut-off as
+  a Potential Radio Technosignature},} arXiv e-prints.
+\newblock \doarXiv{2611.26025}
 
 % type= article
 \bibitem[{M.~A. Garrett {\&} A.~P.~V. Siemion(2023)Garrett \&
